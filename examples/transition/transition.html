@@ -1,0 +1,128 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../polymaps.js"></script>
+    <style type="text/css">
+
+body {
+  margin: 0;
+  background: #E5E0D9;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+path {
+  fill: #CCC6C2;
+  stroke: #fff;
+  stroke-width: .25px;
+  shape-rendering: crispEdges;
+}
+
+#copy {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  width: 33%;
+  padding-left: 5px;
+  font: 9px sans-serif;
+  color: #fff;
+  cursor: default;
+}
+
+#copy a {
+  color: #fff;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var po = org.polymaps;
+
+var map = po.map()
+    .container(document.body.appendChild(po.svg("svg")));
+
+map.add(po.image()
+    .url(po.url("http://{S}tile.cloudmade.com"
+    + "/1a914755a77758e49e19a26e799268b7/998"
+    + "/256/{Z}/{X}/{Y}.png")
+    .hosts(["a.", "b.", "c.", ""])));
+
+var timer, duration = 500, x, y;
+
+function reflect(f) {
+  return function(t) {
+    return .5 * (t < .5 ? f(2 * t) : (2 - f(2 - 2 * t)));
+  };
+}
+
+function poly(e) {
+  return function(t) {
+    return t < 0 ? 0 : t > 1 ? 1 : Math.pow(t, e);
+  };
+}
+
+var ease = reflect(poly(3)); // cubic-in-out
+
+window.addEventListener("mousedown", function(e) {
+  if (timer) clearInterval(timer);
+  var start = Date.now(),
+      end = start + duration,
+      g = document.getElementsByTagName("g")[0];
+
+  x = e.clientX;
+  y = e.clientY;
+
+  timer = setInterval(function() {
+    var t = (Date.now() - start) / (end - start);
+
+    if (t >= 1) {
+      t = 1;
+      clearInterval(timer);
+      timer = null;
+    }
+
+    g.setAttribute("transform",
+        "translate(" + x + "," + y + ")"
+        + "scale(" + (3 * ease(t) + 1) + ")"
+        + "translate(" + -x + "," + -y + ")");
+
+  }, 24);
+}, false);
+
+window.addEventListener("mouseup", function(e) {
+  if (timer) clearInterval(timer);
+  var start = Date.now(),
+      end = start + duration,
+      g = document.getElementsByTagName("g")[0];
+
+  timer = setInterval(function() {
+    var t = (Date.now() - start) / (end - start);
+
+    if (t >= 1) {
+      t = 1;
+      clearInterval(timer);
+      timer = null;
+    }
+
+    t = 1 - ease(t);
+    g.setAttribute("transform",
+        "translate(" + x + "," + y + ")"
+        + "scale(" + (3 * t + 1) + ")"
+        + "translate(" + -x + "," + -y + ")");
+
+  }, 24);
+}, false);
+
+    </script>
+    <div id="copy">
+      &copy; 2010
+      <a href="http://www.cloudmade.com/">CloudMade</a>,
+      <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors,
+      <a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a>.
+    </div>
+  </body>
+</html>

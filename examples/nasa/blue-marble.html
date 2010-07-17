@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../polymaps.js"></script>
+    <style type="text/css">
+
+body {
+  margin: 0;
+  background: #012;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+#copy {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  padding-left: 5px;
+  font: 9px sans-serif;
+  color: #fff;
+  cursor: default;
+}
+
+#copy a {
+  color: #fff;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var po = org.polymaps;
+
+var map = po.map()
+    .container(document.body.appendChild(po.svg("svg")))
+    .zoomRange([0, 9])
+    .add(po.image().url("http://s3.amazonaws.com/com.modestmaps.bluemarble/{Z}-r{Y}-c{X}.jpg"))
+    .add(po.interact());
+
+    </script>
+    <div id="copy">
+      Courtesy <a href="http://earthobservatory.nasa.gov/">NASA Earth Observatory</a>.
+    </div>
+  </body>
+</html>

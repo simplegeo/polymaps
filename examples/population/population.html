@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <title>Population Density</title>
+    <script type="text/javascript" src="../../polymaps.js"></script>
+    <style type="text/css">
+
+@import url("population.css");
+
+body {
+  margin: 0;
+  background: #E6E6E6;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+path {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+
+#county path {
+  stroke: rgba(192, 192, 192, .25);
+  shape-rendering: crispEdges;
+}
+
+#state path {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+#copy {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  padding-left: 5px;
+  font: 9px sans-serif;
+  color: #000;
+  opacity: .5;
+  cursor: default;
+}
+
+#copy a {
+  color: #000;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var po = org.polymaps;
+
+var map = po.map()
+    .container(document.body.appendChild(po.svg("svg")))
+    .center({lat: 39, lon: -96})
+    .zoom(4)
+    .zoomRange([3, 7])
+    .add(po.interact());
+
+map.add(po.image()
+    .url(po.url("http://{S}tile.cloudmade.com"
+    + "/BC9A493B41014CAABB98F0471D759707/20760"
+    + "/256/{Z}/{X}/{Y}.png")
+    .hosts(["a.", "b.", "c.", ""])));
+
+map.add(po.geoJson()
+    .url("http://localhost/boundaries.json?area=county&where=bbox:{B}&zoom={Z}")
+    .on("load", load)
+    .id("county"));
+
+map.add(po.geoJson()
+    .url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}")
+    .id("state"));
+
+function load(e) {
+  for (var i = 0; i < e.features.length; i++) {
+    var feature = e.features[i];
+    feature.element.setAttribute("id", feature.data.id);
+  }
+}
+
+    </script>
+    <span id="copy">
+      &copy; 2010
+      <a href="http://www.cloudmade.com/">CloudMade</a>,
+      <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors,
+      <a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a>.
+      Colors by <a href="http://colorbrewer.org/">Cynthia Brewer</a>.
+    </span>
+  </body>
+</html>

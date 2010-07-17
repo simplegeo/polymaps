@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../polymaps.js"></script>
+    <style type="text/css">
+
+body {
+  margin: 0;
+}
+
+path {
+  fill: #bbb;
+  stroke: #fff;
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+#alaska {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 300px;
+  height: 300px;
+}
+
+#hawaii {
+  position: absolute;
+  bottom: 0px;
+  left: 300px;
+  width: 300px;
+  height: 300px;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var po = org.polymaps;
+
+function svg(id) {
+  var svg = document.body.appendChild(po.svg("svg"));
+  svg.setAttribute("id", id);
+  return svg;
+}
+
+po.map()
+    .container(svg("map"))
+    .center({lat: 37, lon: -96})
+    .zoom(5)
+    .add(po.geoJson().url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}"));
+
+po.map()
+    .container(svg("alaska"))
+    .center({lat: 63, lon: -155})
+    .zoom(3)
+    .add(po.geoJson().url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}"));
+
+po.map()
+    .container(svg("hawaii"))
+    .center({lat: 20.5, lon: -157.5})
+    .zoom(6)
+    .add(po.geoJson().url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}"));
+
+    </script>
+  </body>
+</html>

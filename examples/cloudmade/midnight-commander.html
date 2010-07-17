@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../polymaps.js"></script>
+    <style type="text/css">
+
+body {
+  margin: 0;
+  background: #021019;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+#copy {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  padding-left: 5px;
+  font: 9px sans-serif;
+  color: #1AA398;
+  cursor: default;
+}
+
+#copy a {
+  color: #1AA398;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var po = org.polymaps;
+
+var map = po.map().container(document.body.appendChild(po.svg("svg")));
+
+map.add(po.image()
+    .url(po.url("http://{S}tile.cloudmade.com"
+    + "/1a914755a77758e49e19a26e799268b7/999"
+    + "/256/{Z}/{X}/{Y}.png")
+    .hosts(["a.", "b.", "c.", ""])));
+
+map.add(po.interact());
+
+    </script>
+    <span id="copy">
+      &copy; 2010
+      <a href="http://www.cloudmade.com/">CloudMade</a>,
+      <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors,
+      <a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a>.
+    </span>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+<html>
+  <head>
+    <title>San Francisco Street Pavement</title>
+    <script type="text/javascript" src="../../lib/protovis/protodata.js"></script>
+    <script type="text/javascript" src="../../polymaps.js"></script>
+    <style type="text/css">
+
+body {
+  margin: 0;
+  background: #E6E6E6;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+#streets path {
+  fill: none;
+  stroke-linecap: round;
+}
+
+#copy {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  padding-left: 5px;
+  font: 9px sans-serif;
+  color: #1AA398;
+  cursor: default;
+}
+
+#copy a {
+  color: #1AA398;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var po = org.polymaps;
+
+var color = pv.Scale.linear()
+    .domain(0, 99)
+    .range("red", "white");
+
+var map = po.map()
+    .container(document.body.appendChild(po.svg("svg")))
+    .center({lat: 37.76, lon: -122.44})
+    .zoom(13)
+    .zoomRange([12, 16])
+    .add(po.interact());
+
+map.add(po.image()
+    .url(po.url("http://{S}tile.cloudmade.com"
+    + "/1a914755a77758e49e19a26e799268b7/999"
+    + "/256/{Z}/{X}/{Y}.png")
+    .hosts(["a.", "b.", "c.", ""])));
+
+map.add(po.geoJson()
+    .url("streets.json")
+    .size(null)
+    .clip(false)
+    .on("load", load)
+    .id("streets"));
+
+function pci(feature) {
+  return Number(feature.data.properties.PCI);
+}
+
+function load(e) {
+  var width = Math.pow(2, e.tile.zoom - 12);
+  for (var i = 0; i < e.features.length; i++) {
+    var feature = e.features[i], d = pci(feature);
+    if (!feature.element) continue;
+    feature.element.setAttribute("stroke", color(d).color);
+    feature.element.setAttribute("stroke-width", width);
+    feature.element.appendChild(po.svg("title").appendChild(
+        document.createTextNode(feature.data.properties.STREET + ": " + d + " PCI"))
+        .parentNode);
+  }
+}
+
+    </script>
+    <span id="copy">
+      &copy; 2010
+      <a href="http://www.cloudmade.com/">CloudMade</a>,
+      <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors,
+      <a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a>.
+    </span>
+  </body>
+</html>
