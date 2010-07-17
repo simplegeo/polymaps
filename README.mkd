@@ -1,6 +1,7 @@
 CAVEATS, FEATURE REQUESTS AND KNOWN BUGS
 
 API:
+
 - No defensive copying (on input or output).
 - No type coercion (e.g., String -> Number for zoom).
 - Using == instead of ===.
@@ -10,6 +11,7 @@ API:
 - Include support (not just examples) for TileCache, TileStache, Bing?
 
 Events:
+
 - "move" event does not distinguish zoom / pan / zoom+pan events.
 - "show" events are not supported on image tiles.
 - There are no corresponding "unload" or "hide" events.
@@ -17,16 +19,19 @@ Events:
 - Arrow control pans three times for two keydowns.
 
 Sizing:
+
 - Maps with no explicit size are auto-resized on window resize;
   - This may miss resize based on DOM changes (e.g., element removal).
   - This may generate spurious resize events for fixed-size parents.
 - If the map is bigger than its parent, tiles are not automatically clipped.
 
 Tiles:
+
 - Assumes Mercator projection, with Google-y transform.
 - Anti-aliasing artifacts are visible with smooth zooming / rescaled tiles.
 - When translucent tiles are rescaled, they can overlap with other resolutions.
 
 Queue:
+
 - Should prioritize tile requests from the center out.
 - Create host-specific queues to allow more than 6 simultaneous requests?
