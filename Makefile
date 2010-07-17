@@ -20,8 +20,8 @@ JS_FILES = \
 	src/Grid.js \
 	src/end.js
 
-JS_COMPILER ?= \
-	java -jar /Library/Google/Compiler/compiler-20100201.jar \
+JS_COMPILER = \
+	java -jar lib/google-compiler/compiler-20100616.jar \
 	--charset UTF-8
 
 all: polymaps.min.js polymaps.js
