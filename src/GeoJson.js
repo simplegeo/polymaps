@@ -36,6 +36,7 @@ po.geoJson = function() {
     for (var i = 0; i < coordinates.length; i++) {
       line(coordinates[i], closed, proj, d);
     }
+    if (closed) d.push("Z");
   }
 
   function multi(type, coordinates, closed, proj) {
@@ -44,7 +45,6 @@ po.geoJson = function() {
       type(coordinates[i], closed, proj, d);
     }
     if (!d.length) return;
-    if (closed) d.push("Z");
     var path = po.svg("path");
     path.setAttribute("d", d.join(""));
     return path;
