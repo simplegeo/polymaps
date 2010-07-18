@@ -67,12 +67,12 @@ map.add(po.image()
     .hosts(["a.", "b.", "c.", ""])));
 
 map.add(po.geoJson()
-    .url("http://localhost/boundaries.json?area=county&where=bbox:{B}&zoom={Z}")
+    .url("http://polymaps.appspot.com/county/{Z}/{X}/{Y}.json")
     .on("load", load)
     .id("county"));
 
 map.add(po.geoJson()
-    .url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}")
+    .url("http://polymaps.appspot.com/state/{Z}/{X}/{Y}.json")
     .id("state"));
 
 function load(e) {

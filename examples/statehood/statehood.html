@@ -77,7 +77,7 @@ map.add(po.image()
     .hosts(["a.", "b.", "c.", ""])));
 
 map.add(po.geoJson()
-    .url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}")
+    .url("http://polymaps.appspot.com/state/{Z}/{X}/{Y}.json")
     .on("load", load))
 
 map.container().setAttribute("class", "Blues");

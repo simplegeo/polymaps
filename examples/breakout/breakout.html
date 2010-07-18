@@ -50,19 +50,19 @@ po.map()
     .container(svg("map"))
     .center({lat: 37, lon: -96})
     .zoom(5)
-    .add(po.geoJson().url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}"));
+    .add(po.geoJson().url("http://polymaps.appspot.com/state/{Z}/{X}/{Y}.json"));
 
 po.map()
     .container(svg("alaska"))
     .center({lat: 63, lon: -155})
     .zoom(3)
-    .add(po.geoJson().url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}"));
+    .add(po.geoJson().url("http://polymaps.appspot.com/state/{Z}/{X}/{Y}.json"));
 
 po.map()
     .container(svg("hawaii"))
     .center({lat: 20.5, lon: -157.5})
     .zoom(6)
-    .add(po.geoJson().url("http://localhost/boundaries.json?area=state&where=bbox:{B}&zoom={Z}"));
+    .add(po.geoJson().url("http://polymaps.appspot.com/state/{Z}/{X}/{Y}.json"));
 
     </script>
   </body>
