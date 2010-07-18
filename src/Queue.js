@@ -29,7 +29,7 @@ po.queue = (function() {
       req.onreadystatechange = function(e) {
         if (req.readyState == 4) {
           active--;
-          if (req.status < 300) callback(req.responseText);
+          if (req.status < 300 && req.responseText) callback(req.responseText);
           process();
         }
       };
