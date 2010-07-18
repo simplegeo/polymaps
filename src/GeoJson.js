@@ -102,10 +102,11 @@ po.geoJson = function() {
       for (var i = 0; i < data.features.length; i++) {
         var feature = data.features[i],
             element = geometry(feature.geometry, proj.locationPoint);
-        if (element) g.appendChild(element);
-        var entry = {element: element, data: feature};
-        features.push(entry);
-        updated.push(entry);
+        if (element) {
+          var entry = {element: g.appendChild(element), data: feature};
+          features.push(entry);
+          updated.push(entry);
+        }
       }
       tile.ready = true;
       geoJson.dispatch({type: "load", tile: tile, features: updated});
