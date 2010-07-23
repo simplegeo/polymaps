@@ -11,16 +11,18 @@ po.hash = function() {
         + "/" + center.lon.toFixed(precision));
   }
 
+  function hashchange() {
+    var args = location.hash.substring(1).split("/").map(Number);
+    if (args.length < 3 || args.some(isNaN)) move(); // replace bogus hash
+    else map.zoom(args[0]).center({lat: args[1], lon: args[2]});
+  }
+
   hash.map = function(x) {
     if (!arguments.length) return map;
     if (map) map.off("move", move);
     (map = x).on("move", move);
-    if (location.hash) {
-      var args = location.hash.substring(1).split("/").map(Number);
-      map.zoom(args[0]).center({lat: args[1], lon: args[2]});
-    } else {
-      move();
-    }
+    window.addEventListener("hashchange", hashchange, false);
+    location.hash ? hashchange() : move();
     return hash;
   };
 
