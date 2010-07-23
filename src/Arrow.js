@@ -10,17 +10,64 @@ po.arrow = function() {
 
   function keydown(e) {
     if (e.ctrlKey || e.altKey || e.metaKey) return;
-    var now = Date.now();
+    var now = Date.now(), dx = 0, dy = 0, dz = 0;
     switch (e.keyCode) {
-    case 37: if (!key.left) last = now; key.left = 1; break;
-    case 39: if (!key.right) last = now; key.right = 1; break;
-    case 38: if (!key.up) last = now; key.up = 1; break;
-    case 40: if (!key.down) last = now; key.down = 1; break;
-    case 109: case 189: if (!key.plus) last = now; key.plus = 1; break;
-    case 61: case 187: if (!key.minus) last = now; key.minus = 1; break;
-    default: return;
+      case 37: {
+        if (!key.left) {
+          last = now;
+          key.left = 1;
+          if (!key.right) dx = speed;
+        }
+        break;
+      }
+      case 39: {
+        if (!key.right) {
+          last = now;
+          key.right = 1;
+          if (!key.left) dx = -speed;
+        }
+        break;
+      }
+      case 38: {
+        if (!key.up) {
+          last = now;
+          key.up = 1;
+          if (!key.down) dy = speed;
+        }
+        break;
+      }
+      case 40: {
+        if (!key.down) {
+          last = now;
+          key.down = 1;
+          if (!key.up) dy = -speed;
+        }
+        break;
+      }
+      case 109: case 189: {
+        if (!key.plus) {
+          last = now;
+          key.plus = 1;
+          if (!key.minus) dz = -1;
+        }
+        break;
+      }
+      case 61: case 187: {
+        if (!key.minus) {
+          last = now;
+          key.minus = 1;
+          if (!key.plus) dz = 1;
+        }
+        break;
+      }
+      default: return;
     }
-    if (last == now) repeat(true);
+    if (dz) {
+      var z = map.zoom();
+      map.zoom(dz < 0 ? Math.ceil(z) - 1 : Math.floor(z) + 1);
+    } else if (dx || dy) {
+      map.panBy({x: dx, y: dy});
+    }
     if (!repeatTimer && (key.left | key.right | key.up | key.down)) {
       repeatTimer = setInterval(repeat, repeatInterval);
     }
@@ -30,13 +77,13 @@ po.arrow = function() {
   function keyup(e) {
     last = Date.now();
     switch (e.keyCode) {
-    case 37: key.left = 0; break;
-    case 39: key.right = 0; break;
-    case 38: key.up = 0; break;
-    case 40: key.down = 0; break;
-    case 109: case 189: key.plus = 0; break;
-    case 61: case 187: key.minus = 0; break;
-    default: return;
+      case 37: key.left = 0; break;
+      case 39: key.right = 0; break;
+      case 38: key.up = 0; break;
+      case 40: key.down = 0; break;
+      case 109: case 189: key.plus = 0; break;
+      case 61: case 187: key.minus = 0; break;
+      default: return;
     }
     if (repeatTimer && !(key.left | key.right | key.up | key.down)) {
       repeatTimer = clearInterval(repeatTimer);
@@ -59,17 +106,12 @@ po.arrow = function() {
     return arrow;
   };
 
-  function repeat(down) {
+  function repeat() {
     if (!map) return;
-    if (!down && Date.now() < last + repeatDelay) return;
+    if (Date.now() < last + repeatDelay) return;
     var dx = (key.left - key.right) * speed,
-        dy = (key.up - key.down) * speed,
-        dz = key.minus - key.plus;
+        dy = (key.up - key.down) * speed;
     if (dx || dy) map.panBy({x: dx, y: dy});
-    if (down && dz) {
-      var z = map.zoom();
-      map.zoom(dz < 0 ? Math.ceil(z) - 1 : Math.floor(z) + 1);
-    }
   }
 
   return arrow;
