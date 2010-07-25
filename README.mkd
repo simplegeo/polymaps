@@ -1,6 +1,6 @@
- _  _ |   _ _  _  _  _
-|_)(_)|\/| | |(_||_)_\
-|      /         |    
+     _  _ |   _ _  _  _  _
+    |_)(_)|\/| | |(_||_)_\
+    |      /         |    
 
 Polymaps is a BSD-licensed display and interaction library for tile-based vector
 and raster  maps using SVG and Javascript.
