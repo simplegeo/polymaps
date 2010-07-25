@@ -1,4 +1,31 @@
+ _  _ |   _ _  _  _  _
+|_)(_)|\/| | |(_||_)_\
+|      /         |    
+
+Polymaps is a BSD-licensed display and interaction library for tile-based vector
+and raster  maps using SVG and Javascript.
+
+Our intent is to provide a minimal, extensible, customizable, and free display 
+library for discriminating designers and developers who want to use interactive
+maps in their own projects. Polymaps provides a core set of features in a tight,
+clean package, with plenty of hooks for additional functionality. 
+
+
 CAVEATS, FEATURE REQUESTS AND KNOWN BUGS
+
+Browser Support:
+
+- Tested in recent Webkit browsers (Safari 4+, Chrome 6, Webkit nightlies)
+- Tested in recent Firefox browsers (3.6+) 
+- Optimistic about Opera, IE9, but not part of core testing yet.
+- SVG is *required*, even for image display...
+  - in other words: if you can't require SVG, don't use Polymaps!
+
+Features:
+
+- Vector overlays in GeoJSON format are supported, both  tiled and single file
+- Image layers in Google-y spherical mercator format are supported
+- There are *no default markers* or infobubbles (yet?) 
 
 API:
 
@@ -35,3 +62,4 @@ Queue:
 
 - Should prioritize tile requests from the center out.
 - Create host-specific queues to allow more than 6 simultaneous requests?
+
