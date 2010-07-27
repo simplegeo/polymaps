@@ -60,6 +60,7 @@ map.add(po.image()
 
 map.add(po.geoJson()
     .url("streets.json")
+    .zoom(12)
     .size(null)
     .clip(false)
     .on("load", load)
@@ -70,12 +71,10 @@ function pci(feature) {
 }
 
 function load(e) {
-  var width = Math.pow(2, e.tile.zoom - 12);
   for (var i = 0; i < e.features.length; i++) {
     var feature = e.features[i], d = pci(feature);
     if (!feature.element) continue;
     feature.element.setAttribute("stroke", color(d).color);
-    feature.element.setAttribute("stroke-width", width);
     feature.element.appendChild(po.svg("title").appendChild(
         document.createTextNode(feature.data.properties.STREET + ": " + d + " PCI"))
         .parentNode);

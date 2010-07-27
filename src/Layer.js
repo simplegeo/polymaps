@@ -57,7 +57,7 @@ po.layer = function(load, unload) {
     c0.column = Math.floor(c0.column);
     c0.row = Math.max(0, Math.floor(c0.row));
     c1.column = Math.floor(c1.column);
-    c1.row = Math.min((1 << (c0.zoom + 8)) / tileSize.y - 1, Math.floor(c1.row));
+    c1.row = Math.max(0, Math.min((1 << (c0.zoom + 8)) / tileSize.y - 1, Math.floor(c1.row)));
 
     // tile-specific projection
     function projection(c) {
