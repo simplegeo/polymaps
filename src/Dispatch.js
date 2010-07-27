@@ -1,20 +1,22 @@
 po.dispatch = function(that) {
-  var handlers = {};
+  var types = {};
 
   that.on = function(type, handler) {
-    var array = handlers[type] || (handlers[type] = []);
-    for (var i = 0; i < array.length; i++) {
-      if (array[i] == handler) return that; // already registered
+    var listeners = types[type] || (types[type] = []);
+    for (var i = 0; i < listeners.length; i++) {
+      if (listeners[i].handler == handler) return that; // already registered
     }
-    array.push(handler);
+    listeners.push({handler: handler, on: true});
     return that;
   };
 
   that.off = function(type, handler) {
-    var array = handlers[type];
-    if (array) for (var i = 0; i < array.length; i++) {
-      if (array[i] == handler) {
-        array.splice(i, 1);
+    var listeners = types[type];
+    if (listeners) for (var i = 0; i < listeners.length; i++) {
+      var l = listeners[i];
+      if (l.handler == handler) {
+        l.on = false;
+        listeners.splice(i, 1);
         break;
       }
     }
@@ -22,11 +24,12 @@ po.dispatch = function(that) {
   };
 
   return function(event) {
-    var array = handlers[event.type];
-    if (!array) return;
-    array = array.slice(); // defensive copy
-    for (var i = 0; i < array.length; i++) {
-      array[i].call(that, event);
+    var listeners = types[event.type];
+    if (!listeners) return;
+    listeners = listeners.slice(); // defensive copy
+    for (var i = 0; i < listeners.length; i++) {
+      var l = listeners[i];
+      if (l.on) l.handler.call(that, event);
     }
   };
 };
