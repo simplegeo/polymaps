@@ -29,8 +29,15 @@ po.layer = function(load, unload) {
 
     // set the layer transform
     var k = Math.pow(2, mapZoomFraction);
-    if (k) container.setAttribute("transform", "scale(" + k + ")");
-    else container.removeAttribute("transform");
+    if (mapZoomFraction) {
+      container.setAttribute("transform", "scale(" + k + ")");
+    } else {
+      container.removeAttribute("transform");
+
+      // round to pixel boundary to avoid anti-aliasing artifacts
+      tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
+      tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
+    }
 
     // get the coordinate of the top-left tile
     var c0 = map.pointCoordinate(tileCenter, tileSize, origin);
@@ -145,10 +152,9 @@ po.layer = function(load, unload) {
     // position tiles
     for (var key in newLocks) {
       var tile = newLocks[key],
-          k = Math.pow(2, -(tile.level = tile.zoom - mapZoom)),
+          k = Math.pow(2, tile.level = tile.zoom - mapZoom),
           x = map.coordinatePoint(tileCenter, tileSize, tile),
-          t = "translate(" + Math.round(x.x) + "," + Math.round(x.y) + ")";
-      if (tile.level) t += "scale(" + k + ")";
+          t = "translate(" + x.x * k + "," + x.y * k + ")";
       tile.element.setAttribute("transform", t);
     }
 
@@ -201,8 +207,15 @@ po.layer = function(load, unload) {
       if (id) container.setAttribute("id", id);
       container.setAttribute("class", "layer");
       levels = {};
-      for (var i = -4; i <= -1; i++) levels[i] = container.appendChild(po.svg("g"));
-      for (var i = 2; i >= 0; i--) levels[i] = container.appendChild(po.svg("g"));
+      for (var i = -4; i <= -1; i++) {
+        (levels[i] = container.appendChild(po.svg("g")))
+            .setAttribute("transform", "scale(" + Math.pow(2, -i) + ")");
+      }
+      for (var i = 2; i >= 1; i--) {
+        (levels[i] = container.appendChild(po.svg("g")))
+            .setAttribute("transform", "scale(" + Math.pow(2, -i) + ")");
+      }
+      levels[0] = container.appendChild(po.svg("g"));
       if (layer.init) layer.init(container);
       map.on("move", move).on("resize", move);
       move();
