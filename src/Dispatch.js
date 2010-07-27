@@ -24,6 +24,7 @@ po.dispatch = function(that) {
   return function(event) {
     var array = handlers[event.type];
     if (!array) return;
+    array = array.slice(); // defensive copy
     for (var i = 0; i < array.length; i++) {
       array[i].call(that, event);
     }
