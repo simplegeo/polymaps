@@ -39,6 +39,7 @@ po.map = function() {
     };
   };
 
+  // Note: assumes that tileCenter.zoom == map.zoom!
   map.coordinatePoint = function(tileCenter, tileSize, c) {
     var k = Math.pow(2, zoom - c.zoom);
     return {
@@ -47,6 +48,7 @@ po.map = function() {
     };
   };
 
+  // Note: assumes that tileCenter.zoom == map.zoom!
   map.pointCoordinate = function(tileCenter, tileSize, p) {
     return {
       column: tileCenter.column + (p.x - sizeScale.x / 2) / tileSize.x,
