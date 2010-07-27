@@ -15,7 +15,8 @@ po.layer = function(load, unload) {
   }
 
   function move() {
-    var mapZoom = map.zoom(),
+    var map = layer.map(), // in case the layer is removed
+        mapZoom = map.zoom(),
         mapZoomFraction = mapZoom - (mapZoom = Math.round(mapZoom)),
         mapSize = map.size(),
         tileSize = size || sizeZoom(mapZoom),
