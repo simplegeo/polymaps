@@ -187,6 +187,10 @@ po.layer = function(load, unload) {
   layer.map = function(x) {
     if (!arguments.length) return map;
     if (map) {
+      if (map == x) {
+        container.parentNode.appendChild(container); // move to end
+        return layer;
+      }
       map.off("move", move).off("resize", move);
       container.parentNode.removeChild(container);
       container = levels = null;
