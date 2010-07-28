@@ -3,6 +3,7 @@ po.layer = function(load, unload) {
       origin = {x: 0, y: 0},
       size = {x: 256, y: 256},
       cache = layer.cache = po.cache(load, unload).size(512),
+      visible = true,
       zoom,
       id,
       map,
@@ -21,6 +22,11 @@ po.layer = function(load, unload) {
         mapSize = map.size(),
         tileSize = size || sizeZoom(mapZoom),
         tileCenter = map.locationCoordinate(tileSize, map.center());
+
+    // set the layer visibility
+    visible
+        ? container.removeAttribute("visibility")
+        : container.setAttribute("visibility", "hidden");
 
     // set the layer zoom levels
     for (var z = -4; z <= 2; z++) {
@@ -97,7 +103,7 @@ po.layer = function(load, unload) {
     }
 
     // load the tiles!
-    if (tileLevel > -5 && tileLevel < 3) {
+    if (visible && tileLevel > -5 && tileLevel < 3) {
       for (var column = c0.column; c0.row <= c1.row; c0.row++) {
         for (c0.column = column; c0.column <= c1.column; c0.column++) {
           var tile = cache.load(c0, projection);
@@ -236,6 +242,13 @@ po.layer = function(load, unload) {
   layer.id = function(x) {
     if (!arguments.length) return id;
     id = x;
+    return layer;
+  };
+
+  layer.visible = function(x) {
+    if (!arguments.length) return visible;
+    visible = x;
+    if (map) move();
     return layer;
   };
 
