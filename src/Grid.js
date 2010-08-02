@@ -15,7 +15,7 @@ po.grid = function() {
     var p,
         line = g.firstChild,
         size = map.size(),
-        nw = map.pointLocation({x: 0, y: 0}),
+        nw = map.pointLocation(zero),
         se = map.pointLocation(size),
         step = Math.pow(2, 4 - Math.round(map.zoom()));
 

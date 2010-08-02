@@ -1,6 +1,5 @@
 po.layer = function(load, unload) {
   var layer = {},
-      origin = {x: 0, y: 0},
       size = {x: 256, y: 256},
       cache = layer.cache = po.cache(load, unload).size(512),
       visible = true,
@@ -20,6 +19,7 @@ po.layer = function(load, unload) {
         mapZoom = map.zoom(),
         mapZoomFraction = mapZoom - (mapZoom = Math.round(mapZoom)),
         mapSize = map.size(),
+        mapAngle = map.angle(),
         tileSize = size || sizeZoom(mapZoom),
         tileCenter = map.locationCoordinate(tileSize, map.center());
 
@@ -34,26 +34,38 @@ po.layer = function(load, unload) {
     }
 
     // set the layer transform
-    var k = Math.pow(2, mapZoomFraction);
-    if (mapZoomFraction) {
-      container.setAttribute("transform", "scale(" + k + ")");
-    } else {
-      container.removeAttribute("transform");
+    container.setAttribute("transform",
+        "translate(" + mapSize.x / 2 + "," + mapSize.y / 2 + ")"
+        + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
+        + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : ""));
 
-      // round to pixel boundary to avoid anti-aliasing artifacts
+    // get the coordinates of top-left and bottom-right corners
+    var c0 = map.pointCoordinate(tileCenter, tileSize, zero),
+        c1 = map.pointCoordinate(tileCenter, tileSize, mapSize);
+
+    // get the bounding box of the rotated map (TODO scanline fill)
+    if (mapAngle) {
+      var tl = c0,
+          tr = map.pointCoordinate(tileCenter, tileSize, {x: mapSize.x, y: 0}),
+          br = c1,
+          bl = map.pointCoordinate(tileCenter, tileSize, {x: 0, y: mapSize.y});
+      c0 = {
+        row: Math.min(tl.row, tr.row, br.row, bl.row),
+        column: Math.min(tl.column, tr.column, br.column, bl.column),
+        zoom: mapZoom
+      };
+      c1 = {
+        row: Math.max(tl.row, tr.row, br.row, bl.row),
+        column: Math.max(tl.column, tr.column, br.column, bl.column),
+        zoom: mapZoom
+      };
+    }
+
+    // round to pixel boundary to avoid anti-aliasing artifacts
+    if (!mapAngle && !mapZoomFraction) {
       tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
       tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
     }
-
-    // get the coordinate of the top-left tile
-    var c0 = map.pointCoordinate(tileCenter, tileSize, origin);
-
-    // get the coordinate of the bottom-right tile
-    var c1 = {
-      column: c0.column + mapSize.x / (k * tileSize.x),
-      row: c0.row + mapSize.y / (k * tileSize.y),
-      zoom: c0.zoom
-    };
 
     // layer-specific zoom transform
     var tileLevel = zoom ? zoom(mapZoom) - mapZoom : 0;
@@ -159,8 +171,9 @@ po.layer = function(load, unload) {
     for (var key in newLocks) {
       var tile = newLocks[key],
           k = Math.pow(2, tile.level = tile.zoom - mapZoom),
-          x = map.coordinatePoint(tileCenter, tileSize, tile),
-          t = "translate(" + x.x * k + "," + x.y * k + ")";
+          x = tileSize.x * (tile.column - tileCenter.column * k),
+          y = tileSize.y * (tile.row - tileCenter.row * k),
+          t = "translate(" + x + "," + y + ")";
       tile.element.setAttribute("transform", t);
     }
 

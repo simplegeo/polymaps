@@ -2,14 +2,19 @@ po.map = function() {
   var map = {},
       container,
       size,
-      sizeActual = {x: 0, y: 0},
-      sizeScale = sizeActual,
-      sizeOne = {x: 1, y: 1},
+      sizeActual = zero,
+      sizeRadius = zero, // sizeActual / 2
       center = {lat: 37.76487, lon: -122.41948},
       centerRange,
       zoom = 12,
       zoomFraction = 0,
+      zoomFactor = 1, // Math.pow(2, zoomFraction)
       zoomRange = [1, 18],
+      angle = 0,
+      angleCos = 1, // Math.cos(angle)
+      angleSin = 0, // Math.sin(angle)
+      angleCosi = 1, // Math.cos(-angle)
+      angleSini = 0, // Math.sin(-angle)
       event = po.dispatch(map);
 
   // See http://wiki.openstreetmap.org/wiki/Mercator
@@ -39,43 +44,51 @@ po.map = function() {
     };
   };
 
-  // Note: assumes that tileCenter.zoom == map.zoom!
   map.coordinatePoint = function(tileCenter, tileSize, c) {
-    var k = Math.pow(2, zoom - c.zoom);
+    var kc = Math.pow(2, zoom - c.zoom),
+        kt = Math.pow(2, zoom - tileCenter.zoom),
+        dx = (c.column * kc - tileCenter.column * kt) * tileSize.x * zoomFactor,
+        dy = (c.row * kc - tileCenter.row * kt) * tileSize.y * zoomFactor;
     return {
-      x: sizeScale.x / 2 + tileSize.x * (k * c.column - tileCenter.column),
-      y: sizeScale.y / 2 + tileSize.y * (k * c.row - tileCenter.row)
+      x: sizeRadius.x + angleCos * dx - angleSin * dy,
+      y: sizeRadius.y + angleSin * dx + angleCos * dy
     };
   };
 
-  // Note: assumes that tileCenter.zoom == map.zoom!
   map.pointCoordinate = function(tileCenter, tileSize, p) {
+    var kt = Math.pow(2, zoom - tileCenter.zoom),
+        dx = (p.x - sizeRadius.x) / (tileSize.x * zoomFactor),
+        dy = (p.y - sizeRadius.y) / (tileSize.y * zoomFactor);
     return {
-      column: tileCenter.column + (p.x - sizeScale.x / 2) / tileSize.x,
-      row: tileCenter.row + (p.y - sizeScale.y / 2) / tileSize.y,
+      column: tileCenter.column * kt + angleCosi * dx - angleSini * dy,
+      row: tileCenter.row * kt + angleSini * dx + angleCosi * dy,
       zoom: zoom
     };
   };
 
   map.locationPoint = function(l) {
-    var k = Math.pow(2, 5 + zoom + zoomFraction) / 45;
+    var k = Math.pow(2, 5 + zoom + zoomFraction) / 45,
+        dx = (l.lon - center.lon) * k,
+        dy = (lat2y(center.lat) - lat2y(l.lat)) * k;
     return {
-      x: (l.lon - center.lon) * k + sizeActual.x / 2,
-      y: (lat2y(center.lat) - lat2y(l.lat)) * k + sizeActual.y / 2
+      x: sizeRadius.x + angleCos * dx - angleSin * dy,
+      y: sizeRadius.y + angleSin * dx + angleCos * dy
     };
   };
 
   map.pointLocation = function(p) {
-    var k = 45 / Math.pow(2, 5 + zoom + zoomFraction);
+    var k = 45 / Math.pow(2, 5 + zoom + zoomFraction),
+        dx = (p.x - sizeRadius.x) * k,
+        dy = (p.y - sizeRadius.y) * k;
     return {
-      lat: y2lat(lat2y(center.lat) - (p.y - sizeActual.y / 2) * k),
-      lon: center.lon + (p.x - sizeActual.x / 2) * k
+      lon: center.lon + angleCosi * dx - angleSini * dy,
+      lat: y2lat(lat2y(center.lat) - angleSini * dx - angleCosi * dy)
     };
   };
 
   function recenter() {
     var k = 45 / Math.pow(2, 5 + zoom + zoomFraction),
-        l = Math.max(0, y2lat(180 - sizeActual.y / 2 * k));
+        l = Math.max(0, y2lat(180 - sizeRadius.y * k));
     center.lat = Math.max(-l, Math.min(+l, center.lat));
   }
 
@@ -132,8 +145,7 @@ po.map = function() {
       sizeActual = size;
       resizer.remove(map);
     }
-    var k = Math.pow(2, -zoomFraction);
-    sizeScale = {x: sizeActual.x * k, y: sizeActual.y * k};
+    sizeRadius = {x: sizeActual.x / 2, y: sizeActual.y / 2};
     recenter();
     event({type: "resize"});
     return map;
@@ -167,8 +179,7 @@ po.map = function() {
     if (!arguments.length) return zoom + zoomFraction;
     zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], x));
     zoomFraction = zoom - (zoom = Math.round(zoom));
-    var k = Math.pow(2, -zoomFraction);
-    sizeScale = {x: sizeActual.x * k, y: sizeActual.y * k};
+    zoomFactor = Math.pow(2, zoomFraction);
     return map.center(center);
   };
 
@@ -181,8 +192,7 @@ po.map = function() {
     // update the zoom level
     zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], zoom + zoomFraction + z));
     zoomFraction = zoom - (zoom = Math.round(zoom));
-    k = Math.pow(2, -zoomFraction);
-    sizeScale = {x: sizeActual.x * k, y: sizeActual.y * k};
+    zoomFactor = Math.pow(2, zoomFraction);
 
     // compute the new point of the location
     var x1 = map.locationPoint(l);
@@ -194,6 +204,17 @@ po.map = function() {
     if (!arguments.length) return zoomRange;
     zoomRange = x;
     return map.zoom(zoom + zoomFraction);
+  };
+
+  map.angle = function(x) {
+    if (!arguments.length) return angle;
+    angle = x;
+    angleCos = Math.cos(angle);
+    angleSin = Math.sin(angle);
+    angleCosi = Math.cos(-angle);
+    angleSini = Math.sin(-angle);
+    event({type: "move"});
+    return map;
   };
 
   map.add = function(x) {
