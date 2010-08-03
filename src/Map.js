@@ -88,7 +88,9 @@ po.map = function() {
 
   function recenter() {
     var k = 45 / Math.pow(2, 5 + zoom + zoomFraction),
-        l = Math.max(0, y2lat(180 - sizeRadius.y * k));
+        y = Math.max(angleSin * sizeRadius.x + angleCos * sizeRadius.y,
+                     angleSini * sizeRadius.x + angleCosi * sizeRadius.y),
+        l = Math.max(0, y2lat(180 - y * k));
     center.lat = Math.max(-l, Math.min(+l, center.lat));
   }
 
@@ -216,6 +218,7 @@ po.map = function() {
     angleSin = Math.sin(angle);
     angleCosi = Math.cos(-angle);
     angleSini = Math.sin(-angle);
+    recenter();
     event({type: "move"});
     return map;
   };
