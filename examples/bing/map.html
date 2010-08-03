@@ -75,10 +75,11 @@ $(document).ready(function() {
   }
 
   function template(url, subdomains) {
-    var salt = ~~(Math.random() * 4); // per-session salt
+    var n = subdomains.length,
+        salt = ~~(Math.random() * n); // per-session salt
     return function(c) {
       var quadKey = quad(c.column, c.row, c.zoom),
-          server = Math.abs(salt + c.column + c.row + c.zoom) % 4;
+          server = Math.abs(salt + c.column + c.row + c.zoom) % n;
       return url
           .replace("{quadkey}", quadKey)
           .replace("{subdomain}", subdomains[server]);
