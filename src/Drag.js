@@ -1,6 +1,7 @@
 po.drag = function() {
   var drag = {},
       map,
+      cursor,
       dragging;
 
   function mousedown(e) {
@@ -10,6 +11,8 @@ po.drag = function() {
     };
     map.focusableParent().focus();
     e.preventDefault();
+    cursor = document.body.style.cursor;
+    document.body.style.cursor = "move";
   }
 
   function mousemove(e) {
@@ -23,6 +26,7 @@ po.drag = function() {
     if (!dragging) return;
     mousemove(e);
     dragging = null;
+    document.body.style.cursor = cursor;
   }
 
   drag.map = function(x) {
