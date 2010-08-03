@@ -1,17 +1,23 @@
 po.hash = function() {
   var hash = {},
+      ignore,
       map;
 
   function move() {
     var center = map.center(),
         zoom = map.zoom(),
-        precision = Math.ceil(Math.log(zoom) / Math.LN2);
-    location.replace("#" + zoom.toFixed(2)
-        + "/" + center.lat.toFixed(precision)
-        + "/" + center.lon.toFixed(precision));
+        precision = Math.ceil(Math.log(zoom) / Math.LN2),
+        hash = "#" + zoom.toFixed(2)
+             + "/" + center.lat.toFixed(precision)
+             + "/" + center.lon.toFixed(precision);
+    if (location.hash !== hash) {
+      ignore = true; // don't recenter the map on hashchange!
+      location.replace(hash);
+    }
   }
 
   function hashchange() {
+    if (ignore) { ignore = false; return; }
     var args = location.hash.substring(1).split("/").map(Number);
     if (args.length < 3 || args.some(isNaN)) move(); // replace bogus hash
     else map.zoom(args[0]).center({lat: args[1], lon: args[2]});

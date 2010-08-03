@@ -2,6 +2,7 @@ po.wheel = function() {
   var wheel = {},
       timePrev = 0,
       smooth = true,
+      location,
       map;
 
   /* Yikes! Mousewheel speed is totally nonstandard! */
@@ -11,14 +12,20 @@ po.wheel = function() {
       : /Firefox\//.test(navigator.userAgent) ? .5
       : 360);
 
+  function mousemove(e) {
+    location = map.pointLocation(map.mouse(e));
+  }
+
   function mousewheel(e) {
-    var delta = (e.wheelDelta || -e.detail) * speed;
+    var delta = (e.wheelDelta || -e.detail) * speed,
+        point = map.mouse(e);
+    if (!location) location = map.pointLocation(point);
     if (smooth) {
-      map.zoomBy(delta, map.mouse(e));
+      map.zoomBy(delta, point, location);
     } else if (delta) {
       var timeNow = Date.now();
       if (timeNow - timePrev > 200) {
-        map.zoomBy(delta > 0 ? +1 : -1, map.mouse(e));
+        map.zoomBy(delta > 0 ? +1 : -1, point, location);
         timePrev = timeNow;
       }
     }
@@ -37,8 +44,10 @@ po.wheel = function() {
     map = x;
     // TODO remove from old map container?
     // TODO update if map container changes?
-    map.container().addEventListener("mousewheel", mousewheel, false);
-    map.container().addEventListener("DOMMouseScroll", mousewheel, false);
+    var container = map.container();
+    container.addEventListener("mousemove", mousemove, false);
+    container.addEventListener("mousewheel", mousewheel, false);
+    container.addEventListener("DOMMouseScroll", mousewheel, false);
     return wheel;
   };
 

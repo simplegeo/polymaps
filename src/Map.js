@@ -163,10 +163,13 @@ po.map = function() {
   };
 
   map.panBy = function(x) {
-    var p = map.locationPoint(center);
-    p.x -= x.x;
-    p.y -= x.y;
-    return map.center(map.pointLocation(p));
+    var k = 45 / Math.pow(2, 5 + zoom + zoomFraction),
+        dx = x.x * k,
+        dy = x.y * k;
+    return map.center({
+      lon: center.lon - angleCosi * dx + angleSini * dy,
+      lat: y2lat(lat2y(center.lat) + angleSini * dx + angleCosi * dy)
+    });
   };
 
   map.centerRange = function(x) {
@@ -183,11 +186,11 @@ po.map = function() {
     return map.center(center);
   };
 
-  map.zoomBy = function(z, x0) {
+  map.zoomBy = function(z, x0, l) {
     if (arguments.length < 2) return map.zoom(zoom + zoomFraction + z);
 
     // compute the location of x0
-    var l = map.pointLocation(x0);
+    if (arguments.length < 3) l = map.pointLocation(x0);
 
     // update the zoom level
     zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], zoom + zoomFraction + z));
