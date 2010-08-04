@@ -39,27 +39,11 @@ po.layer = function(load, unload) {
         + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
         + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : ""));
 
-    // get the coordinates of top-left and bottom-right corners
+    // get the coordinates of the four corners
     var c0 = map.pointCoordinate(tileCenter, tileSize, zero),
-        c1 = map.pointCoordinate(tileCenter, tileSize, mapSize);
-
-    // get the bounding box of the rotated map (TODO scanline fill)
-    if (mapAngle) {
-      var tl = c0,
-          tr = map.pointCoordinate(tileCenter, tileSize, {x: mapSize.x, y: 0}),
-          br = c1,
-          bl = map.pointCoordinate(tileCenter, tileSize, {x: 0, y: mapSize.y});
-      c0 = {
-        row: Math.min(tl.row, tr.row, br.row, bl.row),
-        column: Math.min(tl.column, tr.column, br.column, bl.column),
-        zoom: mapZoom
-      };
-      c1 = {
-        row: Math.max(tl.row, tr.row, br.row, bl.row),
-        column: Math.max(tl.column, tr.column, br.column, bl.column),
-        zoom: mapZoom
-      };
-    }
+        c1 = map.pointCoordinate(tileCenter, tileSize, {x: mapSize.x, y: 0}),
+        c2 = map.pointCoordinate(tileCenter, tileSize, mapSize),
+        c3 = map.pointCoordinate(tileCenter, tileSize, {x: 0, y: mapSize.y});
 
     // round to pixel boundary to avoid anti-aliasing artifacts
     if (!mapAngle && !mapZoomFraction) {
@@ -71,18 +55,11 @@ po.layer = function(load, unload) {
     var tileLevel = zoom ? zoom(mapZoom) - mapZoom : 0;
     if (tileLevel) {
       var k = Math.pow(2, tileLevel);
-      c0.column *= k;
-      c0.row *= k;
-      c0.zoom = c1.zoom += tileLevel;
-      c1.column *= k;
-      c1.row *= k;
+      c0.column *= k; c0.row *= k; c0.zoom += tileLevel;
+      c1.column *= k; c1.row *= k; c1.zoom += tileLevel;
+      c2.column *= k; c2.row *= k; c2.zoom += tileLevel;
+      c3.column *= k; c3.row *= k; c3.zoom += tileLevel;
     }
-
-    // floor the coordinates
-    c0.column = Math.floor(c0.column);
-    c0.row = Math.max(0, Math.floor(c0.row));
-    c1.column = Math.floor(c1.column);
-    c1.row = Math.max(0, Math.min((1 << (c0.zoom + 8)) / tileSize.y - 1, Math.floor(c1.row)));
 
     // tile-specific projection
     function projection(c) {
@@ -116,50 +93,57 @@ po.layer = function(load, unload) {
 
     // load the tiles!
     if (visible && tileLevel > -5 && tileLevel < 3) {
-      for (var column = c0.column; c0.row <= c1.row; c0.row++) {
-        for (c0.column = column; c0.column <= c1.column; c0.column++) {
-          var tile = cache.load(c0, projection);
-          newLocks[tile.key] = tile;
-          if (!tile.ready) {
-            tile.proxyRefs = {};
-            var c, full, proxy;
+      var ymax = (1 << (c0.zoom + 8)) / tileSize.y;
+      scanTriangle(c0, c1, c2, 0, ymax, scanLine);
+      scanTriangle(c2, c3, c0, 0, ymax, scanLine);
+    }
 
-            // downsample high-resolution tiles
-            for (var dz = 1; dz <= 2; dz++) {
-              full = true;
-              for (var dy = 0, k = 1 << dz; dy <= k; dy++) {
-                for (var dx = 0; dx <= k; dx++) {
-                  proxy = cache.peek(c = {
-                    column: (c0.column << dz) + dx,
-                    row: (c0.row << dz) + dy,
-                    zoom: c0.zoom + dz
-                  });
-                  if (proxy && proxy.ready) {
-                    newLocks[proxy.key] = cache.load(c);
-                    proxy.proxyCount++;
-                    tile.proxyRefs[proxy.key] = proxy;
-                  } else {
-                    full = false;
-                  }
-                }
-              }
-              if (full) break;
-            }
+    // scan-line conversion
+    function scanLine(x0, x1, y) {
+      var z = c0.zoom;
 
-            // upsample low-resolution tiles
-            if (!full) {
-              for (var dz = 1; dz <= 4; dz++) {
+      for (var x = x0; x < x1; x++) {
+        var tile = cache.load({column: x, row: y, zoom: z}, projection);
+        newLocks[tile.key] = tile;
+        if (!tile.ready) {
+          tile.proxyRefs = {};
+          var c, full, proxy;
+
+          // downsample high-resolution tiles
+          for (var dz = 1; dz <= 2; dz++) {
+            full = true;
+            for (var dy = 0, k = 1 << dz; dy <= k; dy++) {
+              for (var dx = 0; dx <= k; dx++) {
                 proxy = cache.peek(c = {
-                  column: c0.column >> dz,
-                  row: c0.row >> dz,
-                  zoom: c0.zoom - dz
+                  column: (x << dz) + dx,
+                  row: (y << dz) + dy,
+                  zoom: z + dz
                 });
                 if (proxy && proxy.ready) {
                   newLocks[proxy.key] = cache.load(c);
                   proxy.proxyCount++;
                   tile.proxyRefs[proxy.key] = proxy;
-                  break;
+                } else {
+                  full = false;
                 }
+              }
+            }
+            if (full) break;
+          }
+
+          // upsample low-resolution tiles
+          if (!full) {
+            for (var dz = 1; dz <= 4; dz++) {
+              proxy = cache.peek(c = {
+                column: x >> dz,
+                row: y >> dz,
+                zoom: z - dz
+              });
+              if (proxy && proxy.ready) {
+                newLocks[proxy.key] = cache.load(c);
+                proxy.proxyCount++;
+                tile.proxyRefs[proxy.key] = proxy;
+                break;
               }
             }
           }
@@ -276,3 +260,52 @@ po.layer = function(load, unload) {
 
   return layer;
 };
+
+// scan-line conversion
+function edge(a, b) {
+  if (a.row > b.row) { var t = a; a = b; b = t; }
+  return {
+    x0: a.column,
+    y0: a.row,
+    x1: b.column,
+    y1: b.row,
+    dx: b.column - a.column,
+    dy: b.row - a.row
+  };
+}
+
+// scan-line conversion
+function scanSpans(e0, e1, ymin, ymax, scanLine) {
+  var y0 = Math.max(ymin, Math.floor(e1.y0)),
+      y1 = Math.min(ymax, Math.ceil(e1.y1));
+
+  // sort edges by x-coordinate
+  if (e0.x0 < e1.x0 || e0.x1 < e1.x1) { var t = e0; e0 = e1; e1 = t; }
+
+  // scan lines!
+  var m0 = e0.dx / e0.dy,
+      m1 = e1.dx / e1.dy,
+      d0 = e0.dx > 0, // use y + 1 to compute x0
+      d1 = e1.dx < 0; // use y + 1 to compute x1
+  for (var y = y0; y < y1; y++) {
+    var x0 = m0 * Math.max(0, Math.min(e0.dy, y + d0 - e0.y0)) + e0.x0,
+        x1 = m1 * Math.max(0, Math.min(e1.dy, y + d1 - e1.y0)) + e1.x0;
+    scanLine(Math.floor(x1), Math.ceil(x0), y);
+  }
+}
+
+// scan-line conversion
+function scanTriangle(a, b, c, ymin, ymax, scanLine) {
+  var ab = edge(a, b),
+      bc = edge(b, c),
+      ca = edge(c, a);
+
+  // sort edges by y-length
+  if (ab.dy > bc.dy) { var t = ab; ab = bc; bc = t; }
+  if (ab.dy > ca.dy) { var t = ab; ab = ca; ca = t; }
+  if (bc.dy > ca.dy) { var t = bc; bc = ca; ca = t; }
+
+  // scan span! scan span!
+  if (ab.dy) scanSpans(ca, ab, ymin, ymax, scanLine);
+  if (bc.dy) scanSpans(ca, bc, ymin, ymax, scanLine);
+}
