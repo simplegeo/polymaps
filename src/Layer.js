@@ -7,6 +7,7 @@ po.layer = function(load, unload) {
       id,
       map,
       container,
+      transform,
       levels;
 
   function sizeZoom(zoom) {
@@ -37,7 +38,8 @@ po.layer = function(load, unload) {
     container.setAttribute("transform",
         "translate(" + mapSize.x / 2 + "," + mapSize.y / 2 + ")"
         + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
-        + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : ""));
+        + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : "")
+        + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
 
     // get the coordinates of the four corners
     var c0 = map.pointCoordinate(tileCenter, tileSize, zero),
@@ -46,7 +48,7 @@ po.layer = function(load, unload) {
         c3 = map.pointCoordinate(tileCenter, tileSize, {x: 0, y: mapSize.y});
 
     // round to pixel boundary to avoid anti-aliasing artifacts
-    if (!mapAngle && !mapZoomFraction) {
+    if (!transform && !mapAngle && !mapZoomFraction) {
       tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
       tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
     }
@@ -59,6 +61,15 @@ po.layer = function(load, unload) {
       c1.column *= k; c1.row *= k; c1.zoom += tileLevel;
       c2.column *= k; c2.row *= k; c2.zoom += tileLevel;
       c3.column *= k; c3.row *= k; c3.zoom += tileLevel;
+    }
+
+    // layer-specific coordinate transform
+    if (transform) {
+      c0 = transform.unapply(c0);
+      c1 = transform.unapply(c1);
+      c2 = transform.unapply(c2);
+      c3 = transform.unapply(c3);
+      tileCenter = transform.unapply(tileCenter);
     }
 
     // tile-specific projection
@@ -154,7 +165,7 @@ po.layer = function(load, unload) {
     // position tiles
     for (var key in newLocks) {
       var tile = newLocks[key],
-          k = Math.pow(2, tile.level = tile.zoom - mapZoom),
+          k = Math.pow(2, tile.level = tile.zoom - tileCenter.zoom),
           x = tileSize.x * (tile.column - tileCenter.column * k),
           y = tileSize.y * (tile.row - tileCenter.row * k),
           t = "translate(" + x + "," + y + ")";
@@ -245,6 +256,13 @@ po.layer = function(load, unload) {
   layer.visible = function(x) {
     if (!arguments.length) return visible;
     visible = x;
+    if (map) move();
+    return layer;
+  };
+
+  layer.transform = function(x) {
+    if (!arguments.length) return transform;
+    transform = x;
     if (map) move();
     return layer;
   };

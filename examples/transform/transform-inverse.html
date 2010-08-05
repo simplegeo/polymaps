@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <script type="text/javascript" src="../../polymaps.js"></script>
+    <script type="text/javascript" src="nypl.js"></script>
+    <style type="text/css">
+
+body {
+  margin: 0;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+}
+
+#nypl {
+  opacity: .5;
+  -webkit-transition: opacity 250ms linear;
+}
+
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+var po = org.polymaps;
+
+var transform = derive(
+  // broadway & kent
+  {column: 0.294532, row: 0.3759881, zoom: 0},
+  {column: 4.335977, row: 24.711149, zoom: 5},
+  // havemeyer & north 6th
+  {column: 0.2945710, row: 0.3759732, zoom: 0},
+  {column: 19.724611, row: 20.933728, zoom: 5},
+  // river & north 1st
+  {column: 0.2945396, row: 0.3759645, zoom: 0},
+  {column: 16.552508, row: 32.346599, zoom: 6}
+);
+
+var map = po.map()
+    .container(document.body.appendChild(po.svg("svg")))
+    .center({lon: -73, lat: -48})
+    .zoomRange([1, 4])
+    .zoom(3)
+    .add(po.interact());
+
+map.add(po.image()
+    .url(po.url("http://{S}tile.cloudmade.com"
+    + "/1a1b06b230af4efdbb989ea99e9841af" // http://cloudmade.com/register
+    + "/998/256/{Z}/{X}/{Y}.png")
+    .hosts(["a.", "b.", "c.", ""]))
+    .transform(transform));
+
+map.add(po.image()
+    .id("nypl")
+    .url(nypl("8021", {x: 6200, y: 5000})));
+
+function key(e) {
+  var nypl = document.getElementById("nypl");
+  switch (e.keyCode) {
+    case 49: nypl.style.opacity = e.type == "keydown" ? 1 : .5; break;
+    case 50: nypl.style.opacity = e.type == "keydown" ? 0 : .5; break;
+  }
+}
+
+window.addEventListener("keydown", key, false);
+window.addEventListener("keyup", key, false);
+
+    </script>
+  </body>
+</html>

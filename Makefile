@@ -2,6 +2,7 @@ JS_FILES = \
 	src/start.js \
 	src/Id.js \
 	src/Svg.js \
+	src/Transform.js \
 	src/Cache.js \
 	src/Url.js \
 	src/Dispatch.js \
