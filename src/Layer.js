@@ -111,17 +111,18 @@ po.layer = function(load, unload) {
 
     // scan-line conversion
     function scanLine(x0, x1, y) {
-      var z = c0.zoom;
+      var z = c0.zoom,
+          z0 = 2 - tileLevel,
+          z1 = 4 + tileLevel;
 
       for (var x = x0; x < x1; x++) {
         var tile = cache.load({column: x, row: y, zoom: z}, projection);
-        newLocks[tile.key] = tile;
-        if (!tile.ready) {
+        if (!tile.ready && !(tile.key in newLocks)) {
           tile.proxyRefs = {};
           var c, full, proxy;
 
           // downsample high-resolution tiles
-          for (var dz = 1; dz <= 2; dz++) {
+          for (var dz = 1; dz <= z0; dz++) {
             full = true;
             for (var dy = 0, k = 1 << dz; dy <= k; dy++) {
               for (var dx = 0; dx <= k; dx++) {
@@ -144,7 +145,7 @@ po.layer = function(load, unload) {
 
           // upsample low-resolution tiles
           if (!full) {
-            for (var dz = 1; dz <= 4; dz++) {
+            for (var dz = 1; dz <= z1; dz++) {
               proxy = cache.peek(c = {
                 column: x >> dz,
                 row: y >> dz,
@@ -159,6 +160,7 @@ po.layer = function(load, unload) {
             }
           }
         }
+        newLocks[tile.key] = tile;
       }
     }
 
