@@ -6,11 +6,26 @@
 
 body {
   margin: 0;
+  background: #E5E0D9;
 }
 
 svg {
   width: 100%;
   height: 100%;
+}
+
+#copy {
+  position: absolute;
+  left: 0;
+  bottom: 4px;
+  padding-left: 5px;
+  font: 9px sans-serif;
+  color: #fff;
+  cursor: default;
+}
+
+#copy a {
+  color: #fff;
 }
 
 #nypl {
@@ -67,5 +82,11 @@ window.addEventListener("keydown", key, false);
 window.addEventListener("keyup", key, false);
 
     </script>
+    <span id="copy">
+      &copy; 2010
+      <a href="http://www.cloudmade.com/">CloudMade</a>,
+      <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors,
+      <a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a>.
+    </span>
   </body>
 </html>
