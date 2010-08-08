@@ -2,8 +2,8 @@ po.cache = function(load, unload) {
   var cache = {},
       locks = {},
       map = {},
-      head,
-      tail,
+      head = null,
+      tail = null,
       size = 64,
       n = 0;
 
@@ -11,18 +11,10 @@ po.cache = function(load, unload) {
     n--;
     if (unload) unload(tile);
     delete map[tile.key];
-    if (tile.next) {
-      tile.next.prev = tile.prev;
-    } else {
-      tail = tile.prev;
-      tail.next = null;
-    }
-    if (tile.prev) {
-      tile.prev.next = tile.next;
-    } else {
-      head = tile.next;
-      head.prev = null;
-    }
+    if (tile.next) tile.next.prev = tile.prev;
+    else if (tail = tile.prev) tail.next = null;
+    if (tile.prev) tile.prev.next = tile.next;
+    else if (head = tile.next) head.prev = null;
   }
 
   function flush() {
