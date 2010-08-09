@@ -94,21 +94,8 @@ po.map = function() {
     center.lat = Math.max(-l, Math.min(+l, center.lat));
   }
 
-  /*
-   * In Firefox, SVG elements do not report their dimensions correctly. However,
-   * Firefox does correctly report the bounding box of the first child rect!
-   */
-  function bounds() {
-    var svg = container.ownerSVGElement || container;
-    return (typeof svg.offsetWidth == "undefined"
-        ? svg.firstChild
-        : svg).getBoundingClientRect();
-  }
-
   // a place to capture mouse events if no tiles exist
   var rect = po.svg("rect");
-  rect.setAttribute("width", "100%");
-  rect.setAttribute("height", "100%");
   rect.setAttribute("visibility", "hidden");
   rect.setAttribute("pointer-events", "all");
 
@@ -128,8 +115,10 @@ po.map = function() {
   };
 
   map.mouse = function(e) {
-    var x = e.clientX, y = e.clientY, b = bounds();
-    return {x: x - b.left, y: y - b.top};
+    var point = (container.ownerSVGElement || container).createSVGPoint();
+    point.x = e.clientX;
+    point.y = e.clientY;
+    return point.matrixTransform(container.getScreenCTM().inverse());
   };
 
   map.size = function(x) {
@@ -140,13 +129,25 @@ po.map = function() {
 
   map.resize = function() {
     if (!size) {
-      var b = bounds();
+      /*
+       * Firefox does not correctly report the dimensions of SVG elements.
+       * However, it does correctly report the size of the child rect!
+       */
+      var e = container.ownerSVGElement || container;
+      if (e.offsetWidth == null) {
+        rect.setAttribute("width", "100%");
+        rect.setAttribute("height", "100%");
+        e = rect;
+      }
+      b = e.getBoundingClientRect();
       sizeActual = {x: b.width, y: b.height};
       resizer.add(map);
     } else {
       sizeActual = size;
       resizer.remove(map);
     }
+    rect.setAttribute("width", sizeActual.x);
+    rect.setAttribute("height", sizeActual.y);
     sizeRadius = {x: sizeActual.x / 2, y: sizeActual.y / 2};
     recenter();
     event({type: "resize"});
