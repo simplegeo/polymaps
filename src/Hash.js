@@ -17,7 +17,12 @@ po.hash = function() {
     if (location.hash === s0) return; // ignore spurious hashchange events
     var args = (s0 = location.hash).substring(1).split("/").map(Number);
     if (args.length < 3 || args.some(isNaN)) move(); // replace bogus hash
-    else map.zoom(args[0]).center({lat: args[1], lon: args[2]});
+    else {
+      var size = map.size();
+      map.zoomBy(args[0] - map.zoom(),
+          {x: size.x / 2, y: size.y / 2},
+          {lat: args[1], lon: args[2]});
+    }
   }
 
   hash.map = function(x) {
