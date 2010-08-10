@@ -1,6 +1,7 @@
 po.hash = function() {
   var hash = {},
       s0, // cached location.hash
+      lat = 90 - 1e-8, // allowable latitude range
       map;
 
   function move() {
@@ -21,7 +22,7 @@ po.hash = function() {
       var size = map.size();
       map.zoomBy(args[0] - map.zoom(),
           {x: size.x / 2, y: size.y / 2},
-          {lat: args[1], lon: args[2]});
+          {lat: Math.min(lat, Math.max(-lat, args[1])), lon: args[2]});
     }
   }
 
