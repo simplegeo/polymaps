@@ -1,6 +1,15 @@
-function nypl(id, size) {
-  var template = "http://dev.maps.nypl.org/warper/mapscans/wms"
-      + "/" + id
+var nypl = {};
+
+nypl.image = function() {
+  var image = po.layer(load, unload),
+      scanInfo,
+      scanId,
+      tiles = {};
+
+  var infoTemplate = "http://maps.nypl.org/warper-dev/maps/{I}.json"
+      + "?callback=nypl.image.$callback{I}";
+
+  var imageTemplate = "http://dev.maps.nypl.org/warper/mapscans/wms/{I}"
       + "?FORMAT=image%2Fjpeg"
       + "&STATUS=unwarped"
       + "&SERVICE=WMS"
@@ -9,22 +18,83 @@ function nypl(id, size) {
       + "&STYLES="
       + "&EXCEPTIONS=application%2Fvnd.ogc.se_inimage"
       + "&SRS=EPSG%3A4326"
-      + "&WIDTH=256"
-      + "&HEIGHT=256"
+      + "&WIDTH={W}"
+      + "&HEIGHT={H}"
       + "&BBOX={B}";
-  return function(c) {
-    var x = c.column << 13 - c.zoom,
-        y = ((1 << c.zoom) - c.row - 1) << 13 - c.zoom,
-        z = 1 << 13 - c.zoom;
-    if (x < 0 || x > size.x || y < 0 || y > size.y) return "transparent.png";
-    return template.replace(/{(.)}/g, function(s, v) {
+
+  function load(tile) {
+    var element = tile.element = po.svg("image");
+    if (scanInfo) request(tile);
+    tiles[tile.key] = tile;
+  }
+
+  function request(tile) {
+    var element = tile.element,
+        size = image.size(),
+        w = size.x,
+        h = size.y,
+        k = Math.pow(2, -tile.zoom) * Math.max(scanInfo.width, scanInfo.height),
+        x = ~~(tile.column * k),
+        y = scanInfo.height - ~~(tile.row * k),
+        z = ~~k,
+        dx = z,
+        dy = z;
+
+    if (y < dy) {
+      dy = y;
+      h = ~~(size.y * dy / z);
+    }
+
+    if (x > scanInfo.width - dx) {
+      dx = scanInfo.width - x;
+      w = ~~(size.x * dx / z);
+    }
+
+    element.setAttribute("opacity", 0);
+    if ((x < 0) || (dx <= 0) || (dy <= 0)) return; // nothing to display
+    element.setAttribute("width", w);
+    element.setAttribute("height", h);
+
+    var url = imageTemplate.replace(/{(.)}/g, function(s, v) {
       switch (v) {
-        case "B": return [x, y, x + z, y + z].join(",");
+        case "I": return scanId;
+        case "W": return w;
+        case "H": return h;
+        case "B": return [x, y - dy, x + dx, y].join(",");
       }
       return v;
     });
-  };
-}
+
+    tile.request = po.queue.image(element, url, function() {
+      delete tile.request;
+      tile.ready = true;
+      element.removeAttribute("opacity");
+      image.dispatch({type: "load", tile: tile});
+    });
+  }
+
+  function unload(tile) {
+    if (tile.request) tile.request.abort(true);
+    delete tiles[tiles.key];
+  }
+
+  image.scan = function(x) {
+    if (!arguments.length) return scanId;
+    scanId = x;
+    // JSONP, since nypl.org doesn't Access-Control-Allow-Origin: *
+    nypl.image["$callback" + x] = function(x) {
+      self.scanInfo = scanInfo = x.items[0];
+      for (var key in tiles) request(tiles[key]);
+    };
+    var script = document.createElement("script");
+    script.setAttribute("type", "text/javascript");
+    script.setAttribute("src", infoTemplate.replace(/{I}/g, x));
+    document.body.appendChild(script);
+    return image;
+  }
+
+  return image;
+};
 
 function derive(a0, a1, b0, b1, c0, c1) {
 

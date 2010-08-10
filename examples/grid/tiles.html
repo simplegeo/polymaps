@@ -3,19 +3,24 @@
     <script type="text/javascript" src="../../polymaps.js"></script>
     <style type="text/css">
 
+@import url("../example.css");
+
 body {
-  margin: 0;
-  background: #E5E0D9;
+  font: 10px sans-serif;
 }
 
-svg {
-  width: 100%;
-  height: 100%;
+.map rect {
+  fill: #fff;
+  fill-opacity: .15;
+  stroke: red;
+  shape-rendering: crispEdges;
 }
 
-rect.tile {
-  fill-opacity: .25;
+.layer rect {
+  fill: #000;
+  fill-opacity: .15;
   stroke: #E5E0D9;
+  shape-rendering: auto;
   vector-effect: non-scaling-stroke;
 }
 
@@ -26,46 +31,45 @@ rect.tile {
 
 var po = org.polymaps;
 
-var tileSize = {x: 64, y: 64},
-    mapSize = {x: 800, y: 400};
-
 var svg = document.body.appendChild(po.svg("svg")),
     g = svg.appendChild(po.svg("g"));
 
-g.setAttribute("transform", "translate(100, 100)");
-
-var rect = g.appendChild(po.svg("rect"));
-rect.setAttribute("width", mapSize.x);
-rect.setAttribute("height", mapSize.y);
-rect.setAttribute("fill", "none");
-rect.setAttribute("stroke", "red");
-
 var map = po.map()
     .container(g)
-    .size(mapSize)
     .angle(.3)
     .add(po.interact());
 
-map.add(po.layer(grid("green"))
-    .size(tileSize));
+resize();
 
-function grid(color) {
-  return function(tile) {
-    var g = tile.element = po.svg("g");
+var tiles = po.layer(grid)
+    .size({x: 128, y: 128});
 
-    var rect = g.appendChild(po.svg("rect"));
-    rect.setAttribute("class", "tile");
-    rect.setAttribute("fill", color);
-    rect.setAttribute("width", tileSize.x);
-    rect.setAttribute("height", tileSize.y);
+map.add(tiles);
 
-    var text = g.appendChild(po.svg("text"));
-    text.style.font = "8px sans-serif";
-    text.setAttribute("x", 6);
-    text.setAttribute("y", 6);
-    text.setAttribute("dy", ".71em");
-    text.appendChild(document.createTextNode(tile.key.replace(/\//g, " ")));
-  };
+var rect = g.appendChild(po.svg("rect"));
+rect.setAttribute("width", "50%");
+rect.setAttribute("height", "50%");
+
+function resize() {
+  var x = document.body.clientWidth / 2,
+      y = document.body.clientHeight / 2;
+  g.setAttribute("transform", "translate(" + (x / 2) + "," + (y / 2) + ")");
+  map.size({x: x, y: y});
+}
+
+function grid(tile) {
+  var g = tile.element = po.svg("g");
+
+  var rect = g.appendChild(po.svg("rect")),
+      size = tiles.size();
+  rect.setAttribute("width", size.x);
+  rect.setAttribute("height", size.y);
+
+  var text = g.appendChild(po.svg("text"));
+  text.setAttribute("x", 6);
+  text.setAttribute("y", 6);
+  text.setAttribute("dy", ".71em");
+  text.appendChild(document.createTextNode(tile.key));
 }
 
 var spin = 0;
@@ -75,6 +79,7 @@ setInterval(function() {
 
 window.addEventListener("keydown", function(e) { spin = e.metaKey ? .004 : -.004; }, true);
 window.addEventListener("keyup", function() { spin = 0; }, true);
+window.addEventListener("resize", resize, false);
 
     </script>
   </body>

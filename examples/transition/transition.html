@@ -1,39 +1,10 @@
 <html>
   <head>
     <script type="text/javascript" src="../../polymaps.js"></script>
+    <script type="text/javascript" src="ease.js"></script>
     <style type="text/css">
 
-body {
-  margin: 0;
-  background: #E5E0D9;
-}
-
-svg {
-  width: 100%;
-  height: 100%;
-}
-
-path {
-  fill: #CCC6C2;
-  stroke: #fff;
-  stroke-width: .25px;
-  shape-rendering: crispEdges;
-}
-
-#copy {
-  position: absolute;
-  left: 0;
-  bottom: 4px;
-  width: 33%;
-  padding-left: 5px;
-  font: 9px sans-serif;
-  color: #fff;
-  cursor: default;
-}
-
-#copy a {
-  color: #fff;
-}
+@import url("../example.css");
 
     </style>
   </head>
@@ -42,8 +13,11 @@ path {
 
 var po = org.polymaps;
 
+var svg = document.body.appendChild(po.svg("svg")),
+    g = svg.appendChild(po.svg("g"));
+
 var map = po.map()
-    .container(document.body.appendChild(po.svg("svg")));
+    .container(g);
 
 map.add(po.image()
     .url(po.url("http://{S}tile.cloudmade.com"
@@ -51,27 +25,16 @@ map.add(po.image()
     + "/998/256/{Z}/{X}/{Y}.png")
     .hosts(["a.", "b.", "c.", ""])));
 
-var timer, duration = 500, x, y;
-
-function reflect(f) {
-  return function(t) {
-    return .5 * (t < .5 ? f(2 * t) : (2 - f(2 - 2 * t)));
-  };
-}
-
-function poly(e) {
-  return function(t) {
-    return t < 0 ? 0 : t > 1 ? 1 : Math.pow(t, e);
-  };
-}
-
-var ease = reflect(poly(3)); // cubic-in-out
+var timer,
+    duration = 500,
+    x,
+    y,
+    ease = reflect(poly(3)); // cubic-in-out
 
 window.addEventListener("mousedown", function(e) {
   if (timer) clearInterval(timer);
   var start = Date.now(),
-      end = start + duration,
-      g = document.getElementsByTagName("g")[0];
+      end = start + duration;
 
   x = e.clientX;
   y = e.clientY;

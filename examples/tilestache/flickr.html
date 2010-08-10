@@ -3,25 +3,18 @@
     <script type="text/javascript" src="../../polymaps.js"></script>
     <style type="text/css">
 
+@import url("../example.css");
+
 body {
-  margin: 0;
   background: url(dot.gif);
 }
 
-svg {
-  width: 100%;
-  height: 100%;
-}
-
 #copy {
-  position: absolute;
-  left: 0;
   bottom: 0;
   padding: 10px;
   font: 10px sans-serif;
   background: #fff;
   color: #666;
-  cursor: default;
 }
 
 #copy a {
@@ -67,7 +60,8 @@ var map = po.map()
     .zoomRange([0, 9])
     .zoom(3)
     .add(po.image().url(tilestache("http://s3.amazonaws.com/info.aaronland.tiles.shapetiles/{Z}/{X}/{Y}.png")))
-    .add(po.interact());
+    .add(po.interact())
+    .add(po.compass());
 
     </script>
     <span id="copy">

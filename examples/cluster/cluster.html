@@ -4,21 +4,13 @@
     <script type="text/javascript" src="cluster.js"></script>
     <style type="text/css">
 
+@import url("../example.css");
+
 body {
-  margin: 0;
   background: #E6E6E6;
 }
 
-svg {
-  width: 100%;
-  height: 100%;
-}
-
-#streets {
-  opacity: .3;
-}
-
-circle {
+.layer circle {
   fill: lightcoral;
   fill-opacity: .5;
   stroke: brown;
@@ -26,14 +18,8 @@ circle {
 }
 
 #copy {
-  position: absolute;
-  left: 0;
-  bottom: 4px;
-  padding-left: 5px;
-  font: 9px sans-serif;
   color: #000;
   opacity: .5;
-  cursor: default;
 }
 
 #copy a {
@@ -51,7 +37,9 @@ var map = po.map()
     .container(document.body.appendChild(po.svg("svg")))
     .center({lat: 37.787, lon: -122.228})
     .zoom(14)
-    .zoomRange([12, 16]);
+    .zoomRange([12, 16])
+    .add(po.interact())
+    .add(po.hash());
 
 map.add(po.image()
     .url(po.url("http://{S}tile.cloudmade.com"
@@ -66,13 +54,12 @@ map.add(po.geoJson()
     .clip(false)
     .zoom(14));
 
-map.add(po.interact());
-map.add(po.hash());
+map.add(po.compass());
 
 function load(e) {
   var clustering = e.tile.cluster || (e.tile.cluster = cluster()
-    .iterations(16)
-    .size(64));
+      .iterations(16)
+      .size(64));
 
   for (var i = 0; i < e.features.length; i++) {
     var feature = e.features[i];
