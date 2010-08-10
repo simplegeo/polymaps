@@ -11,7 +11,7 @@ po.layer = function(load, unload) {
       levels;
 
   function sizeZoom(zoom) {
-    var k = Math.pow(2, 8 + zoom);
+    var k = Math.pow(2, 8 + Math.min(8, zoom));
     return {x: k, y: k};
   }
 
@@ -104,9 +104,14 @@ po.layer = function(load, unload) {
 
     // load the tiles!
     if (visible && tileLevel > -5 && tileLevel < 3) {
-      var ymax = (1 << (c0.zoom + 8)) / tileSize.y;
-      scanTriangle(c0, c1, c2, 0, ymax, scanLine);
-      scanTriangle(c2, c3, c0, 0, ymax, scanLine);
+      if (size) {
+        var ymax = (1 << (c0.zoom + 8)) / tileSize.y;
+        scanTriangle(c0, c1, c2, 0, ymax, scanLine);
+        scanTriangle(c2, c3, c0, 0, ymax, scanLine);
+      } else {
+        var x = Math.floor((c0.column + c2.column) / 2);
+        scanLine(x, x + 1, 0);
+      }
     }
 
     // scan-line conversion
