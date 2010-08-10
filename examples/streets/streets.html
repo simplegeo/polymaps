@@ -60,7 +60,8 @@ map.add(po.geoJson()
     .on("load", load)
     .id("streets"));
 
-map.add(po.compass());
+map.add(po.compass()
+    .pan("none"));
 
 function pci(feature) {
   return Number(feature.data.properties.PCI);

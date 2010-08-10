@@ -69,7 +69,8 @@ map.add(po.geoJson()
     .url("http://polymaps.appspot.com/state/{Z}/{X}/{Y}.json")
     .on("load", load))
 
-map.add(po.compass());
+map.add(po.compass()
+    .pan("none"));
 
 map.container().setAttribute("class", "Blues");
 

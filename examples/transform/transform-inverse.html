@@ -48,7 +48,8 @@ map.add(nypl.image()
     .id("nypl")
     .scan("8021"));
 
-map.add(po.compass());
+map.add(po.compass()
+    .pan("none"));
 
 function key(e) {
   var nypl = document.getElementById("nypl");

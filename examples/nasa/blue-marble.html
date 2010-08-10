@@ -26,7 +26,7 @@ var map = po.map()
     .zoom(7)
     .add(po.image().url("http://s3.amazonaws.com/com.modestmaps.bluemarble/{Z}-r{Y}-c{X}.jpg"))
     .add(po.interact())
-    .add(po.compass());
+    .add(po.compass().pan("none"));
 
     </script>
     <div id="copy">

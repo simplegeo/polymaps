@@ -61,7 +61,7 @@ var map = po.map()
     .zoom(3)
     .add(po.image().url(tilestache("http://s3.amazonaws.com/info.aaronland.tiles.shapetiles/{Z}/{X}/{Y}.png")))
     .add(po.interact())
-    .add(po.compass());
+    .add(po.compass().pan("none"));
 
     </script>
     <span id="copy">

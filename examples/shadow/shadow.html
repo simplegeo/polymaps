@@ -28,7 +28,8 @@ map.add(po.geoJson()
     .features([{geometry: {coordinates: [-122.258, 37.805], type: "Point"}}])
     .on("load", load))
 
-map.add(po.compass());
+map.add(po.compass()
+    .pan("none"));
 
 /* Create a shadow filter. */
 var filter = map.container().appendChild(po.svg("filter")),

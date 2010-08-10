@@ -65,7 +65,8 @@ map.add(po.geoJson()
     .url("http://polymaps.appspot.com/state/{Z}/{X}/{Y}.json")
     .id("state"));
 
-map.add(po.compass());
+map.add(po.compass()
+    .pan("none"));
 
 function load(e) {
   for (var i = 0; i < e.features.length; i++) {

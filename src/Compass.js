@@ -7,8 +7,9 @@ po.compass = function() {
       last = 0,
       repeatDelay = 250,
       repeatInterval = 50,
-      position = "top-left",
-      zoomStyle = "small",
+      position = "top-left", // top-left, top-right, bottom-left, bottom-right
+      zoomStyle = "small", // none, small, big
+      panStyle = "small", // none, small
       panTimer,
       panDirection,
       map;
@@ -157,29 +158,33 @@ po.compass = function() {
     g = map.container().appendChild(po.svg("g"));
     g.setAttribute("class", "compass");
 
-    var d = g.appendChild(po.svg("g"));
-    d.setAttribute("class", "pan");
+    if (panStyle != "none") {
+      var d = g.appendChild(po.svg("g"));
+      d.setAttribute("class", "pan");
 
-    var back = d.appendChild(po.svg("circle"));
-    back.setAttribute("class", "back");
-    back.setAttribute("r", r);
+      var back = d.appendChild(po.svg("circle"));
+      back.setAttribute("class", "back");
+      back.setAttribute("r", r);
 
-    var s = d.appendChild(pan({x: 0, y: -speed}));
-    s.setAttribute("transform", "rotate(0)");
+      var s = d.appendChild(pan({x: 0, y: -speed}));
+      s.setAttribute("transform", "rotate(0)");
 
-    var w = d.appendChild(pan({x: speed, y: 0}));
-    w.setAttribute("transform", "rotate(90)");
+      var w = d.appendChild(pan({x: speed, y: 0}));
+      w.setAttribute("transform", "rotate(90)");
 
-    var n = d.appendChild(pan({x: 0, y: speed}));
-    n.setAttribute("transform", "rotate(180)");
+      var n = d.appendChild(pan({x: 0, y: speed}));
+      n.setAttribute("transform", "rotate(180)");
 
-    var e = d.appendChild(pan({x: -speed, y: 0}));
-    e.setAttribute("transform", "rotate(270)");
+      var e = d.appendChild(pan({x: -speed, y: 0}));
+      e.setAttribute("transform", "rotate(270)");
 
-    var fore = d.appendChild(po.svg("circle"));
-    fore.setAttribute("fill", "none");
-    fore.setAttribute("class", "fore");
-    fore.setAttribute("r", r);
+      var fore = d.appendChild(po.svg("circle"));
+      fore.setAttribute("fill", "none");
+      fore.setAttribute("class", "fore");
+      fore.setAttribute("r", r);
+
+      window.addEventListener("mouseup", panStop, false);
+    }
 
     if (zoomStyle != "none") {
       var z = g.appendChild(po.svg("g"));
@@ -194,12 +199,11 @@ po.compass = function() {
         }
       }
 
-      z.setAttribute("transform", "translate(0," + r * (/^top-/.test(position) ? (2 + (j + .5) * .4) : -2) + ")");
+      var p = panStyle == "none" ? .4 : 2;
+      z.setAttribute("transform", "translate(0," + r * (/^top-/.test(position) ? (p + (j + .5) * .4) : -p) + ")");
       z.appendChild(zoom(+1)).setAttribute("transform", "translate(0," + (-(j + .5) * r * .4) + ")");
       z.appendChild(zoom(-1)).setAttribute("transform", "scale(-1)");
     }
-
-    window.addEventListener("mouseup", panStop, false);
   }
 
   compass.radius = function(x) {
@@ -217,14 +221,18 @@ po.compass = function() {
   compass.position = function(x) {
     if (!arguments.length) return position;
     position = x;
-    move();
+    return compass;
+  };
+
+  compass.pan = function(x) {
+    if (!arguments.length) return panStyle;
+    panStyle = x;
     return compass;
   };
 
   compass.zoom = function(x) {
     if (!arguments.length) return zoomStyle;
     zoomStyle = x;
-    move();
     return compass;
   };
 

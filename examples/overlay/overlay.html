@@ -27,7 +27,8 @@ map.add(po.image()
 map.add(po.layer(overlay)
     .size(null));
 
-map.add(po.compass());
+map.add(po.compass()
+    .pan("none"));
 
 function overlay(tile, proj) {
   proj = proj(tile);

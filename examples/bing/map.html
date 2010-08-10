@@ -108,7 +108,8 @@ $(document).ready(function() {
     copy.appendChild(document.createTextNode(data.copyright));
 
     /* Display compass control. */
-    map.add(po.compass());
+    map.add(po.compass()
+        .pan("none"));
   }
 });
 

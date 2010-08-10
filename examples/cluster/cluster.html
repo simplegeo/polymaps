@@ -54,7 +54,8 @@ map.add(po.geoJson()
     .clip(false)
     .zoom(14));
 
-map.add(po.compass());
+map.add(po.compass()
+    .pan("none"));
 
 function load(e) {
   var clustering = e.tile.cluster || (e.tile.cluster = cluster()

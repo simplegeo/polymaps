@@ -34,7 +34,8 @@ map.add(po.image()
     .hosts(["a.", "b.", "c.", ""]))
     .on("load", load));
 
-map.add(po.compass());
+map.add(po.compass()
+    .pan("none"));
 
 /* Create an invert filter. */
 var filter = map.container().appendChild(po.svg("filter")),
