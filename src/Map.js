@@ -5,7 +5,6 @@ po.map = function() {
       sizeActual = zero,
       sizeRadius = zero, // sizeActual / 2
       center = {lat: 37.76487, lon: -122.41948},
-      centerRange,
       zoom = 12,
       zoomFraction = 0,
       zoomFactor = 1, // Math.pow(2, zoomFraction)
@@ -15,7 +14,14 @@ po.map = function() {
       angleSin = 0, // Math.sin(angle)
       angleCosi = 1, // Math.cos(-angle)
       angleSini = 0, // Math.sin(-angle)
+      ymin = -180, // lat2y(centerRange[0].lat)
+      ymax = 180, // lat2y(centerRange[1].lat)
       event = po.dispatch(map);
+
+  var centerRange = [
+    {lat: y2lat(ymin), lon: -Infinity},
+    {lat: y2lat(ymax), lon: Infinity}
+  ];
 
   // See http://wiki.openstreetmap.org/wiki/Mercator
 
@@ -87,12 +93,23 @@ po.map = function() {
   };
 
   function recenter() {
-    var k = 45 / Math.pow(2, 5 + zoom + zoomFraction),
-        y = Math.max(angleSin * sizeRadius.x + angleCos * sizeRadius.y,
-                     angleSini * sizeRadius.x + angleCosi * sizeRadius.y),
-        l = Math.max(0, y2lat(180 - y * k));
-    center.lat = Math.max(-l, Math.min(+l, center.lat));
-  }
+    if (!centerRange) return;
+    var k = 45 / Math.pow(2, 5 + zoom + zoomFraction);
+
+    // constrain latitude
+    var y = Math.max(Math.abs(angleSin * sizeRadius.x + angleCos * sizeRadius.y),
+                     Math.abs(angleSini * sizeRadius.x + angleCosi * sizeRadius.y)),
+        lat0 = y2lat(ymin - y * k),
+        lat1 = y2lat(ymax + y * k);
+    center.lat = Math.max(lat0, Math.min(lat1, center.lat));
+
+    // constrain longitude
+    var x = Math.max(Math.abs(angleSin * sizeRadius.y + angleCos * sizeRadius.x),
+                     Math.abs(angleSini * sizeRadius.y + angleCosi * sizeRadius.x)),
+        lon0 = centerRange[0].lon - x * k,
+        lon1 = centerRange[1].lon + x * k;
+    center.lon = Math.max(lon0, Math.min(lon1, center.lon));
+ }
 
   // a place to capture mouse events if no tiles exist
   var rect = po.svg("rect");
@@ -156,10 +173,7 @@ po.map = function() {
 
   map.center = function(x) {
     if (!arguments.length) return center;
-    center = centerRange ? {
-      lat: Math.max(centerRange[0].lat, Math.min(centerRange[1].lat, x.lat)),
-      lon: Math.max(centerRange[0].lon, Math.min(centerRange[1].lon, x.lon))
-    } : x;
+    center = x;
     recenter();
     event({type: "move"});
     return map;
@@ -178,7 +192,16 @@ po.map = function() {
   map.centerRange = function(x) {
     if (!arguments.length) return centerRange;
     centerRange = x;
-    return map.center(center);
+    if (centerRange) {
+      ymin = centerRange[0].lat > -90 ? lat2y(centerRange[0].lat) : -Infinity;
+      ymax = centerRange[0].lat < 90 ? lat2y(centerRange[1].lat) : Infinity;
+    } else {
+      ymin = -Infinity;
+      ymax = Infinity;
+    }
+    recenter();
+    event({type: "move"});
+    return map;
   };
 
   map.zoom = function(x) {
