@@ -39,4 +39,4 @@ polymaps.js: $(JS_FILES) Makefile
 	chmod a-w $@
 
 clean:
-	rm polymaps.js polymaps.min.js
+	rm -f polymaps.js polymaps.min.js
