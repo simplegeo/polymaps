@@ -77,8 +77,15 @@ setInterval(function() {
   if (spin) map.angle(map.angle() + spin);
 }, 30);
 
-window.addEventListener("keydown", function(e) { spin = e.metaKey ? .004 : -.004; }, true);
-window.addEventListener("keyup", function() { spin = 0; }, true);
+function key(e) {
+  switch (e.keyCode) {
+    case 65: spin = e.type == "keydown" ? -.004 : 0; break;
+    case 68: spin = e.type == "keydown" ? .004 : 0; break;
+  }
+}
+
+window.addEventListener("keydown", key, true);
+window.addEventListener("keyup", key, true);
 window.addEventListener("resize", resize, false);
 
     </script>
