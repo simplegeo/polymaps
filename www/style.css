@@ -3,6 +3,11 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.svg img.logo
+{
+  display: none;
+}
+
 code, tt, pre {
   font-family: Courier;
 }
