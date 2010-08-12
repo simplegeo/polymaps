@@ -1,0 +1,46 @@
+body {
+  font-size: 14px;
+  text-rendering: optimizeLegibility;
+}
+
+code, tt, pre {
+  font-family: Courier;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+a:link, a:visited {
+  color: steelblue;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.top {
+  padding-top: 15px;
+}
+
+.top a {
+  margin-right: 20px;
+}
+
+.top a, a.bold {
+  font-weight: bold;
+  line-height: 100%;
+}
+
+.blurb {
+  font-weight: 300;
+  font-size: 22px;
+}
+
+img {
+  padding: 0;
+  border: 0;
+  margin-right: 2;
+  margin-bottom: 2;
+}

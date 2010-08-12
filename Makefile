@@ -25,6 +25,33 @@ JS_COMPILER = \
 	java -jar lib/google-compiler/compiler-20100616.jar \
 	--charset UTF-8
 
+WWW_FILES = \
+	polymaps.min.js \
+	lib/nns/nns.min.js \
+	lib/blueprint/screen.css \
+	www/index.html \
+	www/logo-big.js \
+	www/logo-small.js \
+	www/style.css
+
+WWW_EX_FILES = \
+  www/ex/bing-sm.png \
+  www/ex/bluemarble-sm.png \
+  www/ex/cluster-sm.png \
+  www/ex/features-sm.png \
+  www/ex/flickr-sm.png \
+  www/ex/grid-sm.png \
+  www/ex/midnightcommander-sm.png \
+  www/ex/overlay-sm.png \
+  www/ex/paledawn-sm.png \
+  www/ex/population-sm.png \
+  www/ex/shadow-sm.png \
+  www/ex/statehood-sm.png \
+  www/ex/streets-sm.png \
+  www/ex/tiles-sm.png \
+  www/ex/transform-sm.png \
+  www/ex/unemployment-sm.png
+
 all: polymaps.min.js polymaps.js
 
 polymaps.min.js: polymaps.js
@@ -38,5 +65,11 @@ polymaps.js: $(JS_FILES) Makefile
 	cat $(JS_FILES) >> $@
 	chmod a-w $@
 
+html: $(WWW_FILES) Makefile
+	rm -rf $@
+	mkdir $@ $@/ex
+	cp $(WWW_FILES) $@
+	cp $(WWW_EX_FILES) $@/ex
+
 clean:
-	rm -f polymaps.js polymaps.min.js
+	rm -rf polymaps.js polymaps.min.js html
