@@ -15,8 +15,7 @@ po.map = function() {
       angleCosi = 1, // Math.cos(-angle)
       angleSini = 0, // Math.sin(-angle)
       ymin = -180, // lat2y(centerRange[0].lat)
-      ymax = 180, // lat2y(centerRange[1].lat)
-      event = po.dispatch(map);
+      ymax = 180; // lat2y(centerRange[1].lat)
 
   var centerRange = [
     {lat: y2lat(ymin), lon: -Infinity},
@@ -167,7 +166,7 @@ po.map = function() {
     rect.setAttribute("height", sizeActual.y);
     sizeRadius = {x: sizeActual.x / 2, y: sizeActual.y / 2};
     recenter();
-    event({type: "resize"});
+    map.dispatch({type: "resize"});
     return map;
   };
 
@@ -175,7 +174,7 @@ po.map = function() {
     if (!arguments.length) return center;
     center = x;
     recenter();
-    event({type: "move"});
+    map.dispatch({type: "move"});
     return map;
   };
 
@@ -200,7 +199,7 @@ po.map = function() {
       ymax = Infinity;
     }
     recenter();
-    event({type: "move"});
+    map.dispatch({type: "move"});
     return map;
   };
 
@@ -243,7 +242,7 @@ po.map = function() {
     angleCosi = Math.cos(-angle);
     angleSini = Math.sin(-angle);
     recenter();
-    event({type: "move"});
+    map.dispatch({type: "move"});
     return map;
   };
 
@@ -256,6 +255,8 @@ po.map = function() {
     x.map(null);
     return map;
   };
+
+  map.dispatch = po.dispatch(map);
 
   return map;
 };
