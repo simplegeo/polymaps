@@ -35,6 +35,7 @@ WWW_FILES = \
 	www/style.css
 
 WWW_EX_FILES = \
+  www/ex/bing.html \
   www/ex/bing-sm.png \
   www/ex/bluemarble-sm.png \
   www/ex/cluster-sm.png \
@@ -52,6 +53,9 @@ WWW_EX_FILES = \
   www/ex/transform-sm.png \
   www/ex/unemployment-sm.png
 
+PYGMENT = /Library/Pygments-1.3.1/pygmentize
+PYGMENT_STYLE = trac
+
 all: polymaps.min.js polymaps.js
 
 polymaps.min.js: polymaps.js
@@ -65,11 +69,28 @@ polymaps.js: $(JS_FILES) Makefile
 	cat $(JS_FILES) >> $@
 	chmod a-w $@
 
-html: $(WWW_FILES) Makefile
+%.d: %.m4 Makefile www/m4d.sh
+	www/m4d.sh $< > $@
+
+include $(patsubst %.html,%.d,$(filter %.html,$(WWW_EX_FILES)))
+
+html: $(WWW_FILES) $(WWW_EX_FILES) Makefile
 	rm -rf $@
 	mkdir $@ $@/ex
 	cp $(WWW_FILES) $@
 	cp $(WWW_EX_FILES) $@/ex
 
+%.html: %.m4 Makefile
+	rm -f $@
+	pushd $(dir $<) && m4 -P < $(notdir $<) > $(notdir $@) && popd
+	chmod a-w $@
+
+%.js.html: %.js Makefile
+	$(PYGMENT) -f html -O cssclass=syntax,style=$(PYGMENT_STYLE) -l js $(filter %.js,$^) > $@
+
+%.js.txt: %.js Makefile
+	cat $(filter %.js,$^) > $@
+
 clean:
 	rm -rf polymaps.js polymaps.min.js html
+	rm -f $(patsubst %.html,%.d,$(filter %.html,$(WWW_EX_FILES)))
