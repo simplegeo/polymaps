@@ -29,6 +29,7 @@ WWW_FILES = \
 	polymaps.min.js \
 	lib/nns/nns.min.js \
 	lib/blueprint/screen.css \
+	lib/modernizr/modernizr.min.js \
 	www/index.html \
 	www/logo-big.js \
 	www/logo-small.js \
@@ -42,6 +43,8 @@ WWW_EX_FILES = \
   www/ex/features-sm.png \
   www/ex/flickr-sm.png \
   www/ex/grid-sm.png \
+  www/ex/logo-big.png \
+  www/ex/logo-small.png \
   www/ex/midnightcommander-sm.png \
   www/ex/overlay-sm.png \
   www/ex/paledawn-sm.png \
