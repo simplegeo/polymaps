@@ -53,7 +53,9 @@
   var map = po.map()
       .container($n(g2.add("svg:g").attr("transform", "translate(330,-100)")))
       .size({x: 430, y: 140})
-      .add(po.interact());
+      .add(po.drag())
+      .add(po.dblclick())
+      .add(po.wheel());
 
   map.add(po.image()
       .url(po.url("http://{S}tile.cloudmade.com"
