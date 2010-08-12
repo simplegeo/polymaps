@@ -6,7 +6,7 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.PathIterator;
 import java.awt.image.BufferedImage;
 
-public class FontRender {
+public class Logo {
   public static void main(String[] args) {
     String fontName = args.length > 0 ? args[0] : "Helvetica Neue";
     int fontSize = args.length > 1 ? Integer.parseInt(args[1]) : 162;
