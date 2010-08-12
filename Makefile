@@ -38,16 +38,17 @@ WWW_FILES = \
 WWW_EX_FILES = \
   www/ex/bing.html \
   www/ex/bing-sm.png \
-  www/ex/bluemarble-sm.png \
+  www/ex/blue-marble.html \
+  www/ex/blue-marble-sm.png \
   www/ex/cluster-sm.png \
   www/ex/features-sm.png \
   www/ex/flickr-sm.png \
   www/ex/grid-sm.png \
   www/ex/logo-big.png \
   www/ex/logo-small.png \
-  www/ex/midnightcommander-sm.png \
+  www/ex/midnight-commander-sm.png \
   www/ex/overlay-sm.png \
-  www/ex/paledawn-sm.png \
+  www/ex/pale-dawn-sm.png \
   www/ex/population-sm.png \
   www/ex/shadow-sm.png \
   www/ex/statehood-sm.png \

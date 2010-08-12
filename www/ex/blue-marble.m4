@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Polymaps - Bing</title>
+    <title>Polymaps - NASA Blue Marble</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.0.0"></script>
@@ -15,14 +15,7 @@
 }
 
 #map {
-  background: #132328;
-}
-
-#logo {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
+  background: #012;
 }
 
     </style>
@@ -46,15 +39,17 @@
         <img id="logo"/>
       </div>
       <hr class="space"/>
-      <div id="copy" class="span-5 append-1"></div>
+      <div id="copy" class="span-5 append-1">
+        Courtesy <a href="http://earthobservatory.nasa.gov/">NASA Earth Observatory</a>.
+      </div>
       <div class="span-18 last">
 
-m4_include(`../../examples/bing/map.js.html')
+m4_include(`../../examples/nasa/blue-marble.js.html')
 
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/bing/map.js.txt')
+m4_include(`../../examples/nasa/blue-marble.js.txt')
 
       </script>
     </div>

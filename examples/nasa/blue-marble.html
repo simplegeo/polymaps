@@ -5,30 +5,19 @@
 
 @import url("../example.css");
 
-body {
-  background: #012;
-}
-
 .compass .fore, .compass .chevron {
   stroke: #666;
+}
+
+#map {
+  background: #012;
 }
 
     </style>
   </head>
   <body>
-    <script type="text/javascript">
-
-var po = org.polymaps;
-
-var map = po.map()
-    .container(document.body.appendChild(po.svg("svg")))
-    .zoomRange([0, 9])
-    .zoom(7)
-    .add(po.image().url("http://s3.amazonaws.com/com.modestmaps.bluemarble/{Z}-r{Y}-c{X}.jpg"))
-    .add(po.interact())
-    .add(po.compass().pan("none"));
-
-    </script>
+    <div id="map"></div>
+    <script type="text/javascript" src="blue-marble.js"></script>
     <div id="copy">
       Courtesy <a href="http://earthobservatory.nasa.gov/">NASA Earth Observatory</a>.
     </div>
