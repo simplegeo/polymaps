@@ -29,12 +29,12 @@
 
   g.add("svg:path")
       .attr("d", poly)
-      .attr("fill", "none")
-      .attr("stroke", "black")
+      .attr("class", "poly")
       .attr("marker-mid", "url(#dot-big)");
 
   g.add("svg:path")
       .attr("d", maps)
+      .attr("class", "maps")
       .attr("fill", "#021019");
 
   var g2 = g.add("svg:g")

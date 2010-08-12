@@ -45,24 +45,28 @@ img.ex {
   margin-bottom: 2;
 }
 
+.logo .poly {
+  fill: none;
+  stroke: black;
+}
+
+.logo .maps {
+  fill: black;
+  stroke: none;
+}
+
 #map {
   position: relative;
   border: solid 4px #ccc;
   background: #eee;
+  height: 500px;
 }
 
 #copy {
-  position: absolute;
-  left: 0;
-  bottom: 4px;
-  padding-left: 5px;
-  font: 9px sans-serif;
-  color: #fff;
-  cursor: default;
-}
-
-#copy a {
-  color: #fff;
+  color: #999;
+  font-weight: 300;
+  font-size: smaller;
+  height: 1;
 }
 
 .compass .back {
@@ -97,6 +101,7 @@ img.ex {
   fill: #999;
 }
 
+.syntax pre { margin-top: 0; }
 .hll { background-color: #ffffcc }
 .c { color: #999988; font-style: italic } /* Comment */
 .err { color: #a61717; background-color: #e3d2d2 } /* Error */

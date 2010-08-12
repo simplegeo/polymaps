@@ -13,16 +13,14 @@
   stroke: #666;
 }
 
+#map {
+  background: #132328;
+}
+
 #logo {
   position: absolute;
   right: 0;
   bottom: 0;
-  pointer-events: none;
-}
-
-#copy {
-  width: 600px;
-  color: #ccc;
   pointer-events: none;
 }
 
@@ -31,8 +29,10 @@
   <body>
     <div class="container">
       <hr class="space"/>
-      <div class="span-5 append-1">
-        <script type="text/javascript" src="../logo-small.js"></script>
+      <div class="span-5 append-1 logo">
+        <a href="../">
+          <script type="text/javascript" src="../logo-small.js"></script>
+        </a>
       </div>
       <div class="span-18 last top">
         <a href="../">Overview</a>
@@ -41,17 +41,21 @@
         <a href="http://github.com/simplegeo/polymaps">Download</a>
       </div>
       <hr class="space"/>
-      <div class="span-18 prepend-6 last">
-        <div id="map" style="height:500px;"></div>
-        <script type="text/javascript">
+      <div id="map" class="span-24 last">
+        <img id="logo"/>
+      </div>
+      <hr class="space"/>
+      <div id="copy" class="span-5 append-1"></div>
+      <div class="span-18 last">
 
-m4_include(`bing.js.txt')
-
-        </script>
-
-m4_include(`bing.js.html')
+m4_include(`../../examples/bing/map.js.html')
 
       </div>
+      <script type="text/javascript">
+
+m4_include(`../../examples/bing/map.js.txt')
+
+      </script>
     </div>
   </body>
 </html>

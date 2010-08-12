@@ -4,7 +4,8 @@ var div = document.getElementById("map");
 
 var map = po.map()
     .container(div.appendChild(po.svg("svg")))
-    .add(po.interact());
+    .add(po.interact())
+    .add(po.hash());
 
 /*
  * Load the "AerialWithLabels" metadata. "Aerial" and "Road" also work. For more
@@ -35,15 +36,10 @@ function callback(data) {
   }
 
   /* Display brand logo. */
-  var logo = new Image();
-  logo.setAttribute("id", "logo");
-  logo.src = data.brandLogoUri;
-  div.appendChild(logo);
+  document.getElementById("logo").src = data.brandLogoUri;
 
   /* Display copyright notice. */
-  var copy = div.appendChild(document.createElement("div"));
-  copy.setAttribute("id", "copy");
-  copy.appendChild(document.createTextNode(data.copyright));
+  document.getElementById("copy").appendChild(document.createTextNode(data.copyright));
 
   /* Display compass control. */
   map.add(po.compass()
@@ -51,6 +47,7 @@ function callback(data) {
 
 }
 
+/** Returns the given coordinate formatted as a 'quadkey'. */
 function quad(column, row, zoom) {
   var key = "";
   for (var i = 1; i <= zoom; i++) {
@@ -59,6 +56,7 @@ function quad(column, row, zoom) {
   return key;
 }
 
+/** Returns a URL template given a string and a list of subdomains. */
 function template(url, subdomains) {
   var n = subdomains.length,
       salt = ~~(Math.random() * n); // per-session salt

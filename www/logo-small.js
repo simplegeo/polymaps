@@ -10,8 +10,8 @@
   if (end != document.body) end = end.parentNode;
 
   var svg = n$(end).add("svg:svg")
-      .attr("width", 200)
-      .attr("height", 50)
+      .attr("width", 180)
+      .attr("height", 40)
       .attr("stroke-width", .75);
 
   var defs = svg.add("svg:defs");
@@ -25,16 +25,21 @@
     .add("svg:circle")
       .attr("r", 1);
 
+  svg.add("svg:rect")
+      .attr("pointer-events", "all")
+      .attr("fill", "none")
+      .attr("height", "100%")
+      .attr("width", "100%");
+
   var g = svg.add("svg:g")
       .attr("transform", "translate(6,30)");
 
   g.add("svg:path")
       .attr("d", poly)
-      .attr("fill", "white")
-      .attr("stroke", "black")
+      .attr("class", "poly")
       .attr("marker-mid", "url(#dot)");
 
   g.add("svg:path")
       .attr("d", maps)
-      .attr("fill", "black");
+      .attr("class", "maps");
 })();

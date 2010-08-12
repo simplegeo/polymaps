@@ -6,12 +6,12 @@
 
 @import url("../example.css");
 
-body {
-  background: #132328;
-}
-
 .compass .chevron, .compass .fore {
   stroke: #666;
+}
+
+#map {
+  background: #132328;
 }
 
 #logo {
@@ -29,90 +29,9 @@ body {
 
     </style>
   </head>
-  <body>
-    <script type="text/javascript">
-
-var po = org.polymaps;
-
-var map = po.map()
-    .container(document.body.appendChild(po.svg("svg")))
-    .zoomRange([1, 19])
-    .add(po.interact())
-    .add(po.hash());
-
-$(document).ready(function() {
-
-  /*
-   * An Evaluation/Trial key for the Bing Maps REST Services. You should
-   * register for your own key at https://www.bingmapsportal.com/.
-   */
-  var bingKey = "AmT-ZC3HPevQq5IBJ7v8qiDUxrojNaqbW1zBsKF0oMNEs53p7Nk5RlAuAmwSG7bg";
-
-  /*
-   * Load the "AerialWithLabels" metadata. "Aerial" and "Road" also work.
-   * For more information about the Imagery Metadata service, see
-   * http://msdn.microsoft.com/en-us/library/ff701716.aspx
-   */
-  $.ajax({
-    url: "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/AerialWithLabels",
-    data: {key: bingKey},
-    dataType: "jsonp",
-    jsonp: "jsonp",
-    success: success
-  });
-
-  function quad(column, row, zoom) {
-    var key = "";
-    for (var i = 1; i <= zoom; i++) {
-      key += (((row >> zoom - i) & 1) << 1) | ((column >> zoom - i) & 1);
-    }
-    return key;
-  }
-
-  function template(url, subdomains) {
-    var n = subdomains.length,
-        salt = ~~(Math.random() * n); // per-session salt
-    return function(c) {
-      var quadKey = quad(c.column, c.row, c.zoom),
-          server = Math.abs(salt + c.column + c.row + c.zoom) % n;
-      return url
-          .replace("{quadkey}", quadKey)
-          .replace("{subdomain}", subdomains[server]);
-    };
-  }
-
-  function success(data) {
-    self.data = data;
-
-    /* Display each resource as an image layer. */
-    var resourceSets = data.resourceSets;
-    for (var i = 0; i < resourceSets.length; i++) {
-      var resources = data.resourceSets[i].resources;
-      for (var j = 0; j < resources.length; j++) {
-        var resource = resources[j];
-        map.add(po.image()
-            .size({x: resource.imageWidth, y: resource.imageHeight})
-            .url(template(resource.imageUrl, resource.imageUrlSubdomains)));
-      }
-    }
-
-    /* Display brand logo. */
-    var logo = new Image();
-    logo.setAttribute("id", "logo");
-    logo.src = data.brandLogoUri;
-    document.body.appendChild(logo);
-
-    /* Display copyright notice. */
-    var copy = document.body.appendChild(document.createElement("div"));
-    copy.setAttribute("id", "copy");
-    copy.appendChild(document.createTextNode(data.copyright));
-
-    /* Display compass control. */
-    map.add(po.compass()
-        .pan("none"));
-  }
-});
-
-    </script>
+  <body id="map">
+    <script type="text/javascript" src="map.js"></script>
+    <div id="copy"></div>
+    <img id="logo"/>
   </body>
 </html>
