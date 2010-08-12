@@ -1,145 +1,77 @@
-// k-means clustering
-function cluster() {
-  var cluster = {},
-      points = [],
-      iterations = 1,
-      size = 1;
+var po = org.polymaps;
 
-  cluster.size = function(x) {
-    if (!arguments.length) return size;
-    size = x;
-    return cluster;
-  };
+var map = po.map()
+    .container(document.getElementById("map").appendChild(po.svg("svg")))
+    .center({lat: 37.787, lon: -122.228})
+    .zoom(14)
+    .zoomRange([12, 16])
+    .add(po.interact())
+    .add(po.hash());
 
-  cluster.iterations = function(x) {
-    if (!arguments.length) return iterations;
-    iterations = x;
-    return cluster;
-  };
+map.add(po.image()
+    .url(po.url("http://{S}tile.cloudmade.com"
+    + "/1a1b06b230af4efdbb989ea99e9841af" // http://cloudmade.com/register
+    + "/20760/256/{Z}/{X}/{Y}.png")
+    .hosts(["a.", "b.", "c.", ""])));
 
-  cluster.add = function(x) {
-    points.push(x);
-    return cluster;
-  };
+map.add(po.geoJson()
+    .url(crimespotting("http://oakland.crimespotting.org"
+        + "/crime-data"
+        + "?count=1000"
+        + "&format=json"
+        + "&bbox={B}"
+        + "&dstart=2010-04-01"
+        + "&dend=2010-04-07"))
+    .on("load", load)
+    .clip(false)
+    .zoom(14));
 
-  cluster.means = function() {
-    var means = [],
-        seen = {},
-        n = Math.min(size, points.length);
+map.add(po.compass()
+    .pan("none"));
 
-    // Initialize k random (unique!) means.
-    for (var i = 0, m = 2 * n; i < m; i++) {
-      var p = points[~~(Math.random() * points.length)], id = p.x + "/" + p.y;
-      if (!(id in seen)) {
-        seen[id] = 1;
-        if (means.push({x: p.x, y: p.y}) >= n) break;
+function crimespotting(template) {
+  return function(c, location) {
+    var max = 1 << c.zoom, column = c.column % max; // TODO assumes 256x256
+    if (column < 0) column += max;
+    return template.replace(/{(.)}/g, function(s, v) {
+      switch (v) {
+        case "B": {
+          var nw = location({row: c.row, column: column, zoom: c.zoom}),
+              se = location({row: c.row + 1, column: column + 1, zoom: c.zoom}),
+              pn = Math.ceil(Math.log(c.zoom) / Math.LN2);
+          return nw.lon.toFixed(pn)
+              + "," + se.lat.toFixed(pn)
+              + "," + se.lon.toFixed(pn)
+              + "," + nw.lat.toFixed(pn);
+        }
       }
-    }
-    n = means.length;
-
-    // For each iteration, create a kd-tree of the current means.
-    for (var j = 0; j < iterations; j++) {
-      var kd = tree().points(means);
-
-      // Clear the state.
-      for (var i = 0; i < n; i++) {
-        var mean = means[i];
-        mean.sumX = 0;
-        mean.sumY = 0;
-        mean.size = 0;
-        mean.points = [];
-      }
-
-      // Find the mean closest to each point.
-      for (var i = 0; i < points.length; i++) {
-        var point = points[i], mean = kd.find(point);
-        mean.sumX += point.x;
-        mean.sumY += point.y;
-        mean.size++;
-        mean.points.push(point);
-      }
-
-      // Compute the new means.
-      for (var i = 0; i < n; i++) {
-        var mean = means[i];
-        if (!mean.size) continue; // overlapping mean
-        mean.x = mean.sumX / mean.size;
-        mean.y = mean.sumY / mean.size;
-      }
-    }
-
-    return means;
+      return v;
+    });
   };
-
-  return cluster;
 }
 
-// kd-tree
-function tree() {
-  var tree = {},
-      axes = ["x", "y"],
-      root,
-      points = [];
+function load(e) {
+  var cluster = e.tile.cluster || (e.tile.cluster = kmeans()
+      .iterations(16)
+      .size(64));
 
-  tree.axes = function(x) {
-    if (!arguments.length) return axes;
-    axes = x;
-    return tree;
-  };
-
-  tree.points = function(x) {
-    if (!arguments.length) return points;
-    points = x;
-    root = null;
-    return tree;
-  };
-
-  tree.find = function(x) {
-    return find(tree.root(), x, root).point;
-  };
-
-  tree.root = function(x) {
-    return root || (root = node(points, 0));
-  };
-
-  function node(points, depth) {
-    if (!points.length) return;
-    var axis = axes[depth % axes.length], median = points.length >> 1;
-    points.sort(order(axis)); // could use random sample to speed up here
-    return {
-      axis: axis,
-      point: points[median],
-      left: node(points.slice(0, median), depth + 1),
-      right: node(points.slice(median + 1), depth + 1)
-    };
+  for (var i = 0; i < e.features.length; i++) {
+    var feature = e.features[i];
+    cluster.add({
+      x: Number(feature.element.getAttribute("cx")),
+      y: Number(feature.element.getAttribute("cy"))
+    });
   }
 
-  function distance(a, b) {
-    var sum = 0;
-    for (var i = 0; i < axes.length; i++) {
-      var axis = axes[i], d = a[axis] - b[axis];
-      sum += d * d;
-    }
-    return sum;
-  }
+  var tile = e.tile, g = tile.element;
+  while (g.lastChild) g.removeChild(g.lastChild);
 
-  function order(axis) {
-    return function(a, b) {
-      a = a[axis];
-      b = b[axis];
-      return a < b ? -1 : a > b ? 1 : 0;
-    };
+  var means = cluster.means();
+  means.sort(function(a, b) { return b.size - a.size; });
+  for (var i = 0; i < means.length; i++) {
+    var mean = means[i], point = g.appendChild(po.svg("circle"));
+    point.setAttribute("cx", mean.x);
+    point.setAttribute("cy", mean.y);
+    point.setAttribute("r", Math.pow(2, tile.zoom - 11) * Math.sqrt(mean.size));
   }
-
-  function find(node, point, best) {
-    if (distance(node.point, point) < distance(best.point, point)) best = node;
-    if (node.left) best = find(node.left, point, best);
-    if (node.right) {
-      var d = node.point[node.axis] - point[node.axis];
-      if (d * d < distance(best.point, point)) best = find(node.right, point, best);
-    }
-    return best;
-  }
-
-  return tree;
 }

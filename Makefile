@@ -30,6 +30,7 @@ WWW_FILES = \
 	lib/nns/nns.min.js \
 	lib/blueprint/screen.css \
 	lib/modernizr/modernizr.min.js \
+	examples/cluster/kmeans.js \
 	www/index.html \
 	www/logo-big.js \
 	www/logo-small.js \
@@ -40,6 +41,7 @@ WWW_EX_FILES = \
   www/ex/bing-sm.png \
   www/ex/blue-marble.html \
   www/ex/blue-marble-sm.png \
+  www/ex/cluster.html \
   www/ex/cluster-sm.png \
   www/ex/features-sm.png \
   www/ex/flickr-sm.png \
