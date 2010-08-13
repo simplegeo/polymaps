@@ -43,6 +43,7 @@ WWW_EX_FILES = \
 	examples/overlay/sf1906.png \
 	examples/population/population.css \
 	examples/statehood/fips.js \
+	examples/streets/streets.json \
 	www/ex/bing.html \
 	www/ex/bing-sm.png \
 	www/ex/blue-marble.html \
@@ -68,6 +69,7 @@ WWW_EX_FILES = \
 	www/ex/shadow-sm.png \
 	www/ex/statehood.html \
 	www/ex/statehood-sm.png \
+	www/ex/streets.html \
 	www/ex/streets-sm.png \
 	www/ex/tiles-sm.png \
 	www/ex/transform-sm.png \
