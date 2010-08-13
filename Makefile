@@ -45,6 +45,7 @@ WWW_EX_FILES = \
 	examples/statehood/fips.js \
 	examples/streets/streets.json \
 	examples/transform/nypl.js \
+	examples/unemployment/unemployment-data.js \
 	www/ex/bing.html \
 	www/ex/bing-sm.png \
 	www/ex/blue-marble.html \
@@ -76,6 +77,7 @@ WWW_EX_FILES = \
 	www/ex/tiles-sm.png \
 	www/ex/transform.html \
 	www/ex/transform-sm.png \
+	www/ex/unemployment.html \
 	www/ex/unemployment-sm.png
 
 PYGMENT = /Library/Pygments-1.3.1/pygmentize
