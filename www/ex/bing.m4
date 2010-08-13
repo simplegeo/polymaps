@@ -57,7 +57,7 @@
       metadata API</a> provides beautiful aerial (satellite) image tiles at a
       wide range of zoom levels, with optional labels. The &ldquo;Road&rdquo;
       tileset is a more traditional alternative to <a href="pale-dawn.html">Pale
-      Dawn</a>.</p>
+      Dawn</a>. Also? <a href="javascript:map.zoomBy(18-map.zoom(),{x:475,y:100},{lon:-122.49,lat:37.67});">ZOMG PLANE!</a></p>
 
       <p>This map is constructed using a single <a href="../docs/#image"
       >image</a> layer. The tiles are in spherical mercator coordinates, and the

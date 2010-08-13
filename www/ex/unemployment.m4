@@ -67,7 +67,7 @@
         a <a href="http://en.wikipedia.org/wiki/Choropleth_map">choropleth
         map</a>; darker counties have higher unemployment. Unlike static maps,
         you
-        can <a href="javascript:map.zoomBy(9-map.zoom(),{x:700,y:250},{lon:-76.23,lat:38.13})">zoom
+        can <a href="javascript:map.zoomBy(9-map.zoom(),{x:700,y:250},{lon:-76.23,lat:38.13});">zoom
         in</a> for higher resolution, and mouseover to read county names and
         values. You can also experiment with
         different <a href="http://colorbrewer.org/">color scales</a>, such

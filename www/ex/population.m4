@@ -69,7 +69,7 @@
         map</a>; darker counties have higher population densities. A GeoJSON
         layer containing state boundaries is drawn over the counties using a
         thick white
-        border. Try <a href="javascript:map.zoomBy(9-map.zoom(),{x:700,y:250},{lon:-76.23,lat:38.13})">zooming
+        border. Try <a href="javascript:map.zoomBy(9-map.zoom(),{x:700,y:250},{lon:-76.23,lat:38.13});">zooming
         in</a> for higher resolution.</p>
 
         <p>The map background is a monochrome <a href="../docs/#image">image</a>
