@@ -148,7 +148,7 @@ po.geoJson = function() {
   geoJson.init = function(g) {
     if (clip) {
       var size = geoJson.size(),
-          clipPath = g.appendChild(po.svg("clipPath")),
+          clipPath = g.insertBefore(po.svg("clipPath"), g.firstChild),
           rect = clipPath.appendChild(po.svg("rect"));
       clipPath.setAttribute("id", clipId);
       rect.setAttribute("width", size.x);
