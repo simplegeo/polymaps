@@ -41,8 +41,10 @@ a:hover {
 img.ex {
   padding: 0;
   border: 0;
-  margin-right: 2;
-  margin-bottom: 2;
+  margin-right: 2px;
+  margin-bottom: 2px;
+  width: 140px;
+  height: 140px;
 }
 
 .svg .logo img {
@@ -57,6 +59,25 @@ img.ex {
 .logo .maps {
   fill: black;
   stroke: none;
+}
+
+.hi {
+  background: #ff9;
+}
+
+.sidebar {
+  position: fixed;
+  text-align: right;
+  font-weight: 300;
+}
+
+.sidebar h4 {
+  color: #aaa;
+}
+
+.sidebar ul {
+  margin-right: 0;
+  list-style-type: none;
 }
 
 #map {

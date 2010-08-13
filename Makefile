@@ -80,6 +80,9 @@ WWW_EX_FILES = \
 	www/ex/unemployment.html \
 	www/ex/unemployment-sm.png
 
+WWW_DOCS_FILES = \
+	www/docs/index.html
+
 PYGMENT = /Library/Pygments-1.3.1/pygmentize
 PYGMENT_STYLE = trac
 
@@ -101,11 +104,12 @@ polymaps.js: $(JS_FILES) Makefile
 
 include $(patsubst %.html,%.d,$(filter %.html,$(WWW_EX_FILES)))
 
-html: $(WWW_FILES) $(WWW_EX_FILES) Makefile
+html: $(WWW_FILES) $(WWW_EX_FILES) $(WWW_DOCS_FILES) Makefile
 	rm -rf $@
-	mkdir $@ $@/ex
+	mkdir $@ $@/ex $@/docs
 	cp $(WWW_FILES) $@
 	cp $(WWW_EX_FILES) $@/ex
+	cp $(WWW_DOCS_FILES) $@/docs
 
 %.html: %.m4 Makefile
 	rm -f $@

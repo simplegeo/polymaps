@@ -1,69 +1,62 @@
 <html>
   <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <title>Polymaps</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>Polymaps - Documentation</title>
+    <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
+    <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
+    <script type="text/javascript" src="../nns.min.js?1.0.0"></script>
     <style type="text/css">
 
-@import url("../lib/blueprint/screen.css") screen;
-@import url("../lib/blueprint/print.css") print;
-@import url("../lib/blueprint/plugins/fancy-type/screen.css") screen;
-@import url("style.css");
+@import url("../screen.css?0.9");
+@import url("../style.css?1.6.0");
 
     </style>
   </head>
   <body>
-
     <div class="container">
-      <hr class="space">
-      <h1>Polymaps</h1>
-      <hr>
+      <hr class="space"/>
+      <div class="span-5 append-1 logo sidebar">
+        <a href="../">
+          <script type="text/javascript" src="../logo-small.js"></script>
+        </a>
+        <hr class="space"/>
 
-      <h3 class="alt">A JavaScript library for image- and vector-tiled maps using SVG.</h3>
-      <hr>
+        <h4>Core</h4>
+        <ul class="no-indent">
+          <li><a href="#map">map</a></li>
+          <li><a href="#image">image</a></li>
+          <li><a href="#geoJson">geoJson</a></li>
+        </ul>
 
-      <div class="span-15 prepend-1 colborder">
-      
-        <p>
-        <strong>Polymaps is a new Javascript library for making and publishing
-        dynamic, interactive maps in modern web browsers.</strong>
-        </p>
-        <p>
-        Polymaps aims for the speedy display of multi-zoom datasets over maps,
-        and supports a variety of visual presentations for tiled vector data in
-        addition to the usual cartography from <a href="http://openstreetmap.org">OpenStreetMap</a>,
-        <a href="http://cloudmade.com/products/web-maps-lite">CloudMade</a>,
-        <a href="http://maps.bing.com">Bing</a>, and other providers of
-        image-based web maps. Because Polymaps can load data at a full range of
-        scales, it’s ideal for showing information from country level on down
-        to states, cities, neighborhoods, and individual streets. Because
-        Polymaps uses SVG (<a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">Scalable
-        Vector Graphics</a>) to display information, you can use familiar,
-        comfortable <a href="http://www.csszengarden.com/">CSS rules</a> to
-        define the design of your data. And because Polymaps uses the well
-        known <a href="http://wiki.openstreetmap.org/wiki/QuadTiles">spherical
-        mercator tile format</a> for its imagery and its data, publishing
-        information is a snap.
-        </p>
-      
-        <h2>Examples</h2>
+        <h4>Controls</h4>
+        <ul class="no-indent">
+          <li><a href="#arrow">arrow</a></li>
+          <li><a href="#compass">compass</a></li>
+          <li><a href="#dblclick">dblclick</a></li>
+          <li><a href="#drag">drag</a></li>
+          <li><a href="#hash">hash</a></li>
+          <li><a href="#interact">interact</a></li>
+          <li><a href="#wheel">wheel</a></li>
+        </ul>
 
-        <a href="../examples/cloudmade/pale-dawn.html" title="CloudMade Pale Dawn"
-          ><img class="ex" src="pale-dawn.png"></a
-        ><a href="../examples/unemployment/unemployment.html" title="U.S. Unemployment by County"
-          ><img class="ex" src="unemployment.png"></a
-        ><a href="../examples/cluster/cluster.html" title="Oakland Crime Reports"
-          ><img class="ex last" src="cluster.png"></a
-        ><a href="../examples/tilestache/flickr.html" title="Flickr Shapetiles"
-          ><img class="ex" src="flickr.png"></a
-        ><a href="../examples/streets/streets.html" title="San Francisco Pavement Quality"
-          ><img class="ex" src="streets.png"></a
-        ><a href="../examples/nasa/blue-marble.html" title="NASA Blue Marble"
-          ><img class="ex last" src="blue-marble.png"></a
-        >
+        <h4><i>Et cetera</i></h4>
+        <ul class="no-indent">
+          <li><a href="#cache">cache</a></li>
+          <li><a href="#queue">queue</a></li>
+          <li><a href="#svg">svg</a></li>
+          <li><a href="#url">url</a></li>
+        </ul>
+      </div>
+      <div class="span-18 prepend-6 last top">
+        <a href="../">Overview</a>
+        <a href="../ex/">Examples</a>
+        <a href="./">Documentation</a>
+        <a href="http://github.com/simplegeo/polymaps">Download</a>
+      </div>
+      <hr class="space"/>
+      <div class="span-18 prepend-6 last">
 
-        <hr class="space">
-
-        <h2>Overview</h2>
+        <h2>Documentation</h2>
 
         <p><b>Polymaps</b> is a JavaScript library for generating
         &ldquo;slippy&rdquo; maps in the style of
@@ -428,38 +421,8 @@
 
       </div>
 
-      <div class="span-7 last">
-        <h3>Class Index</h3>
-
-        <h4>Core</h4>
-        <ul class="no-indent">
-          <li><a href="#map">map</a></li>
-          <li><a href="#image">image</a></li>
-          <li><a href="#geoJson">geoJson</a></li>
-        </ul>
-
-        <h4>Controls</h4>
-        <ul class="no-indent">
-          <li><a href="#arrow">arrow</a></li>
-          <li><a href="#compass">compass</a></li>
-          <li><a href="#dblclick">dblclick</a></li>
-          <li><a href="#drag">drag</a></li>
-          <li><a href="#hash">hash</a></li>
-          <li><a href="#interact">interact</a></li>
-          <li><a href="#wheel">wheel</a></li>
-        </ul>
-
-        <h4><i>Et cetera</i></h4>
-        <ul class="no-indent">
-          <li><a href="#cache">cache</a></li>
-          <li><a href="#queue">queue</a></li>
-          <li><a href="#svg">svg</a></li>
-          <li><a href="#url">url</a></li>
-        </ul>
-      </div>
-
-      <hr class="space">
-      <hr>
+<!--       <hr class="space"> -->
+<!--       <hr> -->
     </div>
   </body>
 </html>

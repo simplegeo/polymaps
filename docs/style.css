@@ -20,8 +20,8 @@ a:hover {
   text-decoration: underline;
 }
 
-ul.no-indent {
-  padding-left: 0;
+.sidebar ul {
+  padding: 0;
   list-style-type: none;
 }
 
