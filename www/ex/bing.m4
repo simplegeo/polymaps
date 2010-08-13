@@ -37,7 +37,7 @@
       </div>
       <div class="span-18 last top">
         <a href="../">Overview</a>
-        <a href="./">Examples</a>
+        <a class="active" href="./">Examples</a>
         <a href="../docs/">Documentation</a>
         <a href="http://github.com/simplegeo/polymaps">Download</a>
       </div>
@@ -54,7 +54,7 @@
       <p>Want to show what Earth looks like from space? The Bing&#x2122;
       Maps <a href="http://msdn.microsoft.com/en-us/library/ff701716.aspx">imagery
       metadata API</a> provides beautiful aerial (satellite) image tiles at a
-      wide range of zoom levels, with optional labels. The &rdquo;Road&ldquo;
+      wide range of zoom levels, with optional labels. The &ldquo;Road&rdquo;
       tileset is a more traditional alternative to <a href="pale-dawn.html">Pale
       Dawn</a>.</p>
 

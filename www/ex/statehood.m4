@@ -36,7 +36,7 @@
       </div>
       <div class="span-18 last top">
         <a href="../">Overview</a>
-        <a href="./">Examples</a>
+        <a class="active" href="./">Examples</a>
         <a href="../docs/">Documentation</a>
         <a href="http://github.com/simplegeo/polymaps">Download</a>
       </div>

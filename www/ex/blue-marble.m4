@@ -30,7 +30,7 @@
       </div>
       <div class="span-18 last top">
         <a href="../">Overview</a>
-        <a href="./">Examples</a>
+        <a class="active" href="./">Examples</a>
         <a href="../docs/">Documentation</a>
         <a href="http://github.com/simplegeo/polymaps">Download</a>
       </div>
@@ -41,6 +41,25 @@
         Courtesy <a href="http://earthobservatory.nasa.gov/">NASA Earth Observatory</a>.
       </div>
       <div class="span-18 last">
+
+        <h2>Blue Marble</h2>
+
+        <p>The <a href="http://earthobservatory.nasa.gov/">NASA Earth
+        Observatory</a> published a series of 500-meter resolution satellite
+        imagery in 2005, in true color showing seasonal dynamics at monthly
+        intervals. This tileset is a free alternative
+        to <a href="satellite.html">Bing Maps</a>, and demonstrates how custom
+        image tiles can be used with Polymaps.</p>
+
+        <p>This map is constructed using a single <a href="../docs/#image"
+        >image</a> layer pulling tiles from <a href="http://aws.amazon.com/s3/"
+        >Amazon S3</a>. (Hosting courtesy of the folks
+        behind <a href="http://modestmaps.com/">Modest Maps</a>.) The tiles are
+        in spherical mercator coordinates, and the map has standard interaction
+        controls, so this basic example is a useful starting point for
+        customization.</p>
+
+        <h3>Source Code</h3>
 
 m4_include(`../../examples/nasa/blue-marble.js.html')
 
