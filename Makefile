@@ -44,6 +44,7 @@ WWW_EX_FILES = \
 	examples/population/population.css \
 	examples/statehood/fips.js \
 	examples/streets/streets.json \
+	examples/transform/nypl.js \
 	www/ex/bing.html \
 	www/ex/bing-sm.png \
 	www/ex/blue-marble.html \
@@ -73,6 +74,7 @@ WWW_EX_FILES = \
 	www/ex/streets-sm.png \
 	www/ex/tiles.html \
 	www/ex/tiles-sm.png \
+	www/ex/transform.html \
 	www/ex/transform-sm.png \
 	www/ex/unemployment-sm.png
 
