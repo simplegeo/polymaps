@@ -4,7 +4,7 @@
     <title>Polymaps - Affine Transform</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
-    <script type="text/javascript" src="../nns.min.js?1.0.0"></script>
+    <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
     <script type="text/javascript" src="nypl.js?1.6.0"></script>
     <style type="text/css">
 

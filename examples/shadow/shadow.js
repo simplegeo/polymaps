@@ -1,7 +1,9 @@
 var po = org.polymaps;
 
+var svg = n$("#map").add("svg:svg");
+
 var map = po.map()
-    .container(document.getElementById("map").appendChild(po.svg("svg")))
+    .container($n(svg))
     .center({lat: 37.787, lon: -122.228})
     .zoom(12)
     .add(po.interact());
@@ -14,70 +16,70 @@ map.add(po.image()
 
 map.add(po.geoJson()
     .features([{geometry: {coordinates: [-122.258, 37.805], type: "Point"}}])
-    .on("load", load))
+    .on("load", load));
 
 map.add(po.compass()
     .pan("none"));
 
 /* Create a shadow filter. */
-var filter = map.container().appendChild(po.svg("filter")),
-    blur = filter.appendChild(po.svg("feGaussianBlur"));
-filter.setAttribute("id", "shadow"); // don't uppercase ids!
-filter.setAttribute("width", "140%");
-filter.setAttribute("height", "140%");
-blur.setAttribute("in", "SourceAlpha");
-blur.setAttribute("stdDeviation", 3);
+svg.add("svg:filter")
+    .attr("id", "shadow")
+    .attr("width", "140%")
+    .attr("height", "140%")
+  .add("svg:feGaussianBlur")
+    .attr("in", "SourceAlpha")
+    .attr("stdDeviation", 3);
 
 /* Create radial gradient r1. */
-var r1 = map.container().appendChild(po.svg("radialGradient")),
-    r1s0 = r1.appendChild(po.svg("stop")),
-    r1s1 = r1.appendChild(po.svg("stop"));
-r1.setAttribute("id", "r1");
-r1.setAttribute("fx", 0.5);
-r1.setAttribute("fy", 0.9);
-r1s0.setAttribute("offset", "0%");
-r1s0.setAttribute("stop-color", "#00bf17");
-r1s1.setAttribute("offset", "100%");
-r1s1.setAttribute("stop-color", "#0f2f13");
+svg.add("svg:radialGradient")
+    .attr("id", "r1")
+    .attr("fx", 0.5)
+    .attr("fy", 0.9)
+  .add("svg:stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "#00bf17")
+    .parent()
+  .add("svg:stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#0f2f13");
 
 /* Create radial gradient r2. */
-var r2 = map.container().appendChild(po.svg("radialGradient")),
-    r2s0 = r2.appendChild(po.svg("stop")),
-    r2s1 = r2.appendChild(po.svg("stop"));
-r2.setAttribute("id", "r2");
-r2.setAttribute("fx", 0.5);
-r2.setAttribute("fy", 0.1);
-r2s0.setAttribute("offset", "0%");
-r2s0.setAttribute("stop-color", "#cccccc");
-r2s1.setAttribute("offset", "100%");
-r2s1.setAttribute("stop-color", "#cccccc");
-r2s1.setAttribute("stop-opacity", 0);
+svg.add("svg:radialGradient")
+    .attr("id", "r2")
+    .attr("fx", 0.5)
+    .attr("fy", 0.1)
+  .add("svg:stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "#cccccc")
+    .parent()
+  .add("svg:stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#cccccc")
+    .attr("stop-opacity", 0);
 
 function load(e) {
   var r = 20 * Math.pow(2, e.tile.zoom - 12);
   for (var i = 0; i < e.features.length; i++) {
-    var circle = e.features[i].element;
+    var c = n$(e.features[i].element),
+        g = c.parent().add("svg:g", c);
 
-    var g = circle.parentNode.insertBefore(po.svg("g"), circle),
-        x = circle.getAttribute("cx"),
-        y = circle.getAttribute("cy");
-    g.setAttribute("transform", "translate(" + x + "," + y + ")");
+    g.attr("transform", "translate(" + c.attr("cx") + "," + c.attr("cy") + ")");
 
-    var shadow = g.appendChild(po.svg("circle"));
-    shadow.setAttribute("r", r);
-    shadow.setAttribute("transform", "translate(" + r + ",0)skewX(-45)");
-    shadow.setAttribute("opacity", .5);
-    shadow.setAttribute("filter", "url(#shadow)");
+    g.add("svg:circle")
+        .attr("r", r)
+        .attr("transform", "translate(" + r + ",0)skewX(-45)")
+        .attr("opacity", .5)
+        .attr("filter", "url(#shadow)");
 
-    g.appendChild(circle);
-    circle.setAttribute("fill", "url(#r1)");
-    circle.setAttribute("r", r);
-    circle.removeAttribute("cx");
-    circle.removeAttribute("cy");
+    g.add(c
+        .attr("fill", "url(#r1)")
+        .attr("r", r)
+        .attr("cx", null)
+        .attr("cy", null));
 
-    var light = g.appendChild(po.svg("circle"));
-    light.setAttribute("transform", "scale(.95,1)");
-    light.setAttribute("fill", "url(#r2)");
-    light.setAttribute("r", r);
+    g.add("svg:circle")
+        .attr("transform", "scale(.95,1)")
+        .attr("fill", "url(#r2)")
+        .attr("r", r);
   }
 }

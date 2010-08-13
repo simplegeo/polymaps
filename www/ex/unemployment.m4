@@ -4,7 +4,7 @@
     <title>Polymaps - Unemployment</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
-    <script type="text/javascript" src="../nns.min.js?1.0.0"></script>
+    <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
     <script type="text/javascript" src="../protodata.min.js?3.2"></script>
     <script type="text/javascript" src="unemployment-data.js?1.6.0"></script>
     <style type="text/css">
