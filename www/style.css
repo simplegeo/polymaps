@@ -71,15 +71,16 @@ img.ex {
 
 .sidebar {
   position: fixed;
-  text-align: right;
   font-weight: 300;
 }
 
 .sidebar h4 {
+  text-align: right;
   color: #aaa;
 }
 
 .sidebar ul {
+  text-align: right;
   margin-right: 0;
   list-style-type: none;
 }

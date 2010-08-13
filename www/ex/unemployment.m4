@@ -37,6 +37,7 @@
       <hr class="space"/>
       <div class="span-5 append-1 logo">
         <a href="../">
+          <img src="../logo-small.png"/>
           <script type="text/javascript" src="../logo-small.js"></script>
         </a>
       </div>
