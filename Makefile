@@ -47,6 +47,7 @@ WWW_EX_FILES = \
   www/ex/features-sm.png \
 	www/ex/flickr.html \
   www/ex/flickr-sm.png \
+  www/ex/grid.html \
   www/ex/grid-sm.png \
   www/ex/logo-big.png \
   www/ex/logo-small.png \
