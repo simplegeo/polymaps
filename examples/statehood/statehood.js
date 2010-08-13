@@ -1,52 +1,47 @@
-var statehood = {
-  "Delaware": "December 7, 1787",
-  "Pennsylvania": "December 12, 1787",
-  "New Jersey": "December 18, 1787",
-  "Georgia": "January 2, 1788",
-  "Connecticut": "January 9, 1788",
-  "Massachusetts": "February 6, 1788",
-  "Maryland": "April 28, 1788",
-  "South Carolina": "May 23, 1788",
-  "New Hampshire": "June 21, 1788",
-  "Virginia": "June 25, 1788",
-  "New York": "July 26, 1788",
-  "North Carolina": "November 21, 1789",
-  "Rhode Island": "May 29, 1790",
-  "Vermont": "March 4, 1791",
-  "Kentucky": "June 1, 1792",
-  "Tennessee": "June 1, 1796",
-  "Ohio": "March 1, 1803*",
-  "Louisiana": "April 30, 1812",
-  "Indiana": "December 11, 1816",
-  "Mississippi": "December 10, 1817",
-  "Illinois": "December 3, 1818",
-  "Alabama": "December 14, 1819",
-  "Maine": "March 15, 1820",
-  "Missouri": "August 10, 1821",
-  "Arkansas": "June 15, 1836",
-  "Michigan": "January 26, 1837",
-  "Florida": "March 3, 1845",
-  "Texas": "December 29, 1845",
-  "Iowa": "December 28, 1846",
-  "Wisconsin": "May 29, 1848",
-  "California": "September 9, 1850",
-  "Minnesota": "May 11, 1858",
-  "Oregon": "February 14, 1859",
-  "Kansas": "January 29, 1861",
-  "West Virginia": "June 20, 1863",
-  "Nevada": "October 31, 1864",
-  "Nebraska": "March 1, 1867",
-  "Colorado": "August 1, 1876",
-  "North Dakota": "November 2, 1889",
-  "South Dakota": "November 2, 1889",
-  "Montana": "November 8, 1889",
-  "Washington": "November 11, 1889",
-  "Idaho": "July 3, 1890",
-  "Wyoming": "July 10, 1890",
-  "Utah": "January 4, 1896",
-  "Oklahoma": "November 16, 1907",
-  "New Mexico": "January 6, 1912",
-  "Arizona": "February 14, 1912",
-  "Alaska": "January 3, 1959",
-  "Hawaii": "August 21, 1959"
-};
+var po = org.polymaps;
+
+// Compute noniles.
+var quantile = pv.Scale.quantile()
+    .quantiles(9)
+    .domain(pv.values(states))
+    .range(0, 8);
+
+// Date format.
+var format = pv.Format.date("%B %e, %Y");
+
+var map = po.map()
+    .container(document.getElementById("map").appendChild(po.svg("svg")))
+    .center({lat: 40, lon: -95})
+    .zoomRange([3, 7])
+    .zoom(4)
+    .add(po.interact());
+
+map.add(po.image()
+    .url(po.url("http://{S}tile.cloudmade.com"
+    + "/1a1b06b230af4efdbb989ea99e9841af" // http://cloudmade.com/register
+    + "/20760/256/{Z}/{X}/{Y}.png")
+    .hosts(["a.", "b.", "c.", ""])));
+
+map.add(po.geoJson()
+    .url("http://polymaps.appspot.com/state/{Z}/{X}/{Y}.json")
+    .on("load", load))
+
+map.add(po.compass()
+    .pan("none"));
+
+map.container().setAttribute("class", "Blues");
+
+function load(e) {
+  for (var i = 0; i < e.features.length; i++) {
+    var feature = e.features[i], d = states[feature.data.id.substring(6)];
+    if (d == undefined) {
+      feature.element.setAttribute("display", "none");
+    } else {
+      feature.element.setAttribute("class", "q" + quantile(d) + "-" + 9);
+      feature.element.appendChild(po.svg("title").appendChild(
+          document.createTextNode(feature.data.properties.name + ": "
+          + format(d).replace(/ [ ]+/, " ")))
+          .parentNode);
+    }
+  }
+}

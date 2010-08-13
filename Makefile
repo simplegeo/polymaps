@@ -30,6 +30,8 @@ WWW_FILES = \
 	lib/nns/nns.min.js \
 	lib/blueprint/screen.css \
 	lib/modernizr/modernizr.min.js \
+	lib/colorbrewer/colorbrewer.css \
+	lib/protovis/protodata.min.js \
 	www/index.html \
 	www/logo-big.js \
 	www/logo-small.js \
@@ -40,6 +42,7 @@ WWW_EX_FILES = \
 	examples/tilestache/dot.gif \
 	examples/overlay/sf1906.png \
 	examples/population/population.css \
+	examples/statehood/fips.js \
 	www/ex/bing.html \
 	www/ex/bing-sm.png \
 	www/ex/blue-marble.html \
@@ -63,6 +66,7 @@ WWW_EX_FILES = \
 	www/ex/population-sm.png \
 	www/ex/shadow.html \
 	www/ex/shadow-sm.png \
+	www/ex/statehood.html \
 	www/ex/statehood-sm.png \
 	www/ex/streets-sm.png \
 	www/ex/tiles-sm.png \
