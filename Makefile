@@ -56,6 +56,7 @@ WWW_EX_FILES = \
 	www/ex/midnight-commander-sm.png \
 	www/ex/overlay.html \
 	www/ex/overlay-sm.png \
+	www/ex/pale-dawn.html \
 	www/ex/pale-dawn-sm.png \
 	www/ex/population-sm.png \
 	www/ex/shadow-sm.png \

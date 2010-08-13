@@ -7,26 +7,8 @@
 
     </style>
   </head>
-  <body>
-    <script type="text/javascript">
-
-var po = org.polymaps;
-
-var map = po.map()
-    .container(document.body.appendChild(po.svg("svg")))
-    .add(po.interact())
-    .add(po.hash());
-
-map.add(po.image()
-    .url(po.url("http://{S}tile.cloudmade.com"
-    + "/1a1b06b230af4efdbb989ea99e9841af" // http://cloudmade.com/register
-    + "/998/256/{Z}/{X}/{Y}.png")
-    .hosts(["a.", "b.", "c.", ""])));
-
-map.add(po.compass()
-    .pan("none"));
-
-    </script>
+  <body id="map">
+    <script type="text/javascript" src="pale-dawn.js"></script>
     <span id="copy">
       &copy; 2010
       <a href="http://www.cloudmade.com/">CloudMade</a>,
