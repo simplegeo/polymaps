@@ -70,9 +70,8 @@
         <a href="javascript:map.container().setAttribute('class',
         'Blues');">blues</a>.</p>
 
-        <p>This map is constructed using a
-        monochrome <a href="../docs/#image">image</a> layer
-        from <a href="http://www.cloudmade.com/">CloudMade</a>. Register
+        <p>The map background is a monochrome <a href="../docs/#image">image</a>
+        layer from <a href="http://www.cloudmade.com/">CloudMade</a>. Register
         a <a href="http://cloudmade.com/register">developer account</a> with
         CloudMade for your own API key. We&rsquo;re hosting GeoJSON tiles for
         states and counties
