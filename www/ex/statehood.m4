@@ -56,12 +56,12 @@
 
         <p>This simple visualization uses color to encode the date each of the
         fifty United States joined the union; lighter states joined earlier, and
-        darker states joined later. <a
-        href="http://en.wikipedia.org/wiki/Choropleth_map">Choropleth maps</a>
-        are easy with vector tiles and CSS styling. And, unlike static images,
-        you can <a href="javascript:map.zoomBy(9 - map.zoom(), {x: 475, y: 250},
-        {lon: -76.23, lat: 38.13})">zoom in</a> for higher resolution. You
-        can also experiment with
+        darker states joined
+        later. <a href="http://en.wikipedia.org/wiki/Choropleth_map">Choropleth
+        maps</a> are easy with vector tiles and CSS styling. And, unlike static
+        images, you
+        can <a href="javascript:map.zoomBy(9-map.zoom(),{x:700,y:250},{lon:-76.23,lat:38.13})">zoom
+        in</a> for higher resolution. You can also experiment with
         different <a href="http://colorbrewer.org/">color scales</a>, such
         as <a href="javascript:map.container().setAttribute('class',
         'Reds');">reds</a>,
@@ -77,6 +77,7 @@
         states and counties
         on <a href="http://code.google.com/appengine/">Google App Engine</a>,
         and as with image tiles, you can always roll your own!</p>
+
       </div>
       <hr class="space"/>
       <div id="copy" class="span-5 append-1">
