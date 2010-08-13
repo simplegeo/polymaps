@@ -71,6 +71,7 @@ WWW_EX_FILES = \
 	www/ex/statehood-sm.png \
 	www/ex/streets.html \
 	www/ex/streets-sm.png \
+	www/ex/tiles.html \
 	www/ex/tiles-sm.png \
 	www/ex/transform-sm.png \
 	www/ex/unemployment-sm.png
