@@ -39,6 +39,7 @@ WWW_EX_FILES = \
 	examples/cluster/kmeans.js \
 	examples/tilestache/dot.gif \
 	examples/overlay/sf1906.png \
+	examples/population/population.css \
 	www/ex/bing.html \
 	www/ex/bing-sm.png \
 	www/ex/blue-marble.html \
@@ -58,6 +59,7 @@ WWW_EX_FILES = \
 	www/ex/overlay-sm.png \
 	www/ex/pale-dawn.html \
 	www/ex/pale-dawn-sm.png \
+	www/ex/population.html \
 	www/ex/population-sm.png \
 	www/ex/shadow-sm.png \
 	www/ex/statehood-sm.png \
