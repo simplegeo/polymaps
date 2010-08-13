@@ -41,6 +41,23 @@
       </div>
       <div class="span-18 last">
 
+        <h2>Pale Dawn</h2>
+
+        <p>The &ldquo;Pale Dawn&rdquo; tileset has a calm, restrained style
+        designed to work well with lots of data points. It&rsquo;s less about
+        the geographical information as such, and more about providing a
+        suitable background to foreground information.</p>
+
+        <p>This map is constructed using a single <a href="../docs/#image"
+        >image</a> layer of <a href="http://www.cloudmade.com/">CloudMade</a>
+        tiles. The tiles are in spherical mercator coordinates, and the map has
+        standard interaction controls, so this basic example is a useful
+        starting point for customization. Register
+        a <a href="http://cloudmade.com/register">developer account</a> with
+        CloudMade for your own API key.</p>
+
+        <h3>Source Code</h3>
+
 m4_include(`../../examples/cloudmade/pale-dawn.js.html')
 
       </div>

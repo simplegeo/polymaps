@@ -49,6 +49,22 @@
       </div>
       <div class="span-18 last">
 
+        <h2>Midnight Commander</h2>
+
+        <p>You know, for when you&rsquo;re Jason Bourne and you&rsquo;re on the
+        run from the man and you break into the command center and you pull up
+        the secret map interface? That one.</p>
+
+        <p>This map is constructed using a single <a href="../docs/#image"
+        >image</a> layer of <a href="http://www.cloudmade.com/">CloudMade</a>
+        tiles. The tiles are in spherical mercator coordinates, and the map has
+        standard interaction controls, so this basic example is a useful
+        starting point for customization. Register
+        a <a href="http://cloudmade.com/register">developer account</a> with
+        CloudMade for your own API key.</p>
+
+        <h3>Source Code</h3>
+
 m4_include(`../../examples/cloudmade/midnight-commander.js.html')
 
       </div>
