@@ -105,7 +105,7 @@ img.ex {
   fill: #999;
 }
 
-.syntax pre { margin-top: 0; }
+.syntax pre { margin-top: 0; overflow: hidden; text-overflow: ellipsis; }
 .hll { background-color: #ffffcc }
 .c { color: #999988; font-style: italic } /* Comment */
 .err { color: #a61717; background-color: #e3d2d2 } /* Error */
