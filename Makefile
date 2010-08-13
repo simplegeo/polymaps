@@ -31,6 +31,7 @@ WWW_FILES = \
 	lib/blueprint/screen.css \
 	lib/modernizr/modernizr.min.js \
 	examples/cluster/kmeans.js \
+	examples/tilestache/dot.gif \
 	www/index.html \
 	www/logo-big.js \
 	www/logo-small.js \
@@ -44,6 +45,7 @@ WWW_EX_FILES = \
   www/ex/cluster.html \
   www/ex/cluster-sm.png \
   www/ex/features-sm.png \
+	www/ex/flickr.html \
   www/ex/flickr-sm.png \
   www/ex/grid-sm.png \
   www/ex/logo-big.png \
