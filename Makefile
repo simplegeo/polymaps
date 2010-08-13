@@ -50,40 +50,50 @@ WWW_EX_FILES = \
 	examples/unemployment/unemployment-data.js \
 	www/ex/index.html \
 	www/ex/bing.html \
-	www/ex/bing-sm.png \
+	www/ex/bing-s.png \
 	www/ex/bing-m.png \
 	www/ex/blue-marble.html \
-	www/ex/blue-marble-sm.png \
+	www/ex/blue-marble-s.png \
 	www/ex/blue-marble-m.png \
 	www/ex/cluster.html \
-	www/ex/cluster-sm.png \
-	www/ex/features-sm.png \
+	www/ex/cluster-s.png \
+	www/ex/cluster-m.png \
 	www/ex/flickr.html \
-	www/ex/flickr-sm.png \
+	www/ex/flickr-s.png \
+	www/ex/flickr-m.png \
 	www/ex/grid.html \
-	www/ex/grid-sm.png \
+	www/ex/grid-s.png \
+	www/ex/grid-m.png \
 	www/ex/midnight-commander.html \
-	www/ex/midnight-commander-sm.png \
+	www/ex/midnight-commander-s.png \
 	www/ex/midnight-commander-m.png \
 	www/ex/overlay.html \
-	www/ex/overlay-sm.png \
+	www/ex/overlay-s.png \
+	www/ex/overlay-m.png \
 	www/ex/pale-dawn.html \
-	www/ex/pale-dawn-sm.png \
+	www/ex/pale-dawn-s.png \
 	www/ex/pale-dawn-m.png \
 	www/ex/population.html \
-	www/ex/population-sm.png \
+	www/ex/population-s.png \
+	www/ex/population-m.png \
 	www/ex/shadow.html \
-	www/ex/shadow-sm.png \
+	www/ex/shadow-s.png \
+	www/ex/shadow-m.png \
 	www/ex/statehood.html \
-	www/ex/statehood-sm.png \
+	www/ex/statehood-s.png \
+	www/ex/statehood-m.png \
 	www/ex/streets.html \
-	www/ex/streets-sm.png \
+	www/ex/streets-s.png \
+	www/ex/streets-m.png \
 	www/ex/tiles.html \
-	www/ex/tiles-sm.png \
+	www/ex/tiles-s.png \
+	www/ex/tiles-m.png \
 	www/ex/transform.html \
-	www/ex/transform-sm.png \
+	www/ex/transform-s.png \
+	www/ex/transform-m.png \
 	www/ex/unemployment.html \
-	www/ex/unemployment-sm.png
+	www/ex/unemployment-s.png \
+	www/ex/unemployment-m.png
 
 WWW_DOCS_FILES = \
 	www/docs/index.html

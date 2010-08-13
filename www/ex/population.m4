@@ -67,6 +67,11 @@ m4_include(`../../examples/population/population.js.html')
 m4_include(`../../examples/population/population.js.txt')
 
       </script>
+      <div class="span-5 append-1 credits">
+        Polymaps is a project
+        from <a class="bold" href="http://simplegeo.com/">SimpleGeo</a>
+        and <a class="bold" href="http://stamen.com/">Stamen</a>.
+      </div>
     </div>
   </body>
 </html>
