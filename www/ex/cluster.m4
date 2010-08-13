@@ -5,7 +5,7 @@
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.0.0"></script>
-    <script type="text/javascript" src="../kmeans.js?1.6.0"></script>
+    <script type="text/javascript" src="kmeans.js?1.6.0"></script>
     <style type="text/css">
 
 @import url("../screen.css?0.9");

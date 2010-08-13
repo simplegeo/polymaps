@@ -2,7 +2,8 @@ var po = org.polymaps;
 
 var map = po.map()
     .container(document.getElementById("map").appendChild(po.svg("svg")))
-    .add(po.interact());
+    .add(po.interact())
+    .add(po.hash());
 
 map.add(po.image()
     .url(po.url("http://{S}tile.cloudmade.com"

@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Polymaps - Flickr Shapes</title>
+    <title>Polymaps - Overlay</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.0.0"></script>
@@ -11,7 +11,7 @@
 @import url("../style.css?1.6.0");
 
 #map {
-  background: url(dot.gif);
+  background: #E5E0D9;
 }
 
     </style>
@@ -36,17 +36,19 @@
       </div>
       <hr class="space"/>
       <div id="copy" class="span-5 append-1">
-        Courtesy
-        <a href="http://shapetiles.spum.org/about/">Aaron Straup Cope</a>.
+        &copy; 2010
+        <a href="http://www.cloudmade.com/">CloudMade</a>,
+        <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors,
+        <a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a>.
       </div>
       <div class="span-18 last">
 
-m4_include(`../../examples/tilestache/flickr.js.html')
+m4_include(`../../examples/overlay/overlay.js.html')
 
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/tilestache/flickr.js.txt')
+m4_include(`../../examples/overlay/overlay.js.txt')
 
       </script>
     </div>

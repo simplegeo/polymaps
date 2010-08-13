@@ -5,8 +5,7 @@ var map = po.map()
     .center({lat: 37.787, lon: -122.228})
     .zoom(14)
     .zoomRange([12, 16])
-    .add(po.interact())
-    .add(po.hash());
+    .add(po.interact());
 
 map.add(po.image()
     .url(po.url("http://{S}tile.cloudmade.com"
