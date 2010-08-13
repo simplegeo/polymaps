@@ -61,6 +61,7 @@ WWW_EX_FILES = \
 	www/ex/pale-dawn-sm.png \
 	www/ex/population.html \
 	www/ex/population-sm.png \
+	www/ex/shadow.html \
 	www/ex/shadow-sm.png \
 	www/ex/statehood-sm.png \
 	www/ex/streets-sm.png \
