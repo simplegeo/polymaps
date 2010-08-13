@@ -95,8 +95,7 @@
 
         <p>This example also uses a data visualization library
         called <a href="http://protovis.org/">Protovis</a> for computing
-        quantiles and formatting dates. Protovis is optional and not required to
-        use Polymaps.</p>
+        quantiles. Protovis is optional and not required to use Polymaps.</p>
 
         <p>Note that we&rsquo;re not using Protovis to render
         anything&mdash;just data processing.</p>

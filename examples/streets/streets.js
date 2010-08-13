@@ -1,8 +1,8 @@
 var po = org.polymaps;
 
 var color = pv.Scale.linear()
-    .domain(0, 99)
-    .range("red", "white");
+    .domain(0, 50, 70, 100)
+    .range("#F00", "#930", "#FC0", "#3B0");
 
 var map = po.map()
     .container(document.getElementById("map").appendChild(po.svg("svg")))
@@ -28,13 +28,9 @@ map.add(po.geoJson()
 map.add(po.compass()
     .pan("none"));
 
-function pci(feature) {
-  return Number(feature.data.properties.PCI);
-}
-
 function load(e) {
   for (var i = 0; i < e.features.length; i++) {
-    var feature = e.features[i], d = pci(feature);
+    var feature = e.features[i], d = feature.data.properties.PCI;
     if (!feature.element) continue;
     feature.element.setAttribute("stroke", color(d).color);
     feature.element.appendChild(po.svg("title").appendChild(
