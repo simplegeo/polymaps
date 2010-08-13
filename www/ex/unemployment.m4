@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Polymaps - Population Density</title>
+    <title>Polymaps - Unemployment</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.0.0"></script>
@@ -47,9 +47,7 @@
         <a href="http://github.com/simplegeo/polymaps">Download</a>
       </div>
       <hr class="space"/>
-      <div id="map" class="span-24 last">
-        <img id="logo"/>
-      </div>
+      <div id="map" class="span-24 last"></div>
       <hr class="space"/>
       <div id="copy" class="span-5 append-1">
         &copy; 2010
