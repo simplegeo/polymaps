@@ -28,6 +28,10 @@ a:hover {
   margin-right: 20px;
 }
 
+.top a.active {
+  color: #aaa;
+}
+
 .top a, a.bold {
   font-weight: bold;
   line-height: 100%;

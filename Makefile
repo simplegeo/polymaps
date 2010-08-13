@@ -34,7 +34,9 @@ WWW_FILES = \
 	lib/protovis/protodata.min.js \
 	www/index.html \
 	www/logo-big.js \
+	www/logo-big.png \
 	www/logo-small.js \
+	www/logo-small.png \
 	www/style.css
 
 WWW_EX_FILES = \
@@ -46,10 +48,13 @@ WWW_EX_FILES = \
 	examples/streets/streets.json \
 	examples/transform/nypl.js \
 	examples/unemployment/unemployment-data.js \
+	www/ex/index.html \
 	www/ex/bing.html \
 	www/ex/bing-sm.png \
+	www/ex/bing-m.png \
 	www/ex/blue-marble.html \
 	www/ex/blue-marble-sm.png \
+	www/ex/blue-marble-m.png \
 	www/ex/cluster.html \
 	www/ex/cluster-sm.png \
 	www/ex/features-sm.png \
@@ -57,14 +62,14 @@ WWW_EX_FILES = \
 	www/ex/flickr-sm.png \
 	www/ex/grid.html \
 	www/ex/grid-sm.png \
-	www/ex/logo-big.png \
-	www/ex/logo-small.png \
 	www/ex/midnight-commander.html \
 	www/ex/midnight-commander-sm.png \
+	www/ex/midnight-commander-m.png \
 	www/ex/overlay.html \
 	www/ex/overlay-sm.png \
 	www/ex/pale-dawn.html \
 	www/ex/pale-dawn-sm.png \
+	www/ex/pale-dawn-m.png \
 	www/ex/population.html \
 	www/ex/population-sm.png \
 	www/ex/shadow.html \
@@ -98,6 +103,9 @@ polymaps.js: $(JS_FILES) Makefile
 	echo "// $(shell git rev-parse HEAD)" >> $@
 	cat $(JS_FILES) >> $@
 	chmod a-w $@
+
+%.d: %.html
+	touch $@
 
 %.d: %.m4 Makefile www/m4d.sh
 	www/m4d.sh $< > $@
