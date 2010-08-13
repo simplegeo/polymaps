@@ -57,6 +57,7 @@ svg.add("svg:radialGradient")
     .attr("stop-color", "#cccccc")
     .attr("stop-opacity", 0);
 
+/** Post-process the GeoJSON points and replace them with shiny balls! */
 function load(e) {
   var r = 20 * Math.pow(2, e.tile.zoom - 12);
   for (var i = 0; i < e.features.length; i++) {
