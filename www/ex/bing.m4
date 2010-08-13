@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Polymaps - Bing</title>
+    <title>Polymaps - Satellite</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
@@ -48,6 +48,26 @@
       <hr class="space"/>
       <div id="copy" class="span-5 append-1"></div>
       <div class="span-18 last">
+
+      <h2>Satellite</h2>
+
+      <p>Want to show what Earth looks like from space? The Bing&#x2122;
+      Maps <a href="http://msdn.microsoft.com/en-us/library/ff701716.aspx">imagery
+      metadata API</a> provides beautiful aerial (satellite) image tiles at a
+      wide range of zoom levels, with optional labels. The &rdquo;Road&ldquo;
+      tileset is a more traditional alternative to <a href="pale-dawn.html">Pale
+      Dawn</a>.</p>
+
+      <p>This map is constructed using a single <a href="../docs/#image"
+      >image</a> layer. The tiles are in spherical mercator coordinates, and the
+      map has standard interaction controls. This example implements a
+      custom <a href="../docs/#url">URL template</a> because Bing requires
+      coordinate &ldquo;quadkeys&rdquo; (a bit-wise encoding) rather than the
+      traditional <tt>{Z}/{X}/{Y}</tt>. Register
+      a <a href="https://www.bingmapsportal.com/">Bing Maps account</a> for your
+      own API key.</p>
+
+      <h3>Source Code</h3>
 
 m4_include(`../../examples/bing/map.js.html')
 
