@@ -3,22 +3,21 @@ po.wheel = function() {
       timePrev = 0,
       smooth = true,
       location,
+      speedBug = /WebKit\/533/.test(navigator.userAgent),
+      speedAvg = .3,
       map;
-
-  /* Yikes! Mousewheel speed is totally nonstandard! */
-  var speed = 0.01
-      / (/WebKit\/534\./.test(navigator.userAgent) ? 9
-      : /Chrome\//.test(navigator.userAgent) ? 90
-      : /Firefox\//.test(navigator.userAgent) ? .5
-      : 360);
 
   function move(e) {
     location = null;
   }
 
   function mousewheel(e) {
-    var delta = (e.wheelDelta || -e.detail) * speed,
+    var delta = Math.max(-1, Math.min(1, (e.wheelDelta / 120 || -e.detail) * .1)),
         point = map.mouse(e);
+    if (speedBug) {
+      speedAvg = speedAvg * .95 + Math.abs(delta) * .05;
+      if (speedAvg > .5) delta *= .4;
+    }
     if (!location) location = map.pointLocation(point);
     map.off("move", move);
     if (smooth) {
