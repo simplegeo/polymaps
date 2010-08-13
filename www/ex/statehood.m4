@@ -18,7 +18,6 @@
 }
 
 .layer path {
-  fill: none;
   stroke: #fff;
   stroke-width: 1.5px;
   vector-effect: non-scaling-stroke;
