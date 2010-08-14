@@ -86,7 +86,8 @@ m4_include(`../../examples/grid/tiles.js.html')
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/grid/tiles.js.txt')
+m4_include(`../../examples/grid/tiles.min.js')
+m4_include(`fullscreen.min.js')
 
       </script>
       <div class="span-5 append-1 credits">

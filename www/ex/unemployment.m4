@@ -110,7 +110,8 @@ m4_include(`../../examples/unemployment/unemployment.js.html')
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/unemployment/unemployment.js.txt')
+m4_include(`../../examples/unemployment/unemployment.min.js')
+m4_include(`fullscreen.min.js')
 
       </script>
       <div class="span-5 append-1 credits">

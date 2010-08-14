@@ -103,6 +103,9 @@ PYGMENT_STYLE = trac
 
 all: polymaps.min.js polymaps.js
 
+%.min.js: %.js
+	$(JS_COMPILER) < $^ > $@
+
 polymaps.min.js: polymaps.js
 	rm -f $@
 	echo "// $(shell git rev-parse --short HEAD)" >> $@
@@ -114,11 +117,11 @@ polymaps.js: $(JS_FILES) Makefile
 	cat $(JS_FILES) >> $@
 	chmod a-w $@
 
-%.d: %.html
-	touch $@
-
 %.d: %.m4 Makefile www/m4d.sh
 	www/m4d.sh $< > $@
+
+%.d: %.html
+	touch $@
 
 include $(patsubst %.html,%.d,$(filter %.html,$(WWW_EX_FILES)))
 

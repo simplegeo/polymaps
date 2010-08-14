@@ -86,7 +86,8 @@ m4_include(`../../examples/cluster/cluster.js.html')
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/cluster/cluster.js.txt')
+m4_include(`../../examples/cluster/cluster.min.js')
+m4_include(`fullscreen.min.js')
 
       </script>
       <div class="span-5 append-1 credits">

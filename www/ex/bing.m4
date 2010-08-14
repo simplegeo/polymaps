@@ -52,12 +52,13 @@
 
       <h2>Satellite</h2>
 
-      <p>Want to show what Earth looks like from space? The Bing&#x2122;
+      <p>Want to show what Earth looks like from space? The Bing
       Maps <a href="http://msdn.microsoft.com/en-us/library/ff701716.aspx">imagery
       metadata API</a> provides beautiful aerial (satellite) image tiles at a
       wide range of zoom levels, with optional labels. The &ldquo;Road&rdquo;
       tileset is a more traditional alternative to <a href="pale-dawn.html">Pale
-      Dawn</a>. Also? <a href="javascript:map.zoomBy(18-map.zoom(),{x:475,y:100},{lon:-122.49,lat:37.67});">ZOMG PLANE!</a></p>
+      Dawn</a>. Also? <a href="javascript:map.zoomBy(18-map.zoom(),{x:475,y:100},{lon:-122.49,lat:37.67});">ZOMG
+      PLANE!</a></p>
 
       <p>This map is constructed using a single <a href="../docs/#image"
       >image</a> layer. The tiles are in spherical mercator coordinates, and the
@@ -75,7 +76,8 @@ m4_include(`../../examples/bing/map.js.html')
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/bing/map.js.txt')
+m4_include(`../../examples/bing/map.min.js')
+m4_include(`fullscreen.min.js')
 
       </script>
       <div class="span-5 append-1 credits">

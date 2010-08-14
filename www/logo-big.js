@@ -10,8 +10,8 @@ if (Modernizr.svg && Modernizr.svgclippaths) (function() {
   if (end != document.body) end = end.parentNode;
 
   var svg = n$(end).add("svg:svg")
-      .attr("width", 800)
-      .attr("height", 200);
+      .attr("width", 750)
+      .attr("height", 170);
 
   var defs = svg.add("svg:defs");
 

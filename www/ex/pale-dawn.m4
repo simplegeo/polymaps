@@ -64,7 +64,8 @@ m4_include(`../../examples/cloudmade/pale-dawn.js.html')
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/cloudmade/pale-dawn.js.txt')
+m4_include(`../../examples/cloudmade/pale-dawn.min.js')
+m4_include(`fullscreen.min.js')
 
       </script>
       <div class="span-5 append-1 credits">

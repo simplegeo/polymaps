@@ -71,7 +71,8 @@ m4_include(`../../examples/cloudmade/midnight-commander.js.html')
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/cloudmade/midnight-commander.js.txt')
+m4_include(`../../examples/cloudmade/midnight-commander.min.js')
+m4_include(`fullscreen.min.js')
 
       </script>
       <div class="span-5 append-1 credits">

@@ -97,7 +97,8 @@ m4_include(`../../examples/streets/streets.js.html')
       </div>
       <script type="text/javascript">
 
-m4_include(`../../examples/streets/streets.js.txt')
+m4_include(`../../examples/streets/streets.min.js')
+m4_include(`fullscreen.min.js')
 
       </script>
       <div class="span-5 append-1 credits">
