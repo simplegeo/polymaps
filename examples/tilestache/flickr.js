@@ -2,7 +2,7 @@ var po = org.polymaps;
 
 var map = po.map()
     .container(document.getElementById("map").appendChild(po.svg("svg")))
-    .zoomRange([0, 9])
+    .zoomRange([1, 10])
     .zoom(3)
     .add(po.image().url(tilestache("http://s3.amazonaws.com/info.aaronland.tiles.shapetiles/{Z}/{X}/{Y}.png")))
     .add(po.interact())

@@ -40,6 +40,25 @@
       </div>
       <div class="span-18 last">
 
+        <h2>Flickr Shapes</h2>
+
+        <p>Aaron generated <a href="http://shapetiles.spum.org/about/">Flickr
+        Shapetiles</a> from geotagged <a href="http://flickr.com/">Flickr</a>
+        photos, which have up to six associated <a href="http://woe.spum.org/"
+        >Where On Earth</a> (WOE) IDs. These identifiers correspond to the
+        hierarchy of places where a photo was taken: the neighbourhood, the
+        town, the county, and so on up to continents. If you draw an outline
+        around all the locations for a given WOE entity, you infer an
+        approximate shape of that place!</p>
+
+        <p>This map is constructed using a single <a href="../docs/#image"
+        >image</a> layer pulling tiles from <a href="http://aws.amazon.com/s3/"
+        >Amazon S3</a> via <a href="http://tilestache.org/">TileStache</a>.
+        Hosting courtesy of <a href="http://www.aaronland.info/">Aaron Straup
+        Cope</a>.</p>
+
+        <h3>Source Code</h3>
+
 m4_include(`../../examples/tilestache/flickr.js.html')
 
       </div>
