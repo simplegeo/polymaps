@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Polymaps - Grid</title>
+    <title>Polymaps - Lat-Lon Grid</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
@@ -47,6 +47,26 @@
         <a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a>.
       </div>
       <div class="span-18 last">
+
+        <h2>Lat-Lon Grid</h2>
+
+        <p>The built-in <tt>grid</tt> control draws lines of constant latitude
+        and longitude over the map. The grid reveals that the spherical mercator
+        projection is cylindrical: longitudes are uniformly spaced. <a
+        href="javascript:map.zoom(1.51);">Zoom out</a> to see the exaggeration of
+        latitudes near the poles caused by the log-tan transform.</p>
+
+        <p>The lines are subdivided as you zoom in to maintain constant apparent
+        density&mdash;useful for debugging tiles! A future enhancement of this
+        control might display proper major and minor ticks, as well as labels to
+        show the visible latitudes and longitudes.</p>
+
+        <p>The map background is an <a href="../docs/#image">image</a>
+        layer from <a href="http://www.cloudmade.com/">CloudMade</a>. Register
+        a <a href="http://cloudmade.com/register">developer account</a> with
+        CloudMade for your own API key.</p>
+
+        <h3>Source Code</h3>
 
 m4_include(`../../examples/grid/grid.js.html')
 

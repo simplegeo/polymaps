@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Polymaps - Tiles</title>
+    <title>Polymaps - Tile Grid</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?1.6.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
@@ -50,6 +50,36 @@
       <div id="map" class="span-24 last"></div>
       <hr class="space"/>
       <div class="span-18 prepend-6 last">
+
+        <h2>Tile Grid</h2>
+
+        <p>Use this lightweight layer implementation to explore the tile
+        grid. Polymaps uses
+        a <a href="http://en.wikipedia.org/wiki/Scanline_rendering">polygon-fill
+        algorithm</a> to determine exactly which tiles are visible, given
+        arbitrary zooming, panning and affine transforms.</p>
+
+        <p>As you pan and zoom with the mouse, watch how tiles outside the
+        viewport (the red border) are removed. Tiles that come into view are
+        dynamically generated and cached using the layer. Use the 'A' and 'D'
+        keys to rotate the map!</p>
+
+      </div>
+      <hr class="space"/>
+      <div id="copy" class="span-5 append-1">
+
+        <p>The tile overlay is implemented using an anonymous subclass
+        of <tt>po.layer</tt></a>, which delegates tile creation to
+        the <tt>grid</tt> method. You can copy-and-paste this lightweight layer
+        implementation into your own example for debugging!</p>
+
+        <p>The <tt>resize</tt> method isn&rsquo;t strictly needed for this
+        example, but we wanted to show how Polymaps recomputes the visible tiles
+        as the map changes size.</p>
+
+      </div>
+      <div class="span-18 last">
+        <h3>Source Code</h3>
 
 m4_include(`../../examples/grid/tiles.js.html')
 
