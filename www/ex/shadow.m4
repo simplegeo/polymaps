@@ -61,6 +61,11 @@
         filter. The marker scales automatically with zoom level, such that it
         appears constant-size over the map!</p>
 
+        <p>The map background is an <a href="../docs/#image">image</a>
+        layer from <a href="http://www.cloudmade.com/">CloudMade</a>. Register
+        a <a href="http://cloudmade.com/register">developer account</a> with
+        CloudMade for your own API key.</p>
+
       </div>
       <hr class="space"/>
       <div id="copy" class="span-5 append-1">

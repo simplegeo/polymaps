@@ -7,6 +7,15 @@ code, tt, pre {
   font-family: Courier;
 }
 
+p + p {
+  text-indent: 2em;
+  margin-top: -1.5em;
+}
+
+form p + p {
+  text-indent: 0;
+}
+
 a {
   text-decoration: none;
   color: black;
