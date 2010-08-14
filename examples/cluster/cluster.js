@@ -20,7 +20,7 @@ map.add(po.geoJson()
         + "&format=json"
         + "&bbox={B}"
         + "&dstart=2010-04-01"
-        + "&dend=2010-04-07"))
+        + "&dend=2010-05-01"))
     .on("load", load)
     .clip(false)
     .zoom(14));

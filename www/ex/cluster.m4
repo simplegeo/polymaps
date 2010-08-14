@@ -50,6 +50,37 @@
       </div>
       <div class="span-18 last">
 
+        <h2><i>k</i>-Means Clustering</h2>
+
+        <p>Symbol maps, such as those used
+        by <a href="http://oakland.crimespotting.org/">Oakland
+        Crimespotting</a>, are great for visualizing discrete events across time
+        and space. But what happens if you want to show thousands of points?
+        Here we
+        use <a href="http://en.wikipedia.org/wiki/K-means_clustering"><i>k</i>-means
+        clustering</a> to coalesce dots and visualize the density of crime in
+        Oakland.</p>
+
+        <p>The map background is a monochrome <a href="../docs/#image">image</a>
+        layer from <a href="http://www.cloudmade.com/">CloudMade</a>. Register
+        a <a href="http://cloudmade.com/register">developer account</a> with
+        CloudMade for your own API key. Crime data is sourced
+        from <a href="http://gismaps.oaklandnet.com/crimewatch/">CrimeWatch</a>.</p>
+
+      </div>
+      <hr class="space"/>
+      <div id="copy" class="span-5 append-1">
+
+        <p>This example uses a helper library to compute
+        the <a href="kmeans.js"><i>k</i>-means</a> and build
+        a <i>kd</i>-tree. These helpers aren&rsquo;t part of the official
+        Polymaps release, but they are covered by the same BSD license and you
+        are welcome to use them!</p>
+
+      </div>
+      <div class="span-18 last">
+        <h3>Source Code</h3>
+
 m4_include(`../../examples/cluster/cluster.js.html')
 
       </div>
