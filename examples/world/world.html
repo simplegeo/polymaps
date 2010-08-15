@@ -1,16 +1,21 @@
 <html>
   <head>
     <title>Internet Users</title>
+    <script type="text/javascript" src="../../lib/protovis/protodata.js"></script>
+    <script type="text/javascript" src="../../lib/nns/nns.js"></script>
     <script type="text/javascript" src="../../polymaps.js"></script>
+    <script type="text/javascript" src="internet.js"></script>
     <style type="text/css">
 
+@import url("../../lib/colorbrewer/colorbrewer.css");
 @import url("../example.css");
 
 #map {
   background: #021019;
 }
 
-path {
+.layer path {
+  fill: #ccc;
   stroke: #021019;
 }
 
@@ -22,9 +27,20 @@ path {
   stroke: #1AA398;
 }
 
+#copy, #copy a {
+  color: #1AA398;
+}
+
     </style>
   </head>
   <body id="map">
     <script type="text/javascript" src="world.js"></script>
+    <span id="copy">
+      &copy; 2010
+      <a href="http://www.cloudmade.com/">CloudMade</a>,
+      <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors,
+      <a href="http://creativecommons.org/licenses/by-sa/2.0/">CCBYSA</a>.
+      Colors by <a href="http://colorbrewer.org/">Cynthia Brewer</a>.
+    </span>
   </body>
 </html>

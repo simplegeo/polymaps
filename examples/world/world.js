@@ -1,5 +1,11 @@
 var po = org.polymaps;
 
+// Compute noniles.
+var quantile = pv.Scale.quantile()
+    .quantiles(9)
+    .domain(pv.values(internet))
+    .range(0, 8);
+
 var map = po.map()
     .container(document.getElementById("map").appendChild(po.svg("svg")))
     .center({lat: 40, lon: 0})
@@ -24,10 +30,14 @@ map.add(po.compass()
 
 function load(e) {
   for (var i = 0; i < e.features.length; i++) {
-    var feature = e.features[i], d = feature.data.properties;
-    feature.element.setAttribute("fill", d.colour);
-    feature.element.appendChild(po.svg("title").appendChild(
-        document.createTextNode(d.name + ":  " + d.value + "%"))
-        .parentNode);
+    var feature = e.features[i],
+        n = feature.data.properties.name,
+        v = internet[n];
+    n$(feature.element)
+        .attr("class", isNaN(v) ? null : "q" + quantile(v) + "-" + 9)
+      .add("svg:title")
+        .text(n + (isNaN(v) ? "" : ":  " + v + "%"));
   }
 }
+
+map.container().setAttribute("class", "YlOrRd");
