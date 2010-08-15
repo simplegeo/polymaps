@@ -4,6 +4,7 @@ po.map = function() {
       size,
       sizeActual = zero,
       sizeRadius = zero, // sizeActual / 2
+      tileSize = {x: 256, y: 256},
       center = {lat: 37.76487, lon: -122.41948},
       zoom = 12,
       zoomFraction = 0,
@@ -22,34 +23,18 @@ po.map = function() {
     {lat: y2lat(ymax), lon: Infinity}
   ];
 
-  // See http://wiki.openstreetmap.org/wiki/Mercator
-
-  function y2lat(y) {
-    return 360 / Math.PI * Math.atan(Math.exp(y * Math.PI / 180)) - 90;
-  }
-
-  function lat2y(lat) {
-    return 180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
-  }
-
-  map.locationCoordinate = function(tileSize, l) {
-    var k = Math.pow(2, 5 + zoom) / 45;
-    return {
-      column: k * (l.lon + 180) / tileSize.x,
-      row: k * (180 - lat2y(l.lat)) / tileSize.y,
-      zoom: zoom
-    };
+  map.locationCoordinate = function(l) {
+    var c = po.map.locationCoordinate(l),
+        k = Math.pow(2, zoom);
+    c.column *= k;
+    c.row *= k;
+    c.zoom += zoom;
+    return c;
   };
 
-  map.coordinateLocation = function(tileSize, c) {
-    var k = 45 / Math.pow(2, 5 + c.zoom);
-    return {
-      lon: k * c.column * tileSize.x - 180,
-      lat: y2lat(180 - k * c.row * tileSize.y)
-    };
-  };
+  map.coordinateLocation = po.map.coordinateLocation;
 
-  map.coordinatePoint = function(tileCenter, tileSize, c) {
+  map.coordinatePoint = function(tileCenter, c) {
     var kc = Math.pow(2, zoom - c.zoom),
         kt = Math.pow(2, zoom - tileCenter.zoom),
         dx = (c.column * kc - tileCenter.column * kt) * tileSize.x * zoomFactor,
@@ -60,21 +45,21 @@ po.map = function() {
     };
   };
 
-  map.pointCoordinate = function(tileCenter, tileSize, p) {
+  map.pointCoordinate = function(tileCenter, p) {
     var kt = Math.pow(2, zoom - tileCenter.zoom),
-        dx = (p.x - sizeRadius.x) / (tileSize.x * zoomFactor),
-        dy = (p.y - sizeRadius.y) / (tileSize.y * zoomFactor);
+        dx = (p.x - sizeRadius.x) / zoomFactor,
+        dy = (p.y - sizeRadius.y) / zoomFactor;
     return {
-      column: tileCenter.column * kt + angleCosi * dx - angleSini * dy,
-      row: tileCenter.row * kt + angleSini * dx + angleCosi * dy,
+      column: tileCenter.column * kt + (angleCosi * dx - angleSini * dy) / tileSize.x,
+      row: tileCenter.row * kt + (angleSini * dx + angleCosi * dy) / tileSize.y,
       zoom: zoom
     };
   };
 
   map.locationPoint = function(l) {
-    var k = Math.pow(2, 5 + zoom + zoomFraction) / 45,
-        dx = (l.lon - center.lon) * k,
-        dy = (lat2y(center.lat) - lat2y(l.lat)) * k;
+    var k = Math.pow(2, zoom + zoomFraction - 3) / 45,
+        dx = (l.lon - center.lon) * k * tileSize.x,
+        dy = (lat2y(center.lat) - lat2y(l.lat)) * k * tileSize.y;
     return {
       x: sizeRadius.x + angleCos * dx - angleSin * dy,
       y: sizeRadius.y + angleSin * dx + angleCos * dy
@@ -82,31 +67,31 @@ po.map = function() {
   };
 
   map.pointLocation = function(p) {
-    var k = 45 / Math.pow(2, 5 + zoom + zoomFraction),
+    var k = 45 / Math.pow(2, zoom + zoomFraction - 3),
         dx = (p.x - sizeRadius.x) * k,
         dy = (p.y - sizeRadius.y) * k;
     return {
-      lon: center.lon + angleCosi * dx - angleSini * dy,
-      lat: y2lat(lat2y(center.lat) - angleSini * dx - angleCosi * dy)
+      lon: center.lon + (angleCosi * dx - angleSini * dy) / tileSize.x,
+      lat: y2lat(lat2y(center.lat) - (angleSini * dx + angleCosi * dy) / tileSize.y)
     };
   };
 
   function recenter() {
     if (!centerRange) return;
-    var k = 45 / Math.pow(2, 5 + zoom + zoomFraction);
+    var k = 45 / Math.pow(2, zoom + zoomFraction - 3);
 
     // constrain latitude
     var y = Math.max(Math.abs(angleSin * sizeRadius.x + angleCos * sizeRadius.y),
                      Math.abs(angleSini * sizeRadius.x + angleCosi * sizeRadius.y)),
-        lat0 = y2lat(ymin - y * k),
-        lat1 = y2lat(ymax + y * k);
+        lat0 = y2lat(ymin - y * k / tileSize.y),
+        lat1 = y2lat(ymax + y * k / tileSize.y);
     center.lat = Math.max(lat0, Math.min(lat1, center.lat));
 
     // constrain longitude
     var x = Math.max(Math.abs(angleSin * sizeRadius.y + angleCos * sizeRadius.x),
                      Math.abs(angleSini * sizeRadius.y + angleCosi * sizeRadius.x)),
-        lon0 = centerRange[0].lon - x * k,
-        lon1 = centerRange[1].lon + x * k;
+        lon0 = centerRange[0].lon - x * k / tileSize.x,
+        lon1 = centerRange[1].lon + x * k / tileSize.x;
     center.lon = Math.max(lon0, Math.min(lon1, center.lon));
  }
 
@@ -170,6 +155,13 @@ po.map = function() {
     return map;
   };
 
+  map.tileSize = function(x) {
+    if (!arguments.length) return tileSize;
+    tileSize = x;
+    map.dispatch({type: "move"});
+    return map;
+  };
+
   map.center = function(x) {
     if (!arguments.length) return center;
     center = x;
@@ -179,12 +171,12 @@ po.map = function() {
   };
 
   map.panBy = function(x) {
-    var k = 45 / Math.pow(2, 5 + zoom + zoomFraction),
+    var k = 45 / Math.pow(2, zoom + zoomFraction - 3),
         dx = x.x * k,
         dy = x.y * k;
     return map.center({
-      lon: center.lon - angleCosi * dx + angleSini * dy,
-      lat: y2lat(lat2y(center.lat) + angleSini * dx + angleCosi * dy)
+      lon: center.lon + (angleSini * dy - angleCosi * dx) / tileSize.x,
+      lat: y2lat(lat2y(center.lat) + (angleSini * dx + angleCosi * dy) / tileSize.y)
     });
   };
 
@@ -287,3 +279,30 @@ resizer.remove = function(map) {
 
 // Note: assumes single window (no frames, iframes, etc.)!
 window.addEventListener("resize", resizer, false);
+
+// See http://wiki.openstreetmap.org/wiki/Mercator
+
+function y2lat(y) {
+  return 360 / Math.PI * Math.atan(Math.exp(y * Math.PI / 180)) - 90;
+}
+
+function lat2y(lat) {
+  return 180 / Math.PI * Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+}
+
+po.map.locationCoordinate = function(l) {
+  var k = 1 / 360;
+  return {
+    column: (l.lon + 180) * k,
+    row: (180 - lat2y(l.lat)) * k,
+    zoom: 0
+  };
+};
+
+po.map.coordinateLocation = function(c) {
+  var k = 45 / Math.pow(2, c.zoom - 3);
+  return {
+    lon: k * c.column - 180,
+    lat: y2lat(180 - k * c.row)
+  };
+};

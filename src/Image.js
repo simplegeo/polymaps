@@ -3,7 +3,8 @@ po.image = function() {
       url = "about:blank";
 
   function load(tile) {
-    var element = tile.element = po.svg("image"), size = image.size();
+    var element = tile.element = po.svg("image"), size = image.map().tileSize();
+    element.setAttribute("preserveAspectRatio", "none");
     element.setAttribute("width", size.x);
     element.setAttribute("height", size.y);
     element.setAttribute("opacity", 0);

@@ -12,7 +12,7 @@ map.add(po.image()
     .hosts(["a.", "b.", "c.", ""])));
 
 map.add(po.layer(overlay)
-    .size(null));
+    .tile(false));
 
 map.add(po.compass()
     .pan("none"));

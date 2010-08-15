@@ -6,15 +6,13 @@ var div = document.getElementById("map"),
 
 var map = po.map()
     .container(g)
+    .tileSize({x: 128, y: 128})
     .angle(.3)
     .add(po.interact());
 
 resize();
 
-var tiles = po.layer(grid)
-    .size({x: 128, y: 128});
-
-map.add(tiles);
+map.add(po.layer(grid));
 
 var rect = g.appendChild(po.svg("rect"));
 rect.setAttribute("width", "50%");
@@ -31,7 +29,7 @@ function grid(tile) {
   var g = tile.element = po.svg("g");
 
   var rect = g.appendChild(po.svg("rect")),
-      size = tiles.size();
+      size = map.tileSize();
   rect.setAttribute("width", size.x);
   rect.setAttribute("height", size.y);
 

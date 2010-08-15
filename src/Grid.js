@@ -61,12 +61,5 @@ po.grid = function() {
     return grid;
   };
 
-  grid.size = function(x) {
-    if (!arguments.length) return size;
-    size = x;
-    if (map) draw();
-    return grid;
-  };
-
   return grid;
 };

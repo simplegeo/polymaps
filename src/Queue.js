@@ -17,7 +17,7 @@ po.queue = (function() {
     return false;
   }
 
-  function text(url, callback, mimeType) {
+  function request(url, callback, mimeType) {
     var req;
 
     function send() {
@@ -29,7 +29,7 @@ po.queue = (function() {
       req.onreadystatechange = function(e) {
         if (req.readyState == 4) {
           active--;
-          if (req.status < 300 && req.responseText) callback(req.responseText);
+          if (req.status < 300) callback(req);
           process();
         }
       };
@@ -47,12 +47,27 @@ po.queue = (function() {
     return {abort: abort};
   }
 
+  function text(url, callback, mimeType) {
+    return request(url, function(req) {
+      if (req.responseText) callback(req.responseText);
+    }, mimeType);
+  }
+
+  /*
+   * We the override MIME type here so that you can load local files; some
+   * browsers don't assign a proper MIME type for local files.
+   */
+
   function json(url, callback) {
-    /*
-     * We the override MIME type here so that you can load local JSON files;
-     * some browsers don't assign a proper MIME type for local files.
-     */
-    return text(url, function(text) { callback(JSON.parse(text)); }, "application/json");
+    return request(url, function(req) {
+      if (req.responseText) callback(JSON.parse(req.responseText));
+    }, "application/json");
+  }
+
+  function xml(url, callback) {
+    return request(url, function(req) {
+      if (req.responseXML) callback(req.responseXML);
+    }, "application/xml");
   }
 
   function image(image, src, callback) {
@@ -84,5 +99,5 @@ po.queue = (function() {
     return {abort: abort};
   }
 
-  return {text: text, json: json, image: image};
+  return {text: text, xml: xml, json: json, image: image};
 })();

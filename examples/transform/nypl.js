@@ -30,7 +30,7 @@ nypl.image = function() {
 
   function request(tile) {
     var element = tile.element,
-        size = image.size(),
+        size = image.map().tileSize(),
         w = size.x,
         h = size.y,
         k = Math.pow(2, -tile.zoom) * Math.max(scanInfo.width, scanInfo.height),

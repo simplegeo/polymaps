@@ -1,8 +1,8 @@
 po.url = function(template) {
   var hosts = [];
 
-  function format(c, location) {
-    var max = 1 << c.zoom, column = c.column % max; // TODO assumes 256x256
+  function format(c) {
+    var max = 1 << c.zoom, column = c.column % max;
     if (column < 0) column += max;
     return template.replace(/{(.)}/g, function(s, v) {
       switch (v) {
@@ -11,13 +11,13 @@ po.url = function(template) {
         case "X": return column;
         case "Y": return c.row;
         case "B": {
-          var se = location({row: c.row, column: column, zoom: c.zoom}),
-              nw = location({row: c.row + 1, column: column + 1, zoom: c.zoom}),
+          var nw = po.map.coordinateLocation({row: c.row, column: column, zoom: c.zoom}),
+              se = po.map.coordinateLocation({row: c.row + 1, column: column + 1, zoom: c.zoom}),
               pn = Math.ceil(Math.log(c.zoom) / Math.LN2);
-          return nw.lat.toFixed(pn)
-              + "," + se.lon.toFixed(pn)
-              + "," + se.lat.toFixed(pn)
-              + "," + nw.lon.toFixed(pn);
+          return se.lat.toFixed(pn)
+              + "," + nw.lon.toFixed(pn)
+              + "," + nw.lat.toFixed(pn)
+              + "," + se.lon.toFixed(pn);
         }
       }
       return v;

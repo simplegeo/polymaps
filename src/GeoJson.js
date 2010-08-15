@@ -1,11 +1,13 @@
-po.geoJson = function() {
+po.geoJson = function(fetch) {
   var geoJson = po.layer(load, unload),
       url = po.url("about:blank"),
       clip = true,
+      clipId,
       zoom = null,
       tiles = {},
-      features,
-      clipId = "org.polymaps." + po.id();
+      features;
+
+  if (!arguments.length) fetch = po.queue.json;
 
   function geometry(o, proj) {
     return o && o.type in types && types[o.type](o, proj);
@@ -98,7 +100,7 @@ po.geoJson = function() {
 
     function update(data) {
       var features = tiles[tile.key] || (tiles[tile.key] = []), updated = [];
-      if (data.next) tile.request = po.queue.json(data.next.href, update);
+      if (data.next) tile.request = fetch(data.next.href, update);
       for (var i = 0; i < data.features.length; i++) {
         var feature = data.features[i],
             element = geometry(feature.geometry, proj.locationPoint);
@@ -115,10 +117,10 @@ po.geoJson = function() {
     if (features) {
       update({features: features});
     } else {
-      tile.request = po.queue.json(url(tile, proj.coordinateLocation), update);
+      tile.request = fetch(url(tile), update);
     }
 
-    if (clip) g.setAttribute("clip-path", "url(#" + clipId + ")");
+    if (clipId) g.setAttribute("clip-path", "url(#" + clipId + ")");
   }
 
   function unload(tile) {
@@ -134,7 +136,7 @@ po.geoJson = function() {
 
   geoJson.features = function(x) {
     if (!arguments.length) return features;
-    if (x) geoJson.size(null).clip(false);
+    if (x) geoJson.tile(false);
     features = x;
     return geoJson;
   };
@@ -146,11 +148,11 @@ po.geoJson = function() {
   };
 
   geoJson.init = function(g) {
-    if (clip) {
-      var size = geoJson.size(),
+    if (clip && geoJson.tile()) {
+      var size = geoJson.map().tileSize(),
           clipPath = g.insertBefore(po.svg("clipPath"), g.firstChild),
           rect = clipPath.appendChild(po.svg("rect"));
-      clipPath.setAttribute("id", clipId);
+      clipPath.setAttribute("id", clipId = "org.polymaps." + po.id());
       rect.setAttribute("width", size.x);
       rect.setAttribute("height", size.y);
     }

@@ -24,7 +24,7 @@ function tilestache(template) {
   }
 
   return function(c) {
-    var max = 1 << c.zoom, column = c.column % max; // TODO assumes 256x256
+    var max = 1 << c.zoom, column = c.column % max;
     if (column < 0) column += max;
     return template.replace(/{(.)}/g, function(s, v) {
       switch (v) {

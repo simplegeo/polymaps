@@ -1,14 +1,10 @@
 var po = org.polymaps;
 
-var color = pv.Scale.linear()
-    .domain(0, 50, 70, 100)
-    .range("#F00", "#930", "#FC0", "#3B0");
-
 var map = po.map()
     .container(document.getElementById("map").appendChild(po.svg("svg")))
-    .center({lat: 37.76, lon: -122.44})
-    .zoom(13)
-    .zoomRange([12, 16])
+    .center({lat: 40, lon: 0})
+    .zoomRange([1, 4])
+    .zoom(2)
     .add(po.interact());
 
 map.add(po.image()
@@ -18,22 +14,20 @@ map.add(po.image()
     .hosts(["a.", "b.", "c.", ""])));
 
 map.add(po.geoJson()
-    .url("streets.json")
-    .zoom(12)
+    .url("world.json")
     .tile(false)
-    .on("load", load)
-    .id("streets"));
+    .zoom(3)
+    .on("load", load));
 
 map.add(po.compass()
     .pan("none"));
 
 function load(e) {
   for (var i = 0; i < e.features.length; i++) {
-    var feature = e.features[i], d = feature.data.properties.PCI;
-    if (!feature.element) continue;
-    feature.element.setAttribute("stroke", color(d).color);
+    var feature = e.features[i], d = feature.data.properties;
+    feature.element.setAttribute("fill", d.colour);
     feature.element.appendChild(po.svg("title").appendChild(
-        document.createTextNode(feature.data.properties.STREET + ": " + d + " PCI"))
+        document.createTextNode(d.name + ":  " + d.value + "%"))
         .parentNode);
   }
 }
