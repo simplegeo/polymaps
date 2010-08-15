@@ -69,9 +69,9 @@
       <div id="copy" class="span-5 append-1">
 
         <p>The tile overlay is implemented using an anonymous subclass
-        of <tt>po.layer</tt></a>, which delegates tile creation to
-        the <tt>grid</tt> method. You can copy-and-paste this lightweight layer
-        implementation into your own example for debugging!</p>
+        of <tt>po.layer</tt>, which delegates tile creation to the <tt>grid</tt>
+        method. You can copy-and-paste this lightweight layer implementation
+        into your own example for debugging!</p>
 
         <p>The <tt>resize</tt> method isn&rsquo;t strictly needed for this
         example, but we wanted to show how Polymaps recomputes the visible tiles
