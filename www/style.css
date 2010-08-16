@@ -47,8 +47,12 @@ a:hover {
 }
 
 .blurb {
-  font-weight: 300;
   font-size: 22px;
+}
+
+.light, .sidebar, .blurb, .credits, #copy {
+  font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font-weight: 300;
 }
 
 img.ex {
@@ -80,7 +84,6 @@ img.ex {
 
 .sidebar {
   position: fixed;
-  font-weight: 300;
 }
 
 .sidebar h4 {
@@ -96,7 +99,6 @@ img.ex {
 
 .credits {
   position: fixed;
-  font-weight: 300;
   bottom: 0;
   padding-bottom: 1em;
   padding-top: 2em;
@@ -113,8 +115,7 @@ img.ex {
 
 #copy {
   color: #999;
-  font-weight: 300;
-  font-size: smaller;
+  font-size: 12px;
   height: 1;
 }
 
