@@ -1,10 +1,14 @@
 var po = org.polymaps;
 
-// Compute noniles.
-var quantile = pv.Scale.quantile()
-    .quantiles(9)
-    .domain(pv.values(internet))
-    .range(0, 8);
+var population = tsv("population.tsv")
+    .key(function(l) { return l[1]; })
+    .value(function(l) { return l[2].replace(/,/g, ""); })
+    .map();
+
+var internet = tsv("internet.tsv")
+    .key(function(l) { return l[1]; })
+    .value(function(l) { return l[2].replace(/,/g, "") / population[l[1]]; })
+    .map();
 
 var map = po.map()
     .container(document.getElementById("map").appendChild(po.svg("svg")))
@@ -14,10 +18,7 @@ var map = po.map()
     .add(po.interact());
 
 map.add(po.image()
-    .url(po.url("http://{S}tile.cloudmade.com"
-    + "/1a1b06b230af4efdbb989ea99e9841af" // http://cloudmade.com/register
-    + "/999/256/{Z}/{X}/{Y}.png")
-    .hosts(["a.", "b.", "c.", ""])));
+    .url("http://s3.amazonaws.com/com.modestmaps.bluemarble/{Z}-r{Y}-c{X}.jpg"));
 
 map.add(po.geoJson()
     .url("world.json")
@@ -28,16 +29,20 @@ map.add(po.geoJson()
 map.add(po.compass()
     .pan("none"));
 
+map.container().setAttribute("class", "YlOrRd");
+
 function load(e) {
   for (var i = 0; i < e.features.length; i++) {
     var feature = e.features[i],
         n = feature.data.properties.name,
         v = internet[n];
     n$(feature.element)
-        .attr("class", isNaN(v) ? null : "q" + quantile(v) + "-" + 9)
+        .attr("class", isNaN(v) ? null : "q" + ~~(v * 9) + "-" + 9)
       .add("svg:title")
-        .text(n + (isNaN(v) ? "" : ":  " + v + "%"));
+        .text(n + (isNaN(v) ? "" : ":  " + percent(v)));
   }
 }
 
-map.container().setAttribute("class", "YlOrRd");
+function percent(v) {
+  return (v * 100).toPrecision(Math.min(2, 2 - Math.log(v) / Math.LN2)) + "%";
+}

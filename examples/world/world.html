@@ -1,34 +1,30 @@
 <html>
   <head>
     <title>Internet Users</title>
-    <script type="text/javascript" src="../../lib/protovis/protodata.js"></script>
     <script type="text/javascript" src="../../lib/nns/nns.js"></script>
     <script type="text/javascript" src="../../polymaps.js"></script>
-    <script type="text/javascript" src="internet.js"></script>
+    <script type="text/javascript" src="tsv.js"></script>
     <style type="text/css">
 
 @import url("../../lib/colorbrewer/colorbrewer.css");
 @import url("../example.css");
 
 #map {
-  background: #021019;
+  background: #012;
+}
+
+.compass .fore, .compass .chevron {
+  stroke: #666;
 }
 
 .layer path {
   fill: #ccc;
-  stroke: #021019;
-}
-
-.compass .back {
-  fill: #256574;
-}
-
-.compass .fore, .compass .chevron {
-  stroke: #1AA398;
+  fill-opacity: .85;
+  stroke: #012;
 }
 
 #copy, #copy a {
-  color: #1AA398;
+  color: #aaa;
 }
 
     </style>
