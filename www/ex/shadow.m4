@@ -78,7 +78,7 @@
 
         <p>The <tt>n$</tt> method converts a DOM element to a wrapper, which has
         convenience methods for setting attributes (<tt>attr</tt>) and creating
-        child elements (<tt>add</tt>). Other libraries, include <a
+        child elements (<tt>add</tt>). Other libraries, including <a
         href="http://jquery.com/">jQuery</a>, provide similar functionality.</p>
 
       </div>

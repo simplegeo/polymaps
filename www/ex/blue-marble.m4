@@ -39,7 +39,8 @@
       <div id="map" class="span-24 last"></div>
       <hr class="space"/>
       <div id="copy" class="span-5 append-1">
-        Courtesy <a href="http://earthobservatory.nasa.gov/">NASA Earth Observatory</a>.
+        Courtesy <a href="http://earthobservatory.nasa.gov/">NASA Earth
+        Observatory</a>.
       </div>
       <div class="span-18 last">
 

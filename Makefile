@@ -41,13 +41,17 @@ WWW_FILES = \
 
 WWW_EX_FILES = \
 	examples/cluster/kmeans.js \
-	examples/tilestache/dot.gif \
 	examples/overlay/sf1906.png \
 	examples/population/population.css \
 	examples/statehood/fips.js \
 	examples/streets/streets.json \
+	examples/tilestache/dot.gif \
 	examples/transform/nypl.js \
 	examples/unemployment/unemployment-data.js \
+	examples/world/internet.tsv \
+	examples/world/population.tsv \
+	examples/world/tsv.js \
+	examples/world/world.json \
 	www/ex/index.html \
 	www/ex/bing.html \
 	www/ex/bing-s.png \
@@ -93,7 +97,10 @@ WWW_EX_FILES = \
 	www/ex/transform-m.png \
 	www/ex/unemployment.html \
 	www/ex/unemployment-s.png \
-	www/ex/unemployment-m.png
+	www/ex/unemployment-m.png \
+	www/ex/world.html \
+	www/ex/world-s.png \
+	www/ex/world-m.png
 
 WWW_DOCS_FILES = \
 	www/docs/index.html

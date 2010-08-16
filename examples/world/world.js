@@ -1,13 +1,15 @@
 var po = org.polymaps;
 
+/* Country name -> population (July 2010 Est.). */
 var population = tsv("population.tsv")
     .key(function(l) { return l[1]; })
     .value(function(l) { return l[2].replace(/,/g, ""); })
     .map();
 
+/* Country name -> internet users (2008). */
 var internet = tsv("internet.tsv")
     .key(function(l) { return l[1]; })
-    .value(function(l) { return l[2].replace(/,/g, "") / population[l[1]]; })
+    .value(function(l) { return l[2].replace(/,/g, ""); })
     .map();
 
 var map = po.map()
@@ -31,11 +33,12 @@ map.add(po.compass()
 
 map.container().setAttribute("class", "YlOrRd");
 
+/** Set feature class and add tooltip on tile load. */
 function load(e) {
   for (var i = 0; i < e.features.length; i++) {
     var feature = e.features[i],
         n = feature.data.properties.name,
-        v = internet[n];
+        v = internet[n] / population[n];
     n$(feature.element)
         .attr("class", isNaN(v) ? null : "q" + ~~(v * 9) + "-" + 9)
       .add("svg:title")
@@ -43,6 +46,7 @@ function load(e) {
   }
 }
 
+/** Formats a given number as a percentage, e.g., 10% or 0.02%. */
 function percent(v) {
   return (v * 100).toPrecision(Math.min(2, 2 - Math.log(v) / Math.LN2)) + "%";
 }
