@@ -52,8 +52,8 @@
 
         <p>The built-in <tt>grid</tt> control draws lines of constant latitude
         and longitude over the map. The grid reveals that the spherical mercator
-        projection is cylindrical: longitudes are uniformly spaced. <a
-        href="javascript:map.zoom(1.51);">Zoom out</a> to see the exaggeration of
+        projection is cylindrical: longitudes are uniformly spaced. <a href="#"
+        onclick="map.zoom(1.51);">Zoom out</a> to see the exaggeration of
         latitudes near the poles caused by the log-tan transform.</p>
 
         <p>The lines are subdivided as you zoom in to maintain constant apparent

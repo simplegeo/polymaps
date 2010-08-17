@@ -56,18 +56,17 @@
 
         <p>This simple visualization uses color to encode the date each of the
         fifty United States joined the union; lighter states joined earlier, and
-        darker states joined
-        later. <a href="http://en.wikipedia.org/wiki/Choropleth_map">Choropleth
-        maps</a> are easy with vector tiles and CSS styling. And, unlike static
-        images, you
-        can <a href="javascript:map.zoomBy(9-map.zoom(),{x:700,y:250},{lon:-76.23,lat:38.13});">zoom
+        darker states joined later. <a href="http://en.wikipedia.org/wiki/Choropleth_map"
+        >Choropleth maps</a> are easy with vector tiles and CSS styling. And,
+        unlike static images, you can <a href="#"
+        onclick="map.zoomBy(9-map.zoom(),{x:700,y:250},{lon:-76.23,lat:38.13});">zoom
         in</a> for higher resolution. You can also experiment with
         different <a href="http://colorbrewer.org/">color scales</a>, such
-        as <a href="javascript:map.container().setAttribute('class',
+        as <a href="#" onclick="map.container().setAttribute('class',
         'Reds');">reds</a>,
-        <a href="javascript:map.container().setAttribute('class',
+        <a href="#" onclick="map.container().setAttribute('class',
         'YlGn');">greens</a> and
-        <a href="javascript:map.container().setAttribute('class',
+        <a href="#" onclick="map.container().setAttribute('class',
         'Blues');">blues</a>.</p>
 
         <p>The map background is a monochrome <a href="../docs/#image">image</a>
