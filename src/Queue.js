@@ -25,21 +25,27 @@ po.queue = (function() {
       if (mimeType && req.overrideMimeType) {
         req.overrideMimeType(mimeType);
       }
-      // recommended check for CORS in XMLHttpRequest
+      // withCredentials is the recommended check for CORS in XMLHttpRequest
       // http://hacks.mozilla.org/2009/07/cross-site-xmlhttprequest-with-cors/
-      if ("withCredentials" in req){
+      // but we'll also use XMLHttpRequest if it's not a full URL 
+      if (!url.match(/^http/) || "withCredentials" in req){
         req.open("GET", url, true);
+        req.onreadystatechange = function(e) {
+          if (req.readyState == 4) {
+            active--;
+            if (req.status < 300) callback(req);
+            process();
+          }
+        };
       } else if (typeof XDomainRequest != "undefined"){
         req = new XDomainRequest();
         req.open("GET", url);
-      }
-      req.onreadystatechange = function(e) {
-        if (req.readyState == 4) {
+        req.onload = function(e) {
           active--;
-          if (req.status < 300) callback(req);
+          callback(req);
           process();
-        }
-      };
+        };
+      }
       req.send(null);
     }
 
