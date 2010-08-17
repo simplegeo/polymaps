@@ -22,10 +22,17 @@ po.queue = (function() {
 
     function send() {
       req = new XMLHttpRequest();
-      if (mimeType) {
+      if (mimeType && req.overrideMimeType) {
         req.overrideMimeType(mimeType);
       }
-      req.open("GET", url, true);
+      // recommended check for CORS in XMLHttpRequest
+      // http://hacks.mozilla.org/2009/07/cross-site-xmlhttprequest-with-cors/
+      if ("withCredentials" in req){
+        req.open("GET", url, true);
+      } else if (typeof XDomainRequest != "undefined"){
+        req = new XDomainRequest();
+        req.open("GET", url);
+      }
       req.onreadystatechange = function(e) {
         if (req.readyState == 4) {
           active--;
@@ -56,6 +63,7 @@ po.queue = (function() {
   /*
    * We the override MIME type here so that you can load local files; some
    * browsers don't assign a proper MIME type for local files.
+   * Internet Explorer doesn't support overrideMimeType.
    */
 
   function json(url, callback) {
