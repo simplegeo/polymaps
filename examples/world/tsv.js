@@ -17,7 +17,7 @@ function tsv(url) {
 
   tsv.map = function(x) {
     var map = {}, req = new XMLHttpRequest();
-    req.overrideMimeType("text/plain");
+    if (req.overrideMimeType) req.overrideMimeType("text/plain");
     req.open("GET", url, false);
     req.send(null);
     var lines = req.responseText.split(/\n/g);
