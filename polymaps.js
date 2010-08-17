@@ -1,4 +1,3 @@
-// 8541b0575f8376937111db93516cbb5e9aac0786
 if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){

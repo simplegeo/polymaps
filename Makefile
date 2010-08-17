@@ -115,12 +115,10 @@ all: polymaps.min.js polymaps.js
 
 polymaps.min.js: polymaps.js
 	rm -f $@
-	echo "// $(shell git rev-parse --short HEAD)" >> $@
 	$(JS_COMPILER) < polymaps.js >> $@
 
 polymaps.js: $(JS_FILES) Makefile
 	rm -f $@
-	echo "// $(shell git rev-parse HEAD)" >> $@
 	cat $(JS_FILES) >> $@
 	chmod a-w $@
 
