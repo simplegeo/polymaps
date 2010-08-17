@@ -3,6 +3,10 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+svg {
+  overflow: hidden;
+}
+
 code, tt, pre {
   font-family: Courier;
 }
