@@ -7,8 +7,8 @@
       .attr("width", 32)
       .attr("height", 32)
       .style("position", "absolute")
-      .style("right", -16)
-      .style("top", -16)
+      .style("right", "-16px")
+      .style("top", "-16px")
       .style("visibility", "visible")
       .on("mousedown", mousedown);
 
@@ -41,7 +41,7 @@
 
       div
           .style("position", "fixed")
-          .style("border-width", "0")
+          .style("border-width", 0)
           .style("width", "100%")
           .style("height", "100%")
           .style("top", 0)
@@ -49,8 +49,8 @@
 
       svg
           .style("position", "fixed")
-          .style("right", 16)
-          .style("top", 16);
+          .style("right", "16px")
+          .style("top", "16px");
 
       arrow
           .attr("transform", "translate(16,16)rotate(135)scale(5)translate(-1.85,0)");
@@ -71,8 +71,8 @@
 
       svg
           .style("position", "absolute")
-          .style("right", -16)
-          .style("top", -16)
+          .style("right", "-16px")
+          .style("top", "-16px")
 
       arrow
           .attr("transform", "translate(16,16)rotate(-45)scale(5)translate(-1.85,0)");
