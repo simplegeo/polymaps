@@ -110,7 +110,8 @@ WWW_EX_FILES = \
 	www/ex/world-m.png
 
 WWW_DOCS_FILES = \
-	www/docs/index.html
+	www/docs/index.html \
+	www/docs/map.html
 
 PYGMENT = /Library/Pygments-1.3.1/pygmentize
 PYGMENT_STYLE = trac

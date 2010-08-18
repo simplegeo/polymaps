@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>Polymaps - Documentation - map</title>
+    <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
+    <script type="text/javascript" src="../polymaps.min.js?2.0.0"></script>
+    <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
+    <style type="text/css">
+
+@import url("../screen.css?0.9");
+@import url("../style.css?2.0.0");
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <hr class="space"/>
+      <div class="span-5 append-1 logo sidebar">
+        <a href="../">
+          <img src="../logo-small.png"/>
+          <script type="text/javascript" src="../logo-small.js"></script>
+        </a>
+        <hr class="space"/>
+
+        <h4>Core</h4>
+        <ul class="no-indent">
+          <li><a class="active" href="map.html">map</a></li>
+          <li><a href="#image">image</a></li>
+          <li><a href="#geoJson">geoJson</a></li>
+        </ul>
+
+        <h4>Controls</h4>
+        <ul class="no-indent">
+          <li><a href="#arrow">arrow</a></li>
+          <li><a href="#compass">compass</a></li>
+          <li><a href="#dblclick">dblclick</a></li>
+          <li><a href="#drag">drag</a></li>
+          <li><a href="#hash">hash</a></li>
+          <li><a href="#interact">interact</a></li>
+          <li><a href="#wheel">wheel</a></li>
+        </ul>
+
+        <h4><i>Et cetera</i></h4>
+        <ul class="no-indent">
+          <li><a href="#cache">cache</a></li>
+          <li><a href="#queue">queue</a></li>
+          <li><a href="#svg">svg</a></li>
+          <li><a href="#url">url</a></li>
+        </ul>
+      </div>
+      <div class="span-18 prepend-6 last top">
+        <a href="../">Overview</a>
+        <a href="../ex/">Examples</a>
+        <a class="active" href="./">Documentation</a>
+        <a href="http://github.com/simplegeo/polymaps">Download</a>
+      </div>
+      <hr class="space"/>
+      <div class="span-18 prepend-6 last">
+
+        <h2>map</h2>
+
+        <dl class="function" id="center">
+          <dt>
+            <i>map</i>.<b>center</b>([<i>x</i>])
+          </dt>
+          <dd>
+            Sets or gets the location of the map center. If the argument
+            <i>x</i> is specified, it sets the new map center, and returns
+            <tt>this</tt>. If no arguments are specified, it returns the current
+            map center.
+          </dd>
+        </dl>
+
+        <dl class="function" id="centerRange">
+          <dt>
+            <i>map</i>.<b>centerRange</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the constraints on the map center. If the argument
+            <i>x</i> is specified, it sets the new center range, and returns
+            <tt>this</tt>. If no arguments are specified, it returns the current
+            center range.</p>
+
+            <p>The constraints are defined as a two-element location array: the
+            locations of the south-west and north-east corners of the visible
+            region. If the center range is null, then no constraints are
+            enforced on the center. The default center range is:
+
+            <pre>[{lat: -85.05112877980659, lon: -Infinity},
+ {lat: +85.05112877980659, lon: +Infinity}]</pre>
+
+            The default behavior thus ensures that one row of tiles is visible
+            at zoom level zero, with infinite wrapping of longitudes. The
+            latitude range of [-85.0&hellip;, +85.0&hellip;] is based on the
+            Spherical Mercator projection. Latitudes of -90 or less, and +90 or
+            greater, are treated as unbounded.</p>
+
+            <p>The constraint enforces that some part of the map (as defined by
+            the center range) is visible within the viewport. This visible
+            region may be infinitely small, as when the map is pushed entirely
+            off-screen. However, because the map is immediately off-screen, it
+            is easy to pull back into view. This behavior also ensures that any
+            visible location on the map can be zoomed in or out without changing
+            its point on-screen.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="zoom">
+          <dt>
+            <i>map</i>.<b>zoom</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the map zoom level; a nonnegative number. If the
+            argument <i>x</i> is specified, it sets the new map zoom level, and
+            returns <tt>this</tt>. If no arguments are specified, it returns the
+            current zoom level.</p>
+
+            <p>The loaded tiles&rsquo; zoom level (assuming the layer is not
+            transformed) will be the rounded map zoom level. Thus, at zoom level
+            0.49, tiles at zoom level 0 will be loaded and magnified; at zoom
+            level 0.51, tiles at zoom level 1 will be loaded and minified.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="zoomRange">
+          <dt>
+            <i>map</i>.<b>zoomRange</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the constraints on the map zoom level; a two-element
+            array of nonnegative numbers representing the minimum and maximum
+            (both inclusive) zoom levels. If the argument <i>x</i> is specified,
+            it sets the new zoom range, and returns <tt>this</tt>. If no
+            arguments are specified, it returns the current zoom range.</p>
+
+            <p>Unlike the center range, the zoom range is not allowed to be
+            null. The default zoom range is [1, 18], but may change in
+            subsequent releases.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="zoomBy">
+          <dt>
+            <i>map</i>.<b>zoomBy</b>(<i>z</i>[, <i>x0</i>[, <i>l</i>]])
+          </dt>
+          <dd>
+            <p>Zooms the map by the specified zoom level delta <i>z</i>, and
+            returns <tt>this</tt>. The new zoom level after this method returns
+            is <tt><i>map</i>.zoom() + <i>z</i></tt>.</p>
+
+            <p>Two optional arguments may be specified. If the second argument
+            <i>x0</i> is specified, the map will preserve the position of the
+            location at the given point <i>x0</i>. For example, to zoom in on
+            the location under the cursor, specify
+            <tt><i>map</i>.mouse(<i>e</i>)</tt>, where <i>e</i> is a mouse
+            event. The third argument <i>l</i> is the location at the given
+            point <i>x0</i>; thus, this method may also be used to zoom and set
+            the location at the given point simultaneously, which is faster than
+            setting the zoom level and map center sequentially.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="panBy">
+          <dt>
+            <i>map</i>.<b>panBy</b>(<i>x</i>)
+          </dt>
+          <dd>
+            Pans the map by the specified pixel delta; returns <tt>this</tt>.
+            The argument <i>x</i> is a point with number attributes <tt>x</tt>
+            and <tt>y</tt> corresponding to pixel delta in two dimensions.
+          </dd>
+        </dl>
+
+        <dl class="function" id="angle">
+          <dt>
+            <i>map</i>.<b>angle</b>([<i>x</i>])
+          </dt>
+          <dd>
+            Sets or gets the map rotation angle in radians; a number. If the
+            argument <i>x</i> is specified, it sets the map rotation and
+            returns <tt>this</tt>. If no arguments are specified, it returns the
+            current rotation angle. The map center and zoom level are unaffected
+            by the rotation.
+          </dd>
+        </dl>
+
+        <dl class="function" id="tileSize">
+          <dt>
+            <i>map</i>.<b>tileSize</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the tile size, in pixels. If the argument <i>x</i>
+            is specified, it sets the tile size and returns <tt>this</tt>. If no
+            arguments are specified, it returns the current tile size. The tile
+            size is represented as an object with <tt>x</tt> and <tt>y</tt>
+            positive number attributes. The default tile size is <tt>{x: 256, y:
+            256}</tt>.</p>
+
+            <p>Note: currently the tile size must be set before any tiles are
+            loaded, and may not be changed after tiles are loaded.</p>
+          </dd>
+        </dl>
+
+        <h3>Structure</h3>
+
+        <dl class="function" id="add">
+          <dt>
+            <i>map</i>.<b>add</b>(<i>x</i>)
+          </dt>
+          <dd>
+            Adds the given object <i>x</i> to the map, and returns
+            <tt>this</tt>. The given object must have a method
+            named <tt>map</tt>, which is passed <tt>this</tt>.
+          </dd>
+        </dl>
+
+        <dl class="function" id="remove">
+          <dt>
+            <i>map</i>.<b>remove</b>(<i>x</i>)
+          </dt>
+          <dd>
+            Removes the given object <i>x</i> from the map, and returns
+            <tt>this</tt>. The given object must have a method
+            named <tt>map</tt>, which is passed null.
+          </dd>
+        </dl>
+
+        <dl class="function" id="container">
+          <dt>
+            <i>map</i>.<b>container</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the map container element. If the argument <i>x</i>
+            is specified, it sets the map container, and returns <tt>this</tt>.
+            If no arguments are specified, it returns the current container.</p>
+
+            <p>The map container must be either an SVG <tt>svg</tt> element or
+            an SVG <tt>g</tt> element. The class attribute of the container
+            element will be set to &ldquo;map&rdquo;.</p>
+
+            <p>Note: currently the container must be set before any objects are
+            added to the map, and may not be changed after objects are
+            added.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="size">
+          <dt>
+            <i>map</i>.<b>size</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the map size. If the argument <i>x</i> is specified,
+            it sets the map size, and returns <tt>this</tt>. If no arguments are
+            specified, it returns the current container. The map size is
+            represented as an object with <tt>x</tt> and <tt>y</tt> positive
+            number attributes.</p>
+
+            <p>The default map size is null, which causes the map to infer its
+            size from the bounds of the container. If the container is an
+            SVG <tt>g</tt> element, the owner <tt>svg</tt> element is used to
+            compute the inferred size. In addition, if the map size is set to
+            null, the map listens to the window for resize events, updating the
+            map size automatically. When the map size is null, calling this
+            method with no arguments will return the inferred size of the map,
+            rather than null.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="resize">
+          <dt>
+            <i>map</i>.<b>resize</b>()
+          </dt>
+          <dd>
+            Tells the map to recompute its inferred size from its container.
+            This method is not normally needed, but can be useful if the
+            container size changes for reasons other than a window resize event,
+            such as when the DOM is mutated.
+          </dd>
+        </dl>
+
+        <h3>Events</h3>
+
+        <dl class="function" id="on">
+          <dt>
+            <i>map</i>.<b>on</b>(<i>t</i>, <i>f</i>)
+          </dt>
+          <dd>
+            <p>Registers the given event listener <i>f</i> to receive events of
+            type <i>t</i>, where <i>f</i> is a function and <i>t</i> is a string;
+            returns <tt>this</tt>. When an event of the given type are
+            dispatched, any registered listeners will receive the given event as
+            a single argument to the function <i>f</i>. The <tt>this</tt>
+            context of the function will be the map object.</p>
+
+            <p>Maps currently support two types of events: &ldquo;move&rdquo;
+            and &ldquo;resize&rdquo;. The move event is dispatched whenever the
+            map center or zoom level changes. The resize event is dispatched
+            whenever the map size changes. Listeners that depend on the visible
+            region should typically listen for both move and resize events,
+            while static overlays (such as the compass control) only need to
+            listen for resize events. These events currently have no additional
+            metadata describing the event, though that additional descriptive
+            information may be added in a future release.</p>
+
+            <p>This method is based on the W3C specification for <a
+            href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-addEventListener"
+            >addEventListener</a>.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="off">
+          <dt>
+            <i>map</i>.<b>off</b>(<i>t</i>, <i>f</i>)
+          </dt>
+          <dd>
+            <p>Removes the given event listener <i>f</i> from events of
+            type <i>t</i>, where <i>f</i> is a function and <i>t</i> is a
+            string; returns <tt>this</tt>. If the listener <i>f</i> is not
+            registered to receive events of type <i>t</i> this method has no
+            effect.</p>
+
+            <p>This method is based on the W3C specification for <a
+            href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-removeEventListener"
+            >removeEventListener</a>.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="dispatch">
+          <dt>
+            <i>map</i>.<b>dispatch</b>(<i>e</i>)
+          </dt>
+          <dd>
+            Dispatches the given event <i>e</i> to any registered listeners. The
+            event <i>e</i> must have a <tt>type</tt> string attribute, which
+            determines which listeners will be notified. This method is
+            typically not needed unless implementing a custom layer.
+          </dd>
+        </dl>
+
+        <dl class="function" id="mouse">
+          <dt>
+            <i>map</i>.<b>mouse</b>(<i>e</i>)
+          </dt>
+          <dd>
+            <p>Returns the position of the mouse, as determined from the given
+            mouse event <i>e</i> in the map&rsquo;s coordinate space. The
+            returned position is an object with <tt>x</tt> and <tt>y</tt> number
+            attributes. Typically, this method returns the <tt>pageX</tt>
+            and <tt>pageY</tt> attributes of the event <i>e</i>, minus the
+            top-left position of the map container; however, this method takes
+            into consideration any <a href="http://www.w3.org/TR/SVG/coords.html"
+            >custom transforms</a> that have been applied to the map container
+            through SVG.</p>
+
+            <p>This method is based on the W3C specification for <a
+            href="http://www.w3.org/TR/SVG/types.html#__svg__SVGLocatable__getScreenCTM"
+            >getScreenCTM</a>.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="focusableParent">
+          <dt>
+            <i>map</i>.<b>focusableParent</b>()
+          </dt>
+          <dd>
+            Returns the focusable parent element containing the map. Typically
+            this method returns the containing window; however, if the map is
+            contained inside of an element with a <a href="http://www.w3.org/TR/html401/interact/forms.html#adef-tabindex"
+            >tabindex</a> attribute, that element is returned instead.
+          </dd>
+        </dl>
+
+        <h3>Projection</h3>
+
+        <dl class="function" id="locationPoint">
+          <dt>
+            <i>map</i>.<b>locationPoint</b>(<i>l</i>)
+          </dt>
+          <dd>
+            Returns the pixel position of the given location <i>l</i>. The
+            returned point is an object with <tt>x</tt> and <tt>y</tt> number
+            attributes, denoting the position relative to the top-left corner of
+            the map container. The position is in the map container&rsquo;s
+            <a href="http://www.w3.org/TR/SVG/coords.html#EstablishingANewUserSpace"
+            >coordinate space</a>, compatible with <a href="#mouse"><tt><i>map</i
+            >.mouse</tt></a>.
+          </dd>
+        </dl>
+
+        <dl class="function" id="pointLocation">
+          <dt>
+            <i>map</i>.<b>pointLocation</b>(<i>p</i>)
+          </dt>
+          <dd>
+            Returns the location of the given pixel position <i>p</i>. The
+            returned location is an object with <tt>lat</tt> and <tt>lon</tt>
+            number attributes, and the given position <i>p</i> is relative to
+            the top-left corner of the map container. The position is in the map
+            container&rsquo;s
+            <a href="http://www.w3.org/TR/SVG/coords.html#EstablishingANewUserSpace"
+            >coordinate space</a>, compatible with <a href="#mouse"><tt><i>map</i
+            >.mouse</tt></a>.
+          </dd>
+        </dl>
+
+        <dl class="function" id="locationCoordinate">
+          <dt>
+            <i>map</i>.<b>locationCoordinate</b>(<i>l</i>)
+          </dt>
+          <dd>
+            Returns the tile coordinate for the specified location <i>l</i>.
+            Unlike the static version of this method, the tile
+            coordinate&rsquo;s zoom level will match the map&rsquo;s rounded
+            zoom level, <tt>Math.round(<i>map</i>.zoom())</tt>. The coordinate
+            is represented as an object with <tt>zoom</tt>, <tt>column</tt>
+            and <tt>row</tt> number attributes. The row and column values are
+            typically fractional (floating point); use <tt>Math.floor</tt> to
+            determine the tile at the given coordinate.
+          </dd>
+        </dl>
+
+        <dl class="function" id="coordinateLocation">
+          <dt>
+            <i>map</i>.<b>coordinateLocation</b>(<i>c</i>)
+          </dt>
+          <dd>
+            Returns the location for the specified tile coordinate <i>c</i>.
+            The location is represented as an object with <tt>lat</tt>
+            and <tt>lon</tt> number attributes, and the coordinate is
+            represented as an object with <tt>zoom</tt>, <tt>column</tt>
+            and <tt>row</tt> number attributes.
+          </dd>
+        </dl>
+
+        <dl class="function" id="pointCoordinate">
+          <dt>
+            <i>map</i>.<b>pointCoordinate</b>(<i>x</i>, <i>p</i>)
+          </dt>
+          <dd>
+            Returns the tile coordinate for the specified pixel position
+            <i>p</i>, relative to the precomputed map center coordinate
+            <i>x</i>. The tile center should be computed as
+            <tt><i>map</i>.locationCoordinate(<i>map</i>.center())</tt>.
+            This method is typically not needed unless implementing a custom
+            layer.
+          </dd>
+        </dl>
+
+        <dl class="function" id="coordinatePoint">
+          <dt>
+            <i>map</i>.<b>coordinatePoint</b>(<i>x</i>, <i>c</i>)
+          </dt>
+          <dd>
+            Returns the pixel position for the specified tile coordinate
+            <i>c</i>, relative to the precomputed map center coordinate
+            <i>x</i>. The tile center should be computed as
+            <tt><i>map</i>.locationCoordinate(<i>map</i>.center())</tt>.
+            This method is typically not needed unless implementing a custom
+            layer.
+          </dd>
+        </dl>
+
+        <dl class="function" id="_locationCoordinate">
+          <dt>
+            <i>po</i>.map.<b>locationCoordinate</b>(<i>l</i>)
+          </dt>
+          <dd>
+            Returns the tile coordinate for the specified location <i>l</i>.
+            The returned tile coordinate&rsquo;s zoom level is zero. The
+            location is represented as an object with <tt>lat</tt> and
+            <tt>lon</tt> number attributes, and the coordinate is represented as
+            an object with <tt>zoom</tt>, <tt>column</tt> and <tt>row</tt>
+            number attributes.
+          </dd>
+        </dl>
+
+        <dl class="function" id="_coordinateLocation">
+          <dt>
+            <i>po</i>.map.<b>coordinateLocation</b>(<i>c</i>)
+          </dt>
+          <dd>
+            Returns the location for the specified tile coordinate <i>c</i>.
+            The location is represented as an object with <tt>lat</tt> and
+            <tt>lon</tt> number attributes, and the coordinate is represented as
+            an object with <tt>zoom</tt>, <tt>column</tt> and <tt>row</tt>
+            number attributes.
+          </dd>
+        </dl>
+
+      </div>
+      <div class="span-5 append-1 credits">
+        Polymaps is a project
+        from <a class="bold" href="http://simplegeo.com/">SimpleGeo</a>
+        and <a class="bold" href="http://stamen.com/">Stamen</a>.
+      </div>
+    </div>
+  </body>
+</html>

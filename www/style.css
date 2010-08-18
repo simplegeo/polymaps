@@ -29,16 +29,16 @@ a:hover {
   text-decoration: underline;
 }
 
+a.active {
+  color: #aaa;
+}
+
 .top {
   padding-top: 15px;
 }
 
 .top a {
   margin-right: 20px;
-}
-
-.top a.active {
-  color: #aaa;
 }
 
 .top a, a.bold {
@@ -108,6 +108,14 @@ img.ex {
   padding-top: 2em;
   background: -webkit-gradient(linear, left top, left bottom, from(rgba(255,255,255,0)), to(#fff), color-stop(.3, #fff));
   background: -moz-linear-gradient(top, rgba(255,255,255,0), #fff 30%);
+}
+
+dl.function dt, dl.function i {
+  font-family: Courier;
+}
+
+dl.function i {
+  color: #936;
 }
 
 #map {
