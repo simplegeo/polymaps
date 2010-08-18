@@ -33,7 +33,18 @@ po.queue = (function() {
         req.onreadystatechange = function(e) {
           if (req.readyState == 4) {
             active--;
-            if (req.status < 300) callback(req);
+            if (req.status < 300) { 
+              // if we couldn't override the mimeType but we wanted xml:
+              if (!req.overrideMimeType && ActiveXObject && req.responseText && mimeType == "application/xml") {
+                var responseXML = new ActiveXObject("Microsoft.XMLDOM");
+                responseXML.async = false;
+                responseXML.loadXML(req.responseText);
+                callback({ responseXML: responseXML });
+              }
+              else {
+                callback(req);
+              }
+            }
             process();
           }
         };
@@ -41,6 +52,12 @@ po.queue = (function() {
         req = new XDomainRequest();
         req.open("GET", url);
         req.onload = function(e) {
+          // XDomainRequest doesn't handle XML automatically
+          if (req.responseText && mimeType == "application/xml") {
+            req.responseXML = new ActiveXObject("Microsoft.XMLDOM");
+            req.responseXML.async = false;
+            req.responseXML.loadXML(req.responseText);
+          }
           active--;
           callback(req);
           process();
