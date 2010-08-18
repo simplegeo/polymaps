@@ -4,14 +4,14 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <title>Polymaps - Statehood</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
-    <script type="text/javascript" src="../polymaps.min.js?2.0.0"></script>
+    <script type="text/javascript" src="../polymaps.min.js?2.0.1"></script>
     <script type="text/javascript" src="../protodata.min.js?3.2"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
-    <script type="text/javascript" src="fips.js?2.0.0"></script>
+    <script type="text/javascript" src="fips.js?2.0.1"></script>
     <style type="text/css">
 
 @import url("../screen.css?0.9");
-@import url("../style.css?2.0.0");
+@import url("../style.css?2.0.1");
 @import url("../colorbrewer.css?1.0.0");
 
 #map {
