@@ -13,23 +13,24 @@
     var types = {
 
       Point: function(e) {
+        var element = e.getElementsByTagName("coordinates")[0],
+            text = element.textContent || element.text,
+            parts = text.split(','),
+            coordinates = parts.map(Number);
         return {
           type: "Point",
-          coordinates: e.getElementsByTagName("coordinates")[0]
-            .textContent
-            .split(",")
-            .map(Number)
+          coordinates: coordinates
         };
       },
 
       LineString: function(e) {
+        var element = e.getElementsByTagName("coordinates")[0],
+            text = element.textContent || element.text,
+            parts = text.trim().split(/\s+/),
+            coordinates = parts.map(function(a) { return a.split(",").slice(0, 2).map(Number); });
         return {
           type: "LineString",
-          coordinates: e.getElementsByTagName("coordinates")[0]
-            .textContent
-            .trim()
-            .split(/\s+/)
-            .map(function(a) { return a.split(",").slice(0, 2).map(Number); })
+          coordinates: coordinates
         };
       }
 
@@ -40,11 +41,12 @@
     }
 
     function geoJson(xml) {
+      if (xml.documentElement) xml = xml.documentElement;
       var features = [],
       placemarks = xml.getElementsByTagName("Placemark");
       for (var i = 0; i < placemarks.length; i++) {
         var e = placemarks[i],
-        f = {id: e.getAttribute("id"), properties: {}};
+        f = { type: "Feature", id: e.getAttribute("id"), properties: {} };
         for (var c = e.firstChild; c; c = c.nextSibling) {
           switch (c.tagName) {
           case "name": f.properties.name = c.textContent; continue;
@@ -55,7 +57,7 @@
         }
         if (f.geometry) features.push(f);
       }
-      return {features: features};
+      return { type: "FeatureCollection", features: features };
     }
 
     return kml;
