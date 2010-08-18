@@ -33,6 +33,9 @@ WWW_FILES = \
 	lib/colorbrewer/colorbrewer.css \
 	lib/protovis/protodata.min.js \
 	www/index.html \
+	www/download.html \
+	www/forkme.png \
+	www/zip.png \
 	www/logo-big.js \
 	www/logo-big.png \
 	www/logo-small.js \

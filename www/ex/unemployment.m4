@@ -46,7 +46,7 @@
         <a href="../">Overview</a>
         <a class="active" href="./">Examples</a>
         <a href="../docs/">Documentation</a>
-        <a href="http://github.com/simplegeo/polymaps">Download</a>
+        <a href="../download.html">Download</a>
       </div>
       <hr class="space"/>
       <div id="map" class="span-24 last"></div>
