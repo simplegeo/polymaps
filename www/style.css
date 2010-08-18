@@ -64,6 +64,10 @@ img.ex {
   height: 140px;
 }
 
+img, svg {
+  float: left;
+}
+
 .svg .logo img {
   display: none;
 }
@@ -116,7 +120,7 @@ img.ex {
 #copy {
   color: #999;
   font-size: 12px;
-  height: 1;
+  height: 1em;
 }
 
 .compass .back {
