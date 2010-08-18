@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.0"; // semver.org
+  po.version = "2.0.1"; // semver.org
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -312,7 +312,7 @@ po.queue = (function() {
       };
       img.onload = function() {
         active--;
-        callback();
+        callback(img);
         process();
       };
       img.src = src;
@@ -1431,7 +1431,7 @@ po.hash = function() {
   function move() {
     var center = map.center(),
         zoom = map.zoom(),
-        precision = Math.ceil(Math.log(zoom) / Math.LN2),
+        precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2)),
         s1 = "#" + zoom.toFixed(2)
              + "/" + center.lat.toFixed(precision)
              + "/" + center.lon.toFixed(precision);

@@ -7,7 +7,7 @@ po.hash = function() {
   function move() {
     var center = map.center(),
         zoom = map.zoom(),
-        precision = Math.ceil(Math.log(zoom) / Math.LN2),
+        precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2)),
         s1 = "#" + zoom.toFixed(2)
              + "/" + center.lat.toFixed(precision)
              + "/" + center.lon.toFixed(precision);
