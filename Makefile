@@ -35,7 +35,9 @@ WWW_FILES = \
 	www/index.html \
 	www/download.html \
 	www/forkme.png \
-	www/zip.png \
+	www/git-16x16.png \
+	www/zip-16x16.png \
+	www/zip-128x128.png \
 	www/logo-big.js \
 	www/logo-big.png \
 	www/logo-small.js \

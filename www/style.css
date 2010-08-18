@@ -64,7 +64,7 @@ img.ex {
   height: 140px;
 }
 
-img, svg {
+.logo img, .logo svg, img.ex {
   float: left;
 }
 
