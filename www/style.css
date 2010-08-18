@@ -87,7 +87,7 @@ img.ex {
 }
 
 .sidebar {
-  position: fixed;
+  position: absolute;
 }
 
 .sidebar h4 {
