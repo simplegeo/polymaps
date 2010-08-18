@@ -73,6 +73,8 @@ WWW_EX_FILES = \
 	www/ex/grid.html \
 	www/ex/grid-s.png \
 	www/ex/grid-m.png \
+	www/ex/mandelbrot.html \
+	www/ex/mandelbrot-m.png \
 	www/ex/midnight-commander.html \
 	www/ex/midnight-commander-s.png \
 	www/ex/midnight-commander-m.png \
