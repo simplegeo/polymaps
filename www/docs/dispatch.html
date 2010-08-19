@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Polymaps - Documentation - url</title>
+    <title>Polymaps - Documentation - dispatch</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?2.0.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
@@ -45,11 +45,11 @@
         <h4><i>Et cetera</i></h4>
         <ul class="no-indent">
           <li><a href="cache.html">cache</a></li>
-          <li><a href="dispatch.html">dispatch</a></li>
+          <li><a class="active" href="dispatch.html">dispatch</a></li>
           <li><a href="queue.html">queue</a></li>
           <li><a href="svg.html">svg</a></li>
           <li><a href="transform.html">transform</a></li>
-          <li><a class="active" href="url.html">url</a></li>
+          <li><a href="url.html">url</a></li>
         </ul>
       </div>
       <div class="span-18 prepend-6 last top">
@@ -61,40 +61,70 @@
       <hr class="space"/>
       <div class="span-18 prepend-6 last">
 
-        <h2>url</h2>
+        <h2>dispatch</h2>
 
         <div class="span-4">
-        <a href="#po.url">po.url</a><br>
-        <a href="#template">template</a><br>
-        <a href="#hosts">hosts</a><br>
+        <a href="#dispatch">dispatch</a><br>
+        <a href="#off">off</a><br>
+        <a href="#on">on</a><br>
+        <a href="#po.dispatch">po.dispatch</a><br>
         </div>
 
         <hr class="space"/>
 
-        <dl class="function" id="po.url">
+        <dl class="function" id="po.dispatch">
           <dt>
-            <i>po</i>.<b>url</b>(<i>t</i>)
+            <i>po</i>.<b>dispatch</b>(<i>o</i>)
           </dt>
           <dd>
             &hellip;
           </dd>
         </dl>
 
-        <dl class="function" id="template">
+        <dl class="function" id="on">
           <dt>
-            <i>url</i>.<b>template</b>([<i>x</i>])
+            <i>dispatch</i>.<b>on</b>(<i>t</i>, <i>f</i>)
           </dt>
           <dd>
-            &hellip;
+            <p>Registers the given event listener <i>f</i> to receive events of
+            type <i>t</i>, where <i>f</i> is a function and <i>t</i> is a string;
+            returns <tt>this</tt>. When an event of the given type are
+            dispatched, any registered listeners will receive the given event as
+            a single argument to the function <i>f</i>. The <tt>this</tt>
+            context of the function will be this dispatch object.</p>
+
+            <p>This method is based on the W3C specification for <a
+            href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-addEventListener"
+            >addEventListener</a>.</p>
           </dd>
         </dl>
 
-        <dl class="function" id="hosts">
+        <dl class="function" id="off">
           <dt>
-            <i>url</i>.<b>hosts</b>([<i>x</i>])
+            <i>dispatch</i>.<b>off</b>(<i>t</i>, <i>f</i>)
           </dt>
           <dd>
-            &hellip;
+            <p>Removes the given event listener <i>f</i> from events of
+            type <i>t</i>, where <i>f</i> is a function and <i>t</i> is a
+            string; returns <tt>this</tt>. If the listener <i>f</i> is not
+            registered to receive events of type <i>t</i> this method has no
+            effect.</p>
+
+            <p>This method is based on the W3C specification for <a
+            href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-removeEventListener"
+            >removeEventListener</a>.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="dispatch">
+          <dt>
+            <i>dispatch</i>.<b>dispatch</b>(<i>e</i>)
+          </dt>
+          <dd>
+            Dispatches the given event <i>e</i> to any registered listeners. The
+            event <i>e</i> must have a <tt>type</tt> string attribute, which
+            determines which listeners will be notified. This method is
+            typically not needed unless implementing a custom layer.
           </dd>
         </dl>
 

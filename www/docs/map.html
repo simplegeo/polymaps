@@ -45,6 +45,7 @@
         <h4><i>Et cetera</i></h4>
         <ul class="no-indent">
           <li><a href="cache.html">cache</a></li>
+          <li><a href="dispatch.html">dispatch</a></li>
           <li><a href="queue.html">queue</a></li>
           <li><a href="svg.html">svg</a></li>
           <li><a href="transform.html">transform</a></li>
@@ -82,11 +83,8 @@
         </div>
 
         <div class="span-4">
-        <a href="#dispatch">dispatch</a><br>
         <a href="#focusableParent">focusableParent</a><br>
         <a href="#mouse">mouse</a><br>
-        <a href="#off">off</a><br>
-        <a href="#on">on</a><br>
         </div>
 
         <div class="span-4">
@@ -332,62 +330,16 @@
 
         <h3>Events</h3>
 
-        <dl class="function" id="on">
-          <dt>
-            <i>map</i>.<b>on</b>(<i>t</i>, <i>f</i>)
-          </dt>
-          <dd>
-            <p>Registers the given event listener <i>f</i> to receive events of
-            type <i>t</i>, where <i>f</i> is a function and <i>t</i> is a string;
-            returns <tt>this</tt>. When an event of the given type are
-            dispatched, any registered listeners will receive the given event as
-            a single argument to the function <i>f</i>. The <tt>this</tt>
-            context of the function will be the map object.</p>
-
-            <p>Maps currently support two types of events: &ldquo;move&rdquo;
-            and &ldquo;resize&rdquo;. The move event is dispatched whenever the
-            map center or zoom level changes. The resize event is dispatched
-            whenever the map size changes. Listeners that depend on the visible
-            region should typically listen for both move and resize events,
-            while static overlays (such as the compass control) only need to
-            listen for resize events. These events currently have no additional
-            metadata describing the event, though that additional descriptive
-            information may be added in a future release.</p>
-
-            <p>This method is based on the W3C specification for <a
-            href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-addEventListener"
-            >addEventListener</a>.</p>
-          </dd>
-        </dl>
-
-        <dl class="function" id="off">
-          <dt>
-            <i>map</i>.<b>off</b>(<i>t</i>, <i>f</i>)
-          </dt>
-          <dd>
-            <p>Removes the given event listener <i>f</i> from events of
-            type <i>t</i>, where <i>f</i> is a function and <i>t</i> is a
-            string; returns <tt>this</tt>. If the listener <i>f</i> is not
-            registered to receive events of type <i>t</i> this method has no
-            effect.</p>
-
-            <p>This method is based on the W3C specification for <a
-            href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-removeEventListener"
-            >removeEventListener</a>.</p>
-          </dd>
-        </dl>
-
-        <dl class="function" id="dispatch">
-          <dt>
-            <i>map</i>.<b>dispatch</b>(<i>e</i>)
-          </dt>
-          <dd>
-            Dispatches the given event <i>e</i> to any registered listeners. The
-            event <i>e</i> must have a <tt>type</tt> string attribute, which
-            determines which listeners will be notified. This method is
-            typically not needed unless implementing a custom layer.
-          </dd>
-        </dl>
+        <p>Maps use the <a href="dispatch.html">dispatch</a> mechanism to notify
+        interested parties of events. Maps currently support two types of
+        events: &ldquo;move&rdquo; and &ldquo;resize&rdquo;. The move event is
+        dispatched whenever the map center or zoom level changes. The resize
+        event is dispatched whenever the map size changes. Listeners that depend
+        on the visible region should typically listen for both move and resize
+        events, while static overlays (such as the compass control) only need to
+        listen for resize events. These events currently have no additional
+        metadata describing the event, though that additional descriptive
+        information may be added in a future release.</p>
 
         <dl class="function" id="mouse">
           <dt>
@@ -395,7 +347,7 @@
           </dt>
           <dd>
             <p>Returns the position of the mouse, as determined from the given
-            mouse event <i>e</i> in the map&rsquo;s coordinate space. The
+            mouse event <i>e</i>, in the map&rsquo;s coordinate space. The
             returned position is an object with <tt>x</tt> and <tt>y</tt> number
             attributes. Typically, this method returns the <tt>pageX</tt>
             and <tt>pageY</tt> attributes of the event <i>e</i>, minus the

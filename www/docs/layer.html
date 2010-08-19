@@ -45,6 +45,7 @@
         <h4><i>Et cetera</i></h4>
         <ul class="no-indent">
           <li><a href="cache.html">cache</a></li>
+          <li><a href="dispatch.html">dispatch</a></li>
           <li><a href="queue.html">queue</a></li>
           <li><a href="svg.html">svg</a></li>
           <li><a href="transform.html">transform</a></li>
@@ -77,9 +78,9 @@
         </div>
 
         <div class="span-4">
-        <a href="#dispatch">dispatch</a><br>
-        <a href="#off">off</a><br>
-        <a href="#on">on</a><br>
+        <a href="#cache">cache</a><br>
+        <a href="#init">init</a><br>
+        <a href="#show">show</a><br>
         </div>
 
         <hr class="space"/>
@@ -265,30 +266,34 @@
 
         <h3>Events</h3>
 
-        <dl class="function" id="on">
+        <p>Layers use the <a href="dispatch.html">dispatch</a> mechanism to notify
+        interested parties of events. Layers currently support only the
+        &ldquo;load&rdquo; event.</p>
+
+        <dl class="function" id="init">
           <dt>
-            <i>layer</i>.<b>on</b>(<i>t</i>, <i>f</i>)
+            <i>layer</i>.<b>init</b>(<i>g</i>)
           </dt>
           <dd>
             &hellip;
           </dd>
         </dl>
 
-        <dl class="function" id="off">
+        <dl class="function" id="show">
           <dt>
-            <i>layer</i>.<b>off</b>(<i>t</i>, <i>f</i>)
+            <i>layer</i>.<b>show</b>(<i>t</i>)
           </dt>
           <dd>
             &hellip;
           </dd>
         </dl>
 
-        <dl class="function" id="dispatch">
+        <dl class="function" id="cache">
           <dt>
-            <i>layer</i>.<b>dispatch</b>(<i>e</i>)
+            <i>layer</i>.<b>cache</b>
           </dt>
           <dd>
-            &hellip;
+            A reference to layer&rsquo;s <a href="cache.html">tile cache</a>.
           </dd>
         </dl>
 

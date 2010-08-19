@@ -114,6 +114,7 @@ WWW_DOCS_FILES = \
 	www/docs/cache.html \
 	www/docs/compass.html \
 	www/docs/dblclick.html \
+	www/docs/dispatch.html \
 	www/docs/drag.html \
 	www/docs/geoJson.html \
 	www/docs/hash.html \
