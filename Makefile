@@ -13,6 +13,7 @@ JS_FILES = \
 	src/GeoJson.js \
 	src/Dblclick.js \
 	src/Drag.js \
+	src/Touch.js \
 	src/Wheel.js \
 	src/Arrow.js \
 	src/Hash.js \
