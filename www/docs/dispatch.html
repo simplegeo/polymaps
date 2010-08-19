@@ -65,9 +65,18 @@
 
         <div class="span-4">
         <a href="#dispatch">dispatch</a><br>
+        </div>
+
+        <div class="span-4">
+        <a href="#po.dispatch">dispatch</a><br>
+        </div>
+
+        <div class="span-4">
         <a href="#off">off</a><br>
+        </div>
+
+        <div class="span-4">
         <a href="#on">on</a><br>
-        <a href="#po.dispatch">po.dispatch</a><br>
         </div>
 
         <hr class="space"/>
@@ -88,12 +97,12 @@
           <dd>
             <p>Registers the given event listener <i>f</i> to receive events of
             type <i>t</i>, where <i>f</i> is a function and <i>t</i> is a string;
-            returns <tt>this</tt>. When an event of the given type are
+            returns <tt>this</tt>. When an event of the given type is
             dispatched, any registered listeners will receive the given event as
             a single argument to the function <i>f</i>. The <tt>this</tt>
             context of the function will be this dispatch object.</p>
 
-            <p>This method is based on the W3C specification for <a
+            <p>This method is similar to the W3C-specified <a
             href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-addEventListener"
             >addEventListener</a>.</p>
           </dd>
@@ -107,10 +116,10 @@
             <p>Removes the given event listener <i>f</i> from events of
             type <i>t</i>, where <i>f</i> is a function and <i>t</i> is a
             string; returns <tt>this</tt>. If the listener <i>f</i> is not
-            registered to receive events of type <i>t</i> this method has no
-            effect.</p>
+            registered to receive events of type <i>t</i> then this method has
+            no effect.</p>
 
-            <p>This method is based on the W3C specification for <a
+            <p>This method is similar to the W3C-specified <a
             href="http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-EventTarget-removeEventListener"
             >removeEventListener</a>.</p>
           </dd>

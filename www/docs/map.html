@@ -63,39 +63,41 @@
 
         <h2>map</h2>
 
-        <div class="span-4">
-        <a href="#angle">angle</a><br>
-        <a href="#center">center</a><br>
-        <a href="#centerRange">centerRange</a><br>
-        <a href="#panBy">panBy</a><br>
-        <a href="#tileSize">tileSize</a><br>
-        <a href="#zoom">zoom</a><br>
-        <a href="#zoomRange">zoomRange</a><br>
-        </div>
+        <blockquote>Extends <a href="dispatch.html">dispatch</a>.</blockquote>
 
         <div class="span-4">
         <a href="#add">add</a><br>
+        <a href="#angle">angle</a><br>
+        <a href="#center">center</a><br>
+        <a href="#centerRange">centerRange</a><br>
         <a href="#container">container</a><br>
-        <a href="#po.map">po.map</a><br>
-        <a href="#remove">remove</a><br>
-        <a href="#resize">resize</a><br>
-        <a href="#size">size</a><br>
-        </div>
-
-        <div class="span-4">
-        <a href="#focusableParent">focusableParent</a><br>
-        <a href="#mouse">mouse</a><br>
         </div>
 
         <div class="span-4">
         <a href="#coordinateLocation">coordinateLocation</a><br>
+        <a href="#po.map.coordinateLocation">coordinateLocation</a><br>
         <a href="#coordinatePoint">coordinatePoint</a><br>
+        <a href="#focusableParent">focusableParent</a><br>
         <a href="#locationCoordinate">locationCoordinate</a><br>
+        <a href="#po.map.locationCoordinate">locationCoordinate</a><br>
+        </div>
+
+        <div class="span-4">
         <a href="#locationPoint">locationPoint</a><br>
+        <a href="#po.map">map</a><br>
+        <a href="#mouse">mouse</a><br>
+        <a href="#panBy">panBy</a><br>
         <a href="#pointCoordinate">pointCoordinate</a><br>
         <a href="#pointLocation">pointLocation</a><br>
-        <a href="#po.map.coordinateLocation">po.map.coordinateLocation</a><br>
-        <a href="#po.map.locationCoordinate">po.map.locationCoordinate</a><br>
+        </div>
+
+        <div class="span-4">
+        <a href="#remove">remove</a><br>
+        <a href="#resize">resize</a><br>
+        <a href="#size">size</a><br>
+        <a href="#tileSize">tileSize</a><br>
+        <a href="#zoom">zoom</a><br>
+        <a href="#zoomRange">zoomRange</a><br>
         </div>
 
         <hr class="space"/>
@@ -196,17 +198,17 @@
           <dd>
             <p>Zooms the map by the specified zoom level delta <i>z</i>, and
             returns <tt>this</tt>. The new zoom level after this method returns
-            is <tt><i>map</i>.zoom() + <i>z</i></tt>.</p>
+            is the old zoom level plus <i>z</i></tt>.</p>
 
-            <p>Two optional arguments may be specified. If the second argument
-            <i>x0</i> is specified, the map will preserve the position of the
-            location at the given point <i>x0</i>. For example, to zoom in on
-            the location under the cursor, specify
+            <p>Two optional arguments may be specified. The second argument
+            <i>x0</i> specifies a position in the map&rsquo;s coordinate space.
+            The location at the given position will be preserved after the zoom.
+            For example, to zoom in on the location under the cursor, specify
             <tt><i>map</i>.mouse(<i>e</i>)</tt>, where <i>e</i> is a mouse
-            event. The third argument <i>l</i> is the location at the given
-            point <i>x0</i>; thus, this method may also be used to zoom and set
-            the location at the given point simultaneously, which is faster than
-            setting the zoom level and map center sequentially.</p>
+            event. The third argument <i>l</i> specifies the location at
+            <i>x0</i> explicitly; thus, this method may also be used to zoom and
+            set the location at the given point simultaneously, which is faster
+            than setting the zoom and map sequentially.</p>
           </dd>
         </dl>
 
@@ -217,7 +219,9 @@
           <dd>
             Pans the map by the specified pixel delta; returns <tt>this</tt>.
             The argument <i>x</i> is a point with number attributes <tt>x</tt>
-            and <tt>y</tt> corresponding to pixel delta in two dimensions.
+            and <tt>y</tt> corresponding to pixel delta in two dimensions. The
+            delta is specified in screen pixels (and not the map&rsquo;s
+            coordinate space).
           </dd>
         </dl>
 
@@ -282,11 +286,10 @@
           <dd>
             <p>Sets or gets the map container element. If the argument <i>x</i>
             is specified, it sets the map container, and returns <tt>this</tt>.
-            If no arguments are specified, it returns the current container.</p>
-
-            <p>The map container must be either an SVG <tt>svg</tt> element or
-            an SVG <tt>g</tt> element. The class attribute of the container
-            element will be set to &ldquo;map&rdquo;.</p>
+            If no arguments are specified, it returns the current container.
+            The map container must be either an SVG <tt>svg</tt> element or an
+            SVG <tt>g</tt> element. The class attribute of the container element
+            will be set to &ldquo;map&rdquo;.</p>
 
             <p>Note: currently the container must be set before any objects are
             added to the map, and may not be changed after objects are
@@ -400,10 +403,8 @@
             returned location is an object with <tt>lat</tt> and <tt>lon</tt>
             number attributes, and the given position <i>p</i> is relative to
             the top-left corner of the map container. The position is in the map
-            container&rsquo;s
-            <a href="http://www.w3.org/TR/SVG/coords.html#EstablishingANewUserSpace"
-            >coordinate space</a>, compatible with <a href="#mouse"><tt><i>map</i
-            >.mouse</tt></a>.
+            container&rsquo;s coordinate space, compatible with <a href="#mouse"
+            ><tt><i>map</i>.mouse</tt></a>.
           </dd>
         </dl>
 

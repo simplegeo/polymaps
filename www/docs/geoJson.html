@@ -63,8 +63,28 @@
 
         <h2>geoJson</h2>
 
+        <blockquote>Extends
+          <a href="layer.html">layer</a>,
+          <a href="dispatch.html">dispatch</a>.
+        </blockquote>
+
         <div class="span-4">
-        <a href="#po.geoJson">po.geoJson</a><br>
+        <a href="#clip">clip</a><br>
+        <a href="#features">features</a><br>
+        </div>
+
+        <div class="span-4">
+        <a href="#po.geoJson">geoJson</a><br>
+        <a href="#init">init</a><br>
+        </div>
+
+        <div class="span-4">
+        <a href="#reshow">reshow</a><br>
+        <a href="#show">show</a><br>
+        </div>
+
+        <div class="span-4">
+        <a href="#url">url</a><br>
         </div>
 
         <hr class="space"/>
@@ -74,7 +94,21 @@
             <i>po</i>.<b>geoJson</b>([<i>f</i>])
           </dt>
           <dd>
-            Extends <a href="layer.html">layer</a>.
+            <p>Constructs a new GeoJSON layer with default settings.</p>
+
+            <p>An optional fetch function <i>f</i> may be specified, which
+            defaults to <a href="queue.html#po.queue.json"><tt><i>po</i
+            >.queue.json</tt></a>. The fetch function takes two arguments:
+            the URL to fetch as a string, and a callback function. The fetch
+            function must return a request object with an <a
+            href="queue.html#request.abort"><tt>abort</tt></a> method. The
+            callback function should be invoked with the GeoJSON data when
+            available.</p>
+
+            <p>The fetch function may be substituted to support GeoJSON
+            transcoding. For example, a KML layer might be implemented by
+            loading XML, and then converting it into a simplified GeoJSON
+            representation.</p>
           </dd>
         </dl>
 
@@ -83,7 +117,29 @@
             <i>geoJson</i>.<b>url</b>([<i>x</i>])
           </dt>
           <dd>
-            &hellip;
+            <p>Sets or gets the URL template associated with this GeoJSON layer.
+            If the argument <i>x</i> is specified, this method sets the URL
+            template and returns <tt>this</tt>. If no arguments are specified,
+            this method returns the current URL template. The default URL
+            template is &ldquo;about:blank&rdquo;.</p>
+
+            <p>The URL template may be specified either as a string or as a
+            function:</p>
+
+            <p>If a string, then the string is converted into a URL template
+            function using <a href="url.html"><tt><i>po</i>.url</tt></a>.</p>
+
+            <p>If a function, then the given function is invoked, passing in the
+            tile coordinate of the GeoJSON file to load. The tile coordinate is
+            represented as an object with <tt>row</tt>, <tt>column</tt> and
+            <tt>zoom</tt> attributes. The function must return a string
+            representing the URL to load. See <a href="url.html"><tt><i>po</i
+            >.url</tt></a> for an example implementation.</p>
+
+            <p>Note that if the GeoJSON file is not on the same domain, the
+            server must specify a suitable <a href="http://www.w3.org/TR/cors/"
+            >Access-Control-Allow-Origin</a> header for the data to be
+            accessible.</p>
           </dd>
         </dl>
 
@@ -104,6 +160,12 @@
             &hellip;
           </dd>
         </dl>
+
+        <h3>Events</h3>
+
+        <p>GeoJSON layers use the <a href="dispatch.html">dispatch</a> mechanism
+        to notify interested parties of events. In addition to the standard load
+        event, GeoJSON layers support the &ldquo;show&rdquo; event.</p>
 
         <dl class="function" id="init">
           <dt>
@@ -131,12 +193,6 @@
             &hellip;
           </dd>
         </dl>
-
-        <h3>Events</h3>
-
-        <p>GeoJSON layers use the <a href="dispatch.html">dispatch</a> mechanism
-        to notify interested parties of events. In addition to the standard load
-        event, GeoJSON layers support only the &ldquo;show&rdquo; event.</p>
 
       </div>
       <div class="span-5 append-1 credits">

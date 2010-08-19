@@ -63,8 +63,13 @@
 
         <h2>image</h2>
 
+        <blockquote>Extends
+          <a href="layer.html">layer</a>,
+          <a href="dispatch.html">dispatch</a>.
+        </blockquote>
+
         <div class="span-4">
-        <a href="#po.image">po.image</a><br>
+        <a href="#po.image">image</a><br>
         <a href="#url">url</a><br>
         </div>
 
@@ -75,7 +80,7 @@
             <i>po</i>.<b>image</b>()
           </dt>
           <dd>
-            Extends <a href="layer.html">layer</a>.
+            Constructs a new image layer with default settings.
           </dd>
         </dl>
 
@@ -84,7 +89,29 @@
             <i>image</i>.<b>url</b>([<i>x</i>])
           </dt>
           <dd>
-            &hellip;
+            <p>Sets or gets the URL template associated with this image layer.
+            If the argument <i>x</i> is specified, this method sets the URL
+            template and returns <tt>this</tt>. If no arguments are specified,
+            this method returns the current URL template. The default URL
+            template is &ldquo;about:blank&rdquo;.</p>
+
+            <p>The URL template may be specified either as a string or as a
+            function:</p>
+
+            <p>If a string, and the string contains placeholders of the form
+            &ldquo;{<em>A</em>}&rdquo;, where <em>A</em> is any character, then
+            the string is converted into a URL template function using <a
+            href="url.html"><tt><i>po</i>.url</tt></a>. If the string does not
+            contain placeholders, then it is left as a string and the same image
+            is loaded for each tile without using the <a href="queue.html"
+            >request queue</a>.</p>
+
+            <p>If a function, then the given function is invoked, passing in the
+            tile coordinate of the image to load. The tile coordinate is
+            represented as an object with <tt>row</tt>, <tt>column</tt> and
+            <tt>zoom</tt> attributes. The function must return a string
+            representing the URL to load. See <a href="url.html"><tt><i>po</i
+            >.url</tt></a> for an example implementation.</p>
           </dd>
         </dl>
 
