@@ -26,27 +26,29 @@
         <h4>Core</h4>
         <ul class="no-indent">
           <li><a class="active" href="map.html">map</a></li>
-          <li><a href="#image">image</a></li>
-          <li><a href="#geoJson">geoJson</a></li>
+          <li><a href="layer.html">layer</a></li>
+          <li><a href="image.html">image</a></li>
+          <li><a href="geoJson.html">geoJson</a></li>
         </ul>
 
         <h4>Controls</h4>
         <ul class="no-indent">
-          <li><a href="#arrow">arrow</a></li>
-          <li><a href="#compass">compass</a></li>
-          <li><a href="#dblclick">dblclick</a></li>
-          <li><a href="#drag">drag</a></li>
-          <li><a href="#hash">hash</a></li>
-          <li><a href="#interact">interact</a></li>
-          <li><a href="#wheel">wheel</a></li>
+          <li><a href="arrow.html">arrow</a></li>
+          <li><a href="compass.html">compass</a></li>
+          <li><a href="dblclick.html">dblclick</a></li>
+          <li><a href="drag.html">drag</a></li>
+          <li><a href="hash.html">hash</a></li>
+          <li><a href="interact.html">interact</a></li>
+          <li><a href="wheel.html">wheel</a></li>
         </ul>
 
         <h4><i>Et cetera</i></h4>
         <ul class="no-indent">
-          <li><a href="#cache">cache</a></li>
-          <li><a href="#queue">queue</a></li>
-          <li><a href="#svg">svg</a></li>
-          <li><a href="#url">url</a></li>
+          <li><a href="cache.html">cache</a></li>
+          <li><a href="queue.html">queue</a></li>
+          <li><a href="svg.html">svg</a></li>
+          <li><a href="transform.html">transform</a></li>
+          <li><a href="url.html">url</a></li>
         </ul>
       </div>
       <div class="span-18 prepend-6 last top">
@@ -73,6 +75,7 @@
         <div class="span-4">
         <a href="#add">add</a><br>
         <a href="#container">container</a><br>
+        <a href="#po.map">po.map</a><br>
         <a href="#remove">remove</a><br>
         <a href="#resize">resize</a><br>
         <a href="#size">size</a><br>
@@ -93,11 +96,20 @@
         <a href="#locationPoint">locationPoint</a><br>
         <a href="#pointCoordinate">pointCoordinate</a><br>
         <a href="#pointLocation">pointLocation</a><br>
-        <a href="#map.coordinateLocation">map.coordinateLocation</a><br>
-        <a href="#map.locationCoordinate">map.locationCoordinate</a><br>
+        <a href="#po.map.coordinateLocation">po.map.coordinateLocation</a><br>
+        <a href="#po.map.locationCoordinate">po.map.locationCoordinate</a><br>
         </div>
 
         <hr class="space"/>
+
+        <dl class="function" id="po.map">
+          <dt>
+            <i>po</i>.map()
+          </dt>
+          <dd>
+            Constructs a new map with default settings.
+          </dd>
+        </dl>
 
         <dl class="function" id="center">
           <dt>
@@ -500,7 +512,7 @@
           </dd>
         </dl>
 
-        <dl class="function" id="map.locationCoordinate">
+        <dl class="function" id="po.map.locationCoordinate">
           <dt>
             <i>po</i>.map.<b>locationCoordinate</b>(<i>l</i>)
           </dt>
@@ -514,7 +526,7 @@
           </dd>
         </dl>
 
-        <dl class="function" id="map.coordinateLocation">
+        <dl class="function" id="po.map.coordinateLocation">
           <dt>
             <i>po</i>.map.<b>coordinateLocation</b>(<i>c</i>)
           </dt>

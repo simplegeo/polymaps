@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>Polymaps - Documentation - layer</title>
+    <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
+    <script type="text/javascript" src="../polymaps.min.js?2.0.0"></script>
+    <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
+    <style type="text/css">
+
+@import url("../screen.css?0.9");
+@import url("../style.css?2.0.0");
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <hr class="space"/>
+      <div class="span-5 append-1 logo sidebar">
+        <a href="../">
+          <img src="../logo-small.png"/>
+          <script type="text/javascript" src="../logo-small.js"></script>
+        </a>
+        <hr class="space"/>
+
+        <h4>Core</h4>
+        <ul class="no-indent">
+          <li><a href="map.html">map</a></li>
+          <li><a class="active" href="layer.html">layer</a></li>
+          <li><a href="image.html">image</a></li>
+          <li><a href="geoJson.html">geoJson</a></li>
+        </ul>
+
+        <h4>Controls</h4>
+        <ul class="no-indent">
+          <li><a href="arrow.html">arrow</a></li>
+          <li><a href="compass.html">compass</a></li>
+          <li><a href="dblclick.html">dblclick</a></li>
+          <li><a href="drag.html">drag</a></li>
+          <li><a href="hash.html">hash</a></li>
+          <li><a href="interact.html">interact</a></li>
+          <li><a href="wheel.html">wheel</a></li>
+        </ul>
+
+        <h4><i>Et cetera</i></h4>
+        <ul class="no-indent">
+          <li><a href="cache.html">cache</a></li>
+          <li><a href="queue.html">queue</a></li>
+          <li><a href="svg.html">svg</a></li>
+          <li><a href="transform.html">transform</a></li>
+          <li><a href="url.html">url</a></li>
+        </ul>
+      </div>
+      <div class="span-18 prepend-6 last top">
+        <a href="../">Overview</a>
+        <a href="../ex/">Examples</a>
+        <a class="active" href="./">Documentation</a>
+        <a href="http://github.com/simplegeo/polymaps">Download</a>
+      </div>
+      <hr class="space"/>
+      <div class="span-18 prepend-6 last">
+
+        <h2>layer</h2>
+
+        <div class="span-4">
+        <a href="#container">container</a><br>
+        <a href="#id">id</a><br>
+        <a href="#map">map</a><br>
+        <a href="#po.layer">po.layer</a><br>
+        </div>
+
+        <div class="span-4">
+        <a href="#tile">tile</a><br>
+        <a href="#transform">transform</a><br>
+        <a href="#visible">visible</a><br>
+        <a href="#zoom">zoom</a><br>
+        </div>
+
+        <div class="span-4">
+        <a href="#dispatch">dispatch</a><br>
+        <a href="#off">off</a><br>
+        <a href="#on">on</a><br>
+        </div>
+
+        <hr class="space"/>
+
+        <dl class="function" id="po.layer">
+          <dt>
+            <i>po</i>.<b>layer</b>(<i>l</i>[, <i>u</i>])
+          </dt>
+          <dd>
+            <p>Constructs a new layer with the specified load function <i>l</i>,
+            and optional unload function <i>u</i>. The layer constructor is not
+            used directly unless implementing a custom layer; see the <a
+            href="image.html">image</a> and <a href="geoJson.html">geoJson</a>
+            layers for reference implementations.</p>
+
+            <p><br>The load function is used by the <a href="cache.html">tile
+            cache</a> to create the tile element. It is invoked with two
+            arguments: the tile object and a tile projection constructor. Use of
+            the tile projection is optional.</p>
+
+            <p><em>Tile objects</em> are a superset of coordinates; they have
+            the standard <tt>row</tt>, <tt>column</tt> and <tt>zoom</tt> number
+            attributes. The tile&rsquo;s <tt>key</tt> attribute is an unique
+            string based on the coordinate: &ldquo;{Z}/{X}/{Y}&rdquo;. The load
+            function is responsible for populating the <tt>element</tt>
+            attribute with an SVG element (such as a <tt>g</tt>
+            or <tt>image</tt> element) that can be added to the layer
+            container.</p>
+
+            <p><em>Tile projections</em> are passed to the load function as a
+            constructor. The constructor must be invoked, passing in the tile
+            object, to construct the projection. Once constructed, the
+            projection has a single attribute, <tt>locationPoint</tt> which has
+            similar semantics to the map&rsquo;s <a href="map.html#locationPoint"
+            ><tt>locationPoint</tt></a> method. However, the returned points are
+            relative to the top-left corner of the tile (rather than the map),
+            allowing the layer to reposition tiles without reprojecting.</p>
+
+            <p><br>Asynchronously-loaded tiles present some additional
+            requirements.</p>
+
+            <p>Load functions are responsible for setting the <tt>ready</tt>
+            attribute of the tile to true when the tile is ready to be
+            displayed. This avoids displaying tiles progressively as they load
+            (for example, with images); the layer takes care of displaying
+            cached &ldquo;proxy&rdquo; tiles at neighboring zoom levels while
+            tiles are loading.</p>
+
+            <p>When the tile is ready, the load function must dispatch a load
+            event on the layer. The load event must have a <tt>type</tt> string
+            attribute with the value &ldquo;load&rdquo;, and a <tt>tile</tt>
+            attribute referencing the tile object. The layer requires this load
+            event in order to hide any proxy tiles that were displayed while the
+            tile was loading.</p>
+
+            <p>If tiles are loaded asynchronously, the load function should
+            store the request object returned by the <a href="queue.html"
+            >queue</a> on the <tt>request</tt> attribute. This allows the cache
+            to cancel pending requests if necessary, such as when a tile with a
+            queued request is no longer needed.</p>
+
+            <p>The unload function <i>u</i> should be implemented if tiles are
+            loaded asynchronously, so as to abort the tile request. This method
+            is invoked with a single argument of the tile object on tiles that
+            are removed from the cache.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="container">
+          <dt>
+            <i>layer</i>.<b>container</b>()
+          </dt>
+          <dd>
+            <p>Returns the layer&rsquo;s container element. The container element
+            is set only if the layer is currently bound to a map. The container
+            is an SVG <tt>g</tt> element with the class attribute &ldquo;layer&rdquo;.</p>
+
+            <p>The container initially has seven child <tt>g</tt> elements that
+            correspond to the tiles at various zoom levels relative to the
+            map&rsquo;s (rounded) zoom level. When all needed tiles are loaded,
+            the proxy tiles are removed from the map and only the
+            last <tt>g</tt> element contains tiles.</p>
+
+            <p>These group elements have class attributes to allow
+            zoom-dependent styling. This includes both relative zoom classes,
+            such as &ldquo;zoom-1&rdquo; and &ldquo;zoom+1&rdquo;, and absolute
+            zoom classes, such as &ldqquo;zoom9&rdquo; and
+            &ldquo;zoom13&rdquo;.</p>
+
+            <p>The layer container, the zoom-specific group elements, and the
+            tiles themselves have transform attributes to control how tiles are
+            displayed. Tiles are translated relative to the map center. The
+            zoom-specific group elements then provide relative scaling
+            (e.g., <tt>scale(2)</tt> for the -1 zoom layer). Lastly, the layer
+            container is translated such that the origin is the center of the
+            map&rsquo;s viewport, with additional transformation as needed to
+            support rotation, continuous zooming, and layer-specific affine
+            transforms.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="id">
+          <dt>
+            <i>layer</i>.<b>id</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the id attribute on the layer&rsquo;s container. If
+            the argument <i>x</i> is specified, it is a unique string identifier
+            for the layer, and this method returns <tt>this</tt>. If no
+            arguments are specified, this method returns the current id. The id
+            defaults to null, which means that no id attribute should be set on
+            the container.</p>
+
+            <p>This method must be called before the layer is bound to a map,
+            and cannot be called while the layer is bound to a map.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="map">
+          <dt>
+            <i>layer</i>.<b>map</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Adds this layer to the specified map <i>x</i>, removes this layer
+            from its current map, or returns the current map. This method is
+            typically not called directly, but is needed to support the
+            map&rsquo;s <a href="map.html#add">add</a> and <a href="map.html#remove"
+            >remove</a> methods.</p>
+
+            <p>If the argument <i>x</i> is specified, this method returns
+            <tt>this</tt>. If <i>x</i> is null, this layer is removed from its
+            current map; otherwise, this layer is added to the specified map. If
+            no arguments are specified, this method returns the current map,
+            which may be null. Whew!</p>
+          </dd>
+        </dl>
+
+        <h3>View</h3>
+
+        <dl class="function" id="tile">
+          <dt>
+            <i>layer</i>.<b>tile</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets whether this layer is tiled. If the argument
+            <i>x</i> is specified, it is a boolean which determines whether or
+            not this layer is tiled, and returns <tt>this</tt>. If no arguments
+            are specified, it returns true if and only if this layer is
+            tiled.</p>
+
+            <p>Layers are tiled by default. Disabling tiling is useful if the
+            associated data (say a static GeoJSON file) is not tiled, and thus
+            you only want to display the data once.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="transform">
+          <dt>
+            <i>layer</i>.<b>transform</b>([<i>x</i>])
+          </dt>
+          <dd>
+            &hellip;
+          </dd>
+        </dl>
+
+        <dl class="function" id="visible">
+          <dt>
+            <i>layer</i>.<b>visible</b>([<i>x</i>])
+          </dt>
+          <dd>
+            &hellip;
+          </dd>
+        </dl>
+
+        <dl class="function" id="zoom">
+          <dt>
+            <i>layer</i>.<b>zoom</b>([<i>x</i>])
+          </dt>
+          <dd>
+            &hellip;
+          </dd>
+        </dl>
+
+        <h3>Events</h3>
+
+        <dl class="function" id="on">
+          <dt>
+            <i>layer</i>.<b>on</b>(<i>t</i>, <i>f</i>)
+          </dt>
+          <dd>
+            &hellip;
+          </dd>
+        </dl>
+
+        <dl class="function" id="off">
+          <dt>
+            <i>layer</i>.<b>off</b>(<i>t</i>, <i>f</i>)
+          </dt>
+          <dd>
+            &hellip;
+          </dd>
+        </dl>
+
+        <dl class="function" id="dispatch">
+          <dt>
+            <i>layer</i>.<b>dispatch</b>(<i>e</i>)
+          </dt>
+          <dd>
+            &hellip;
+          </dd>
+        </dl>
+
+      </div>
+      <div class="span-5 append-1 credits">
+        Polymaps is a project
+        from <a class="bold" href="http://simplegeo.com/">SimpleGeo</a>
+        and <a class="bold" href="http://stamen.com/">Stamen</a>.
+      </div>
+    </div>
+  </body>
+</html>

@@ -50,7 +50,7 @@ a.active {
   font-size: 22px;
 }
 
-.light, .sidebar, .blurb, .credits, #copy {
+.light, .sidebar, .sidebar h4, .blurb, .credits, #copy {
   font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Arial, Helvetica, sans-serif;
   font-weight: 300;
 }
@@ -118,7 +118,7 @@ dl.function i {
   color: #936;
 }
 
-#map {
+div#map {
   position: relative;
   border: solid 4px #ccc;
   background: #eee;

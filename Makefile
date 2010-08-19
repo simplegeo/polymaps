@@ -110,8 +110,23 @@ WWW_EX_FILES = \
 	www/ex/world-m.png
 
 WWW_DOCS_FILES = \
+	www/docs/arrow.html \
+	www/docs/cache.html \
+	www/docs/compass.html \
+	www/docs/dblclick.html \
+	www/docs/drag.html \
+	www/docs/geoJson.html \
+	www/docs/hash.html \
+	www/docs/image.html \
 	www/docs/index.html \
-	www/docs/map.html
+	www/docs/interact.html \
+	www/docs/layer.html \
+	www/docs/map.html \
+	www/docs/queue.html \
+	www/docs/svg.html \
+	www/docs/transform.html \
+	www/docs/url.html \
+	www/docs/wheel.html
 
 PYGMENT = /Library/Pygments-1.3.1/pygmentize
 PYGMENT_STYLE = trac
