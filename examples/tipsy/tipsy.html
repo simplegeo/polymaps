@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <script type="text/javascript" src="../../lib/jquery/jquery.min.js"></script>
@@ -22,6 +23,7 @@ body {
 
 .tipsy-inner {
   padding: 3px;
+  line-height: 0;
 }
 
 .tipsy-inner img {
@@ -37,7 +39,7 @@ body {
 
 var po = org.polymaps;
 
-var tips = {};
+var radius = 10, tips = {};
 
 var map = po.map()
     .container(document.body.appendChild(po.svg("svg")))
@@ -85,7 +87,7 @@ map.add(po.compass()
 function load(e) {
   for (var i = 0; i < e.features.length; i++) {
     var f = e.features[i];
-    f.element.setAttribute("r", 10);
+    f.element.setAttribute("r", radius);
     f.element.addEventListener("mousedown", toggle(f.data), false);
     f.element.addEventListener("dblclick", cancel, false);
   }
@@ -95,7 +97,10 @@ function show(e) {
   for (var i = 0; i < e.features.length; i++) {
     var f = e.features[i], tip = tips[f.data.id];
     tip.feature = f.data;
-    tip.target = f.element;
+    tip.location = {
+      lat: f.data.geometry.coordinates[1],
+      lon: f.data.geometry.coordinates[0]
+    };
     update(tip);
   }
 }
@@ -113,16 +118,9 @@ function cancel(e) {
 
 function update(tip) {
   if (!tip.visible) return; // ignore
-  if (!tip.target.ownerSVGElement) {
-    tip.visible = false;
-    $(tip.anchor).tipsy("hide");
-    return;
-  }
-  var box = po.svg.bbox(tip.target);
-  tip.anchor.style.left = box.x + "px";
-  tip.anchor.style.top = box.y + "px";
-  tip.anchor.style.width = box.width + "px";
-  tip.anchor.style.height = box.height + "px";
+  var p = map.locationPoint(tip.location);
+  tip.anchor.style.left = p.x - radius + "px";
+  tip.anchor.style.top = p.y - radius + "px";
   $(tip.anchor).tipsy("show");
 }
 
@@ -141,6 +139,8 @@ function toggle(f) {
     };
     tip.anchor.style.position = "absolute";
     tip.anchor.style.visibility = "hidden";
+    tip.anchor.style.width = radius * 2 + "px";
+    tip.anchor.style.height = radius * 2 + "px";
     $(tip.anchor).tipsy({
       html: true,
       fallback: f.properties.html,
@@ -150,27 +150,6 @@ function toggle(f) {
   }
   return tip.toggle;
 }
-
-po.svg.bbox = function(e) {
-  var box = e.getBBox(),
-      tl = e.ownerSVGElement.createSVGPoint(),
-      br = e.ownerSVGElement.createSVGPoint(),
-      ctm = e.getScreenCTM(),
-      x,
-      y;
-  tl.x = box.x;
-  tl.y = box.y;
-  br.x = box.x + box.width;
-  br.y = box.y + box.width;
-  tl = tl.matrixTransform(ctm);
-  br = br.matrixTransform(ctm);
-  return {
-    x: x = Math.floor(Math.min(tl.x, br.x)),
-    y: y = Math.floor(Math.min(tl.y, br.y)),
-    width: Math.ceil(Math.max(tl.x, br.x)) - x,
-    height: Math.ceil(Math.max(tl.y, br.y)) - y
-  };
-};
 
     </script>
     <span id="copy">
