@@ -75,12 +75,7 @@
 
         <div class="span-4">
         <a href="#po.geoJson">geoJson</a><br>
-        <a href="#init">init</a><br>
-        </div>
-
-        <div class="span-4">
         <a href="#reshow">reshow</a><br>
-        <a href="#show">show</a><br>
         </div>
 
         <div class="span-4">
@@ -148,7 +143,20 @@
             <i>geoJson</i>.<b>features</b>([<i>x</i>])
           </dt>
           <dd>
-            &hellip;
+            <p>Sets or gets the &ldquo;hard-coded&rdquo; features for this
+            GeoJSON layer. If the argument <i>x</i> is specified, this method
+            sets the features to the given array of GeoJSON <a
+            href="http://geojson.org/geojson-spec.html#feature-objects"
+            >feature objects</a> and returns <tt>this</tt>. If no arguments are
+            specified, this method returns the current features array, which
+            defaults to null.</p>
+
+            <p>The purpose of this method is to support non-tiled GeoJSON
+            layers that are loaded through external means, such as via <a
+            href="http://en.wikipedia.org/wiki/JSON#JSONP">JSONP</a> or directly
+            embedded in the HTML. Specifying the features array has the
+            additional side-effect of disabling <a href="layer.html#tile"
+            >tiling</a> and <a href="#clip">clipping</a>.</p>
           </dd>
         </dl>
 
@@ -157,7 +165,17 @@
             <i>geoJson</i>.<b>clip</b>([<i>x</i>])
           </dt>
           <dd>
-            &hellip;
+            <p>Sets or gets whether tiles are clipped. If the boolean argument
+            <i>x</i> is specified, the method enables or disables clipping
+            accordingly, and returns <tt>this</tt>. If no arguments are
+            specified, the method returns true if and only if tiles are
+            clipped.</p>
+
+            <p>Tiles are clipped by default. Disabling clipping is useful for
+            GeoJSON features that may extend beyond the tile boundary, such as
+            points. Clipping can only be disabled before any tiles are loaded;
+            this method should be called (if at all) before the layer is added
+            to the map.</p>
           </dd>
         </dl>
 
@@ -165,32 +183,18 @@
 
         <p>GeoJSON layers use the <a href="dispatch.html">dispatch</a> mechanism
         to notify interested parties of events. In addition to the standard load
-        event, GeoJSON layers support the &ldquo;show&rdquo; event.</p>
-
-        <dl class="function" id="init">
-          <dt>
-            <i>geoJson</i>.<b>init</b>(<i>g</i>)
-          </dt>
-          <dd>
-            &hellip;
-          </dd>
-        </dl>
-
-        <dl class="function" id="show">
-          <dt>
-            <i>geoJson</i>.<b>show</b>(<i>t</i>)
-          </dt>
-          <dd>
-            &hellip;
-          </dd>
-        </dl>
+        event, GeoJSON layers support the &ldquo;show&rdquo; event that is
+        triggered for each tile as it becomes visible. The show event allows
+        tiles to be styled dynamically through JavaScript.</p>
 
         <dl class="function" id="reshow">
           <dt>
             <i>geoJson</i>.<b>reshow</b>()
           </dt>
           <dd>
-            &hellip;
+            Dispatches a show event for each visible tile. If tiles are styled
+            dynamically through a show event listener, this allows styling to be
+            re-evaluated for all visible tiles.
           </dd>
         </dl>
 

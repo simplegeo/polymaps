@@ -78,7 +78,16 @@
             <i>po</i>.<b>hash</b>()
           </dt>
           <dd>
-            &hellip;
+            <p>Constructs a hash control with default settings. The hash control
+            provides two-way coordination of the window&rsquo;s location hash
+            with the map center and zoom. This allows map URLs to be
+            conveniently copy-and-pasted, preserving the view. To further cut
+            down on URL length, the precision of latitude and longitude is based
+            on the zoom level.</p>
+
+            <p>The hash control also listens for the window
+            &ldquo;hashchange&rdquo; event, such that links on the page or
+            editing via the address bar can update the map center and zoom.</p>
           </dd>
         </dl>
 
@@ -87,7 +96,15 @@
             <i>hash</i>.<b>map</b>([<i>x</i>])
           </dt>
           <dd>
-            &hellip;
+            <p>Adds this control to the specified map <i>x</i>, or returns the
+            current map. This method is typically not called directly, but is
+            needed to support the map&rsquo;s <a href="map.html#add">add</a>
+            method.</p>
+
+            <p>If the argument <i>x</i> is specified, this control is added to
+            the given map and returns <tt>this</tt>. If no arguments are
+            specified, this method returns the current map, which defaults to
+            null. This method does not currently support removal.</p>
           </dd>
         </dl>
 

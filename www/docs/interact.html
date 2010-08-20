@@ -78,7 +78,11 @@
             <i>po</i>.<b>interact</b>()
           </dt>
           <dd>
-            &hellip;
+            Constructs the standard interaction controls with default settings.
+            This includes the <a href="drag.html">drag</a>, <a href="wheel.html"
+            >wheel</a>, <a href="dblclick.html">dblclick</a> and <a href="arrow.html"
+            >arrow</a> controls. This control set does not allow customization;
+            to customize controls, add them individually instead.
           </dd>
         </dl>
 
@@ -87,7 +91,15 @@
             <i>interact</i>.<b>map</b>([<i>x</i>])
           </dt>
           <dd>
-            &hellip;
+            <p>Adds this control to the specified map <i>x</i>, or returns the
+            current map. This method is typically not called directly, but is
+            needed to support the map&rsquo;s <a href="map.html#add">add</a>
+            method.</p>
+
+            <p>If the argument <i>x</i> is specified, this control is added to
+            the given map and returns <tt>this</tt>. If no arguments are
+            specified, this method returns the current map, which defaults to
+            null. This method does not currently support removal.</p>
           </dd>
         </dl>
 
