@@ -12,7 +12,7 @@
 @import url("../screen.css?0.9");
 @import url("../style.css?2.0.1");
 
-#map {
+div#map {
   background: #E6E6E6;
 }
 

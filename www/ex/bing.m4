@@ -15,7 +15,7 @@
   stroke: #666;
 }
 
-#map {
+div#map {
   background: #132328;
 }
 

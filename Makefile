@@ -45,6 +45,8 @@ WWW_FILES = \
 	www/style.css
 
 WWW_EX_FILES = \
+	examples/canvas/procedural.js \
+	examples/canvas/mandelbrot-worker.js \
 	examples/cluster/kmeans.js \
 	examples/overlay/sf1906.png \
 	examples/population/population.css \

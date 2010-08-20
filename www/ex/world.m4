@@ -13,7 +13,7 @@
 @import url("../style.css?2.0.1");
 @import url("../colorbrewer.css?1.0.0");
 
-#map {
+div#map {
   background: #012;
 }
 
