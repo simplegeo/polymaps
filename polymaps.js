@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.1"; // semver.org
+  po.version = "2.0.2"; // semver.org
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -673,7 +673,7 @@ po.layer = function(load, unload) {
 
     // set the layer transform
     container.setAttribute("transform",
-        "translate(" + mapSize.x / 2 + "," + mapSize.y / 2 + ")"
+        "translate(" + (mapSize.x >> 1) + "," + (mapSize.y >> 1) + ")"
         + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
         + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : "")
         + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
@@ -686,8 +686,8 @@ po.layer = function(load, unload) {
 
     // round to pixel boundary to avoid anti-aliasing artifacts
     if (!transform && !mapAngle && !mapZoomFraction) {
-      tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
-      tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
+      tileCenter.column = Math.round(tileSize.x * tileCenter.column) / tileSize.x;
+      tileCenter.row = Math.round(tileSize.y * tileCenter.row) / tileSize.y;
     }
 
     // layer-specific zoom transform
