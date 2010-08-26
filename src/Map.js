@@ -117,8 +117,21 @@ po.map = function() {
 
   map.mouse = function(e) {
     var point = (container.ownerSVGElement || container).createSVGPoint();
-    point.x = e.clientX;
-    point.y = e.clientY;
+    if ((bug44083 < 0) && (window.scrollX || window.scrollY)) {
+      var svg = document.body.appendChild(po.svg("svg"));
+      svg.style.position = "absolute";
+      svg.style.top = svg.style.left = "0px";
+      var ctm = svg.getScreenCTM();
+      bug44083 = !(ctm.f || ctm.e);
+      document.body.removeChild(svg);
+    }
+    if (bug44083) {
+      point.x = e.pageX;
+      point.y = e.pageY;
+    } else {
+      point.x = e.clientX;
+      point.y = e.clientY;
+    }
     return point.matrixTransform(container.getScreenCTM().inverse());
   };
 
@@ -306,3 +319,6 @@ po.map.coordinateLocation = function(c) {
     lat: y2lat(180 - k * c.row)
   };
 };
+
+// https://bugs.webkit.org/show_bug.cgi?id=44083
+var bug44083 = /WebKit/.test(navigator.userAgent) ? -1 : 0;

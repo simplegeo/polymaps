@@ -3,8 +3,6 @@ po.wheel = function() {
       timePrev = 0,
       smooth = true,
       location,
-      speedBug = /WebKit\/533/.test(navigator.userAgent),
-      speedAvg = .3,
       map;
 
   function move(e) {
@@ -14,10 +12,8 @@ po.wheel = function() {
   function mousewheel(e) {
     var delta = Math.max(-1, Math.min(1, (e.wheelDelta / 120 || -e.detail) * .1)),
         point = map.mouse(e);
-    if (speedBug) {
-      speedAvg = speedAvg * .95 + Math.abs(delta) * .05;
-      if (speedAvg > .5) delta *= .4;
-    }
+    if ((bug40441 < 0) && (Math.abs(e.wheelDelta) >= 4800)) bug40441 = 1;
+    if (bug40441 == 1) delta *= .1;
     if (!location) location = map.pointLocation(point);
     map.off("move", move);
     if (smooth) {
@@ -54,3 +50,6 @@ po.wheel = function() {
 
   return wheel;
 };
+
+// https://bugs.webkit.org/show_bug.cgi?id=40441
+var bug40441 = /WebKit\/533/.test(navigator.userAgent) ? -1 : 0;

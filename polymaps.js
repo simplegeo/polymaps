@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.2"; // semver.org
+  po.version = "2.0.2+1"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -451,8 +451,21 @@ po.map = function() {
 
   map.mouse = function(e) {
     var point = (container.ownerSVGElement || container).createSVGPoint();
-    point.x = e.clientX;
-    point.y = e.clientY;
+    if ((bug44083 < 0) && (window.scrollX || window.scrollY)) {
+      var svg = document.body.appendChild(po.svg("svg"));
+      svg.style.position = "absolute";
+      svg.style.top = svg.style.left = "0px";
+      var ctm = svg.getScreenCTM();
+      bug44083 = !(ctm.f || ctm.e);
+      document.body.removeChild(svg);
+    }
+    if (bug44083) {
+      point.x = e.pageX;
+      point.y = e.pageY;
+    } else {
+      point.x = e.clientX;
+      point.y = e.clientY;
+    }
     return point.matrixTransform(container.getScreenCTM().inverse());
   };
 
@@ -640,6 +653,9 @@ po.map.coordinateLocation = function(c) {
     lat: y2lat(180 - k * c.row)
   };
 };
+
+// https://bugs.webkit.org/show_bug.cgi?id=44083
+var bug44083 = /WebKit/.test(navigator.userAgent) ? -1 : 0;
 po.layer = function(load, unload) {
   var layer = {},
       cache = layer.cache = po.cache(load, unload).size(512),
@@ -673,7 +689,7 @@ po.layer = function(load, unload) {
 
     // set the layer transform
     container.setAttribute("transform",
-        "translate(" + (mapSize.x >> 1) + "," + (mapSize.y >> 1) + ")"
+        "translate(" + (mapSize.x / 2) + "," + (mapSize.y / 2) + ")"
         + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
         + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : "")
         + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
@@ -685,9 +701,9 @@ po.layer = function(load, unload) {
         c3 = map.pointCoordinate(tileCenter, {x: 0, y: mapSize.y});
 
     // round to pixel boundary to avoid anti-aliasing artifacts
-    if (!transform && !mapAngle && !mapZoomFraction) {
-      tileCenter.column = Math.round(tileSize.x * tileCenter.column) / tileSize.x;
-      tileCenter.row = Math.round(tileSize.y * tileCenter.row) / tileSize.y;
+    if (!mapZoomFraction && !mapAngle && !transform) {
+      tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
+      tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
     }
 
     // layer-specific zoom transform
@@ -1253,8 +1269,6 @@ po.wheel = function() {
       timePrev = 0,
       smooth = true,
       location,
-      speedBug = /WebKit\/533/.test(navigator.userAgent),
-      speedAvg = .3,
       map;
 
   function move(e) {
@@ -1264,10 +1278,8 @@ po.wheel = function() {
   function mousewheel(e) {
     var delta = Math.max(-1, Math.min(1, (e.wheelDelta / 120 || -e.detail) * .1)),
         point = map.mouse(e);
-    if (speedBug) {
-      speedAvg = speedAvg * .95 + Math.abs(delta) * .05;
-      if (speedAvg > .5) delta *= .4;
-    }
+    if ((bug40441 < 0) && (Math.abs(e.wheelDelta) >= 4800)) bug40441 = 1;
+    if (bug40441 == 1) delta *= .1;
     if (!location) location = map.pointLocation(point);
     map.off("move", move);
     if (smooth) {
@@ -1304,6 +1316,9 @@ po.wheel = function() {
 
   return wheel;
 };
+
+// https://bugs.webkit.org/show_bug.cgi?id=40441
+var bug40441 = /WebKit\/533/.test(navigator.userAgent) ? -1 : 0;
 po.arrow = function() {
   var arrow = {},
       key = {left: 0, right: 0, up: 0, down: 0, plus: 0, minus: 0},

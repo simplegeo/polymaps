@@ -31,7 +31,7 @@ po.layer = function(load, unload) {
 
     // set the layer transform
     container.setAttribute("transform",
-        "translate(" + (mapSize.x >> 1) + "," + (mapSize.y >> 1) + ")"
+        "translate(" + (mapSize.x / 2) + "," + (mapSize.y / 2) + ")"
         + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
         + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : "")
         + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
@@ -43,9 +43,9 @@ po.layer = function(load, unload) {
         c3 = map.pointCoordinate(tileCenter, {x: 0, y: mapSize.y});
 
     // round to pixel boundary to avoid anti-aliasing artifacts
-    if (!transform && !mapAngle && !mapZoomFraction) {
-      tileCenter.column = Math.round(tileSize.x * tileCenter.column) / tileSize.x;
-      tileCenter.row = Math.round(tileSize.y * tileCenter.row) / tileSize.y;
+    if (!mapZoomFraction && !mapAngle && !transform) {
+      tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
+      tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
     }
 
     // layer-specific zoom transform
