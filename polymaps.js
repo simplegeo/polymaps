@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.2+3"; // This fork not semver!
+  po.version = "2.0.2+4"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -755,7 +755,7 @@ po.layer = function(load, unload) {
 
     // load the tiles!
     if (visible && tileLevel > -5 && tileLevel < 3) {
-      var ymax = 1 << c0.zoom;
+      var ymax = 1 << Math.max(0, c0.zoom);
       if (tile) {
         scanTriangle(c0, c1, c2, 0, ymax, scanLine);
         scanTriangle(c2, c3, c0, 0, ymax, scanLine);
@@ -959,7 +959,11 @@ function scanSpans(e0, e1, ymin, ymax, scanLine) {
       y1 = Math.min(ymax, Math.ceil(e1.y1));
 
   // sort edges by x-coordinate
-  if (e0.x0 < e1.x0 || e0.x1 < e1.x1) { var t = e0; e0 = e1; e1 = t; }
+  if ((e0.x0 == e1.x0 && e0.y0 == e1.y0)
+      ? (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1)
+      : (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
+    var t = e0; e0 = e1; e1 = t;
+  }
 
   // scan lines!
   var m0 = e0.dx / e0.dy,
