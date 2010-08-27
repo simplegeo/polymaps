@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.2+2"; // This fork not semver!
+  po.version = "2.0.2+3"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -1734,11 +1734,15 @@ po.compass = function() {
 
   compass.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    map.on("move", move);
-    map.on("resize", move);
-    draw();
-    move();
+    if (map) {
+      g.parentNode.removeChild(g);
+      map.off("move", move).off("resize", move);
+    }
+    if (map = x) {
+      map.on("move", move).on("resize", move);
+      draw();
+      move();
+    }
     return compass;
   };
 
