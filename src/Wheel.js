@@ -3,7 +3,8 @@ po.wheel = function() {
       timePrev = 0,
       smooth = true,
       location,
-      map;
+      map,
+      container;
 
   function move(e) {
     location = null;
@@ -38,13 +39,20 @@ po.wheel = function() {
 
   wheel.map = function(x) {
     if (!arguments.length) return map;
-    (map = x).on("move", move);
-    // TODO remove from old map container?
-    // TODO update if map container changes?
-    var container = map.container();
-    container.addEventListener("mousemove", move, false);
-    container.addEventListener("mousewheel", mousewheel, false);
-    container.addEventListener("DOMMouseScroll", mousewheel, false);
+    if (map) {
+      container.removeEventListener("mousemove", move, false);
+      container.removeEventListener("mousewheel", mousewheel, false);
+      container.removeEventListener("DOMMouseScroll", mousewheel, false);
+      container = null;
+      map.off("move", move);
+    }
+    if (map = x) {
+      map.on("move", move);
+      container = map.container();
+      container.addEventListener("mousemove", move, false);
+      container.addEventListener("mousewheel", mousewheel, false);
+      container.addEventListener("DOMMouseScroll", mousewheel, false);
+    }
     return wheel;
   };
 

@@ -28,10 +28,15 @@ po.hash = function() {
 
   hash.map = function(x) {
     if (!arguments.length) return map;
-    if (map) map.off("move", move);
-    (map = x).on("move", move);
-    window.addEventListener("hashchange", hashchange, false);
-    location.hash ? hashchange() : move();
+    if (map) {
+      map.off("move", move);
+      window.removeEventListener("hashchange", hashchange, false);
+    }
+    if (map = x) {
+      map.on("move", move);
+      window.addEventListener("hashchange", hashchange, false);
+      location.hash ? hashchange() : move();
+    }
     return hash;
   };
 

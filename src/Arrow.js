@@ -6,7 +6,8 @@ po.arrow = function() {
       repeatDelay = 250,
       repeatInterval = 50,
       speed = 16,
-      map;
+      map,
+      parent;
 
   function keydown(e) {
     if (e.ctrlKey || e.altKey || e.metaKey) return;
@@ -91,12 +92,26 @@ po.arrow = function() {
     e.preventDefault();
   }
 
+  function repeat() {
+    if (!map) return;
+    if (Date.now() < last + repeatDelay) return;
+    var dx = (key.left - key.right) * speed,
+        dy = (key.up - key.down) * speed;
+    if (dx || dy) map.panBy({x: dx, y: dy});
+  }
+
   arrow.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    var p = map.focusableParent();
-    p.addEventListener("keydown", keydown, false);
-    p.addEventListener("keyup", keyup, false);
+    if (map) {
+      parent.removeEventListener("keydown", keydown, false);
+      parent.removeEventListener("keyup", keyup, false);
+      parent = null;
+    }
+    if (map = x) {
+      parent = map.focusableParent();
+      parent.addEventListener("keydown", keydown, false);
+      parent.addEventListener("keyup", keyup, false);
+    }
     return arrow;
   };
 
@@ -105,14 +120,6 @@ po.arrow = function() {
     speed = x;
     return arrow;
   };
-
-  function repeat() {
-    if (!map) return;
-    if (Date.now() < last + repeatDelay) return;
-    var dx = (key.left - key.right) * speed,
-        dy = (key.up - key.down) * speed;
-    if (dx || dy) map.panBy({x: dx, y: dy});
-  }
 
   return arrow;
 };
