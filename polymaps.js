@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.2+1"; // This fork not semver!
+  po.version = "2.0.2+2"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -1276,10 +1276,10 @@ po.wheel = function() {
   }
 
   function mousewheel(e) {
-    var delta = Math.max(-1, Math.min(1, (e.wheelDelta / 120 || -e.detail) * .1)),
+    var delta = (e.wheelDelta / 120 || -e.detail) * .1,
         point = map.mouse(e);
     if ((bug40441 < 0) && (Math.abs(e.wheelDelta) >= 4800)) bug40441 = 1;
-    if (bug40441 == 1) delta *= .1;
+    if (bug40441 == 1) delta *= .03;
     if (!location) location = map.pointLocation(point);
     map.off("move", move);
     if (smooth) {
