@@ -1,6 +1,7 @@
 po.wheel = function() {
   var wheel = {},
       timePrev = 0,
+      last = 0,
       smooth = true,
       location,
       map,
@@ -13,7 +14,14 @@ po.wheel = function() {
   function mousewheel(e) {
     var delta = (e.wheelDelta / 120 || -e.detail) * .1,
         point = map.mouse(e);
-    if ((bug40441 < 0) && (Math.abs(e.wheelDelta) >= 4800)) bug40441 = 1;
+
+    /* Detect fast & large wheel events on WebKit. */
+    if (bug40441 < 0) {
+      var now = Date.now(), since = now - last;
+      if ((since > 9) && (Math.abs(e.wheelDelta) / since >= 50)) bug40441 = 1;
+      last = now;
+    }
+
     if (bug40441 == 1) delta *= .03;
     if (!location) location = map.pointLocation(point);
     map.off("move", move);
