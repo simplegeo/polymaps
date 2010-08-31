@@ -76,6 +76,15 @@ po.map = function() {
     };
   };
 
+  function rezoom() {
+    if (zoomRange) {
+      if (zoom < zoomRange[0]) zoom = zoomRange[0];
+      else if (zoom > zoomRange[1]) zoom = zoomRange[1];
+    }
+    zoomFraction = zoom - (zoom = Math.round(zoom));
+    zoomFactor = Math.pow(2, zoomFraction);
+  }
+
   function recenter() {
     if (!centerRange) return;
     var k = 45 / Math.pow(2, zoom + zoomFraction - 3);
@@ -210,9 +219,8 @@ po.map = function() {
 
   map.zoom = function(x) {
     if (!arguments.length) return zoom + zoomFraction;
-    zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], x));
-    zoomFraction = zoom - (zoom = Math.round(zoom));
-    zoomFactor = Math.pow(2, zoomFraction);
+    zoom = x;
+    rezoom();
     return map.center(center);
   };
 
@@ -223,9 +231,8 @@ po.map = function() {
     if (arguments.length < 3) l = map.pointLocation(x0);
 
     // update the zoom level
-    zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], zoom + zoomFraction + z));
-    zoomFraction = zoom - (zoom = Math.round(zoom));
-    zoomFactor = Math.pow(2, zoomFraction);
+    zoom = zoom + zoomFraction + z;
+    rezoom();
 
     // compute the new point of the location
     var x1 = map.locationPoint(l);

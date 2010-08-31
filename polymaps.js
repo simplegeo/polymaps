@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.2+6"; // This fork not semver!
+  po.version = "2.0.2+7"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -158,11 +158,12 @@ po.url = function(template) {
   var hosts = [];
 
   function format(c) {
-    var max = 1 << c.zoom, column = c.column % max;
+    var max = c.zoom < 0 ? 1 : 1 << c.zoom,
+        column = c.column % max;
     if (column < 0) column += max;
     return template.replace(/{(.)}/g, function(s, v) {
       switch (v) {
-        case "S": return hosts[(c.zoom + c.row + column) % hosts.length];
+        case "S": return hosts[(Math.abs(c.zoom) + c.row + column) % hosts.length];
         case "Z": return c.zoom;
         case "X": return column;
         case "Y": return c.row;
@@ -410,6 +411,15 @@ po.map = function() {
     };
   };
 
+  function rezoom() {
+    if (zoomRange) {
+      if (zoom < zoomRange[0]) zoom = zoomRange[0];
+      else if (zoom > zoomRange[1]) zoom = zoomRange[1];
+    }
+    zoomFraction = zoom - (zoom = Math.round(zoom));
+    zoomFactor = Math.pow(2, zoomFraction);
+  }
+
   function recenter() {
     if (!centerRange) return;
     var k = 45 / Math.pow(2, zoom + zoomFraction - 3);
@@ -544,9 +554,8 @@ po.map = function() {
 
   map.zoom = function(x) {
     if (!arguments.length) return zoom + zoomFraction;
-    zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], x));
-    zoomFraction = zoom - (zoom = Math.round(zoom));
-    zoomFactor = Math.pow(2, zoomFraction);
+    zoom = x;
+    rezoom();
     return map.center(center);
   };
 
@@ -557,9 +566,8 @@ po.map = function() {
     if (arguments.length < 3) l = map.pointLocation(x0);
 
     // update the zoom level
-    zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], zoom + zoomFraction + z));
-    zoomFraction = zoom - (zoom = Math.round(zoom));
-    zoomFactor = Math.pow(2, zoomFraction);
+    zoom = zoom + zoomFraction + z;
+    rezoom();
 
     // compute the new point of the location
     var x1 = map.locationPoint(l);
@@ -729,7 +737,7 @@ po.layer = function(load, unload) {
     // tile-specific projection
     function projection(c) {
       var zoom = c.zoom,
-          max = 1 << zoom,
+          max = zoom < 0 ? 1 : 1 << zoom,
           column = c.column % max,
           row = c.row;
       if (column < 0) column += max;
@@ -755,7 +763,7 @@ po.layer = function(load, unload) {
 
     // load the tiles!
     if (visible && tileLevel > -5 && tileLevel < 3) {
-      var ymax = 1 << Math.max(0, c0.zoom);
+      var ymax = c0.zoom < 0 ? 1 : 1 << c0.zoom;
       if (tile) {
         scanTriangle(c0, c1, c2, 0, ymax, scanLine);
         scanTriangle(c2, c3, c0, 0, ymax, scanLine);
