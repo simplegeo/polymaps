@@ -1,6 +1,7 @@
 po.drag = function() {
   var drag = {},
       map,
+      container,
       cursor,
       dragging;
 
@@ -31,10 +32,14 @@ po.drag = function() {
 
   drag.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    // TODO remove from old map container?
-    // TODO update if map container changes?
-    map.container().addEventListener("mousedown", mousedown, false);
+    if (map) {
+      container.removeEventListener("mousedown", mousedown, false);
+      container = null;
+    }
+    if (map = x) {
+      container = map.container();
+      container.addEventListener("mousedown", mousedown, false);
+    }
     return drag;
   };
 

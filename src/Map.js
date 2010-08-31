@@ -76,6 +76,15 @@ po.map = function() {
     };
   };
 
+  function rezoom() {
+    if (zoomRange) {
+      if (zoom < zoomRange[0]) zoom = zoomRange[0];
+      else if (zoom > zoomRange[1]) zoom = zoomRange[1];
+    }
+    zoomFraction = zoom - (zoom = Math.round(zoom));
+    zoomFactor = Math.pow(2, zoomFraction);
+  }
+
   function recenter() {
     if (!centerRange) return;
     var k = 45 / Math.pow(2, zoom + zoomFraction - 3);
@@ -117,8 +126,21 @@ po.map = function() {
 
   map.mouse = function(e) {
     var point = (container.ownerSVGElement || container).createSVGPoint();
-    point.x = e.clientX;
-    point.y = e.clientY;
+    if ((bug44083 < 0) && (window.scrollX || window.scrollY)) {
+      var svg = document.body.appendChild(po.svg("svg"));
+      svg.style.position = "absolute";
+      svg.style.top = svg.style.left = "0px";
+      var ctm = svg.getScreenCTM();
+      bug44083 = !(ctm.f || ctm.e);
+      document.body.removeChild(svg);
+    }
+    if (bug44083) {
+      point.x = e.pageX;
+      point.y = e.pageY;
+    } else {
+      point.x = e.clientX;
+      point.y = e.clientY;
+    }
     return point.matrixTransform(container.getScreenCTM().inverse());
   };
 
@@ -197,9 +219,8 @@ po.map = function() {
 
   map.zoom = function(x) {
     if (!arguments.length) return zoom + zoomFraction;
-    zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], x));
-    zoomFraction = zoom - (zoom = Math.round(zoom));
-    zoomFactor = Math.pow(2, zoomFraction);
+    zoom = x;
+    rezoom();
     return map.center(center);
   };
 
@@ -210,9 +231,8 @@ po.map = function() {
     if (arguments.length < 3) l = map.pointLocation(x0);
 
     // update the zoom level
-    zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], zoom + zoomFraction + z));
-    zoomFraction = zoom - (zoom = Math.round(zoom));
-    zoomFactor = Math.pow(2, zoomFraction);
+    zoom = zoom + zoomFraction + z;
+    rezoom();
 
     // compute the new point of the location
     var x1 = map.locationPoint(l);
@@ -306,3 +326,6 @@ po.map.coordinateLocation = function(c) {
     lat: y2lat(180 - k * c.row)
   };
 };
+
+// https://bugs.webkit.org/show_bug.cgi?id=44083
+var bug44083 = /WebKit/.test(navigator.userAgent) ? -1 : 0;

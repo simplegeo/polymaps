@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.2"; // semver.org
+  po.version = "2.0.2+9"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -158,11 +158,12 @@ po.url = function(template) {
   var hosts = [];
 
   function format(c) {
-    var max = 1 << c.zoom, column = c.column % max;
+    var max = c.zoom < 0 ? 1 : 1 << c.zoom,
+        column = c.column % max;
     if (column < 0) column += max;
     return template.replace(/{(.)}/g, function(s, v) {
       switch (v) {
-        case "S": return hosts[(c.zoom + c.row + column) % hosts.length];
+        case "S": return hosts[(Math.abs(c.zoom) + c.row + column) % hosts.length];
         case "Z": return c.zoom;
         case "X": return column;
         case "Y": return c.row;
@@ -410,6 +411,15 @@ po.map = function() {
     };
   };
 
+  function rezoom() {
+    if (zoomRange) {
+      if (zoom < zoomRange[0]) zoom = zoomRange[0];
+      else if (zoom > zoomRange[1]) zoom = zoomRange[1];
+    }
+    zoomFraction = zoom - (zoom = Math.round(zoom));
+    zoomFactor = Math.pow(2, zoomFraction);
+  }
+
   function recenter() {
     if (!centerRange) return;
     var k = 45 / Math.pow(2, zoom + zoomFraction - 3);
@@ -451,8 +461,21 @@ po.map = function() {
 
   map.mouse = function(e) {
     var point = (container.ownerSVGElement || container).createSVGPoint();
-    point.x = e.clientX;
-    point.y = e.clientY;
+    if ((bug44083 < 0) && (window.scrollX || window.scrollY)) {
+      var svg = document.body.appendChild(po.svg("svg"));
+      svg.style.position = "absolute";
+      svg.style.top = svg.style.left = "0px";
+      var ctm = svg.getScreenCTM();
+      bug44083 = !(ctm.f || ctm.e);
+      document.body.removeChild(svg);
+    }
+    if (bug44083) {
+      point.x = e.pageX;
+      point.y = e.pageY;
+    } else {
+      point.x = e.clientX;
+      point.y = e.clientY;
+    }
     return point.matrixTransform(container.getScreenCTM().inverse());
   };
 
@@ -531,9 +554,8 @@ po.map = function() {
 
   map.zoom = function(x) {
     if (!arguments.length) return zoom + zoomFraction;
-    zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], x));
-    zoomFraction = zoom - (zoom = Math.round(zoom));
-    zoomFactor = Math.pow(2, zoomFraction);
+    zoom = x;
+    rezoom();
     return map.center(center);
   };
 
@@ -544,9 +566,8 @@ po.map = function() {
     if (arguments.length < 3) l = map.pointLocation(x0);
 
     // update the zoom level
-    zoom = Math.max(zoomRange[0], Math.min(zoomRange[1], zoom + zoomFraction + z));
-    zoomFraction = zoom - (zoom = Math.round(zoom));
-    zoomFactor = Math.pow(2, zoomFraction);
+    zoom = zoom + zoomFraction + z;
+    rezoom();
 
     // compute the new point of the location
     var x1 = map.locationPoint(l);
@@ -640,6 +661,9 @@ po.map.coordinateLocation = function(c) {
     lat: y2lat(180 - k * c.row)
   };
 };
+
+// https://bugs.webkit.org/show_bug.cgi?id=44083
+var bug44083 = /WebKit/.test(navigator.userAgent) ? -1 : 0;
 po.layer = function(load, unload) {
   var layer = {},
       cache = layer.cache = po.cache(load, unload).size(512),
@@ -673,7 +697,7 @@ po.layer = function(load, unload) {
 
     // set the layer transform
     container.setAttribute("transform",
-        "translate(" + (mapSize.x >> 1) + "," + (mapSize.y >> 1) + ")"
+        "translate(" + (mapSize.x / 2) + "," + (mapSize.y / 2) + ")"
         + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
         + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : "")
         + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
@@ -685,9 +709,9 @@ po.layer = function(load, unload) {
         c3 = map.pointCoordinate(tileCenter, {x: 0, y: mapSize.y});
 
     // round to pixel boundary to avoid anti-aliasing artifacts
-    if (!transform && !mapAngle && !mapZoomFraction) {
-      tileCenter.column = Math.round(tileSize.x * tileCenter.column) / tileSize.x;
-      tileCenter.row = Math.round(tileSize.y * tileCenter.row) / tileSize.y;
+    if (!mapZoomFraction && !mapAngle && !transform) {
+      tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
+      tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
     }
 
     // layer-specific zoom transform
@@ -713,7 +737,7 @@ po.layer = function(load, unload) {
     // tile-specific projection
     function projection(c) {
       var zoom = c.zoom,
-          max = 1 << zoom,
+          max = zoom < 0 ? 1 : 1 << zoom,
           column = c.column % max,
           row = c.row;
       if (column < 0) column += max;
@@ -739,7 +763,7 @@ po.layer = function(load, unload) {
 
     // load the tiles!
     if (visible && tileLevel > -5 && tileLevel < 3) {
-      var ymax = 1 << c0.zoom;
+      var ymax = c0.zoom < 0 ? 1 : 1 << c0.zoom;
       if (tile) {
         scanTriangle(c0, c1, c2, 0, ymax, scanLine);
         scanTriangle(c2, c3, c0, 0, ymax, scanLine);
@@ -943,7 +967,11 @@ function scanSpans(e0, e1, ymin, ymax, scanLine) {
       y1 = Math.min(ymax, Math.ceil(e1.y1));
 
   // sort edges by x-coordinate
-  if (e0.x0 < e1.x0 || e0.x1 < e1.x1) { var t = e0; e0 = e1; e1 = t; }
+  if ((e0.x0 == e1.x0 && e0.y0 == e1.y0)
+      ? (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1)
+      : (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
+    var t = e0; e0 = e1; e1 = t;
+  }
 
   // scan lines!
   var m0 = e0.dx / e0.dy,
@@ -1011,7 +1039,7 @@ po.image = function() {
 };
 po.geoJson = function(fetch) {
   var geoJson = po.layer(load, unload),
-      url = po.url("about:blank"),
+      url = "about:blank",
       clip = true,
       clipId,
       zoom = null,
@@ -1110,25 +1138,42 @@ po.geoJson = function(fetch) {
     proj = proj(tile);
 
     function update(data) {
-      var features = tiles[tile.key] || (tiles[tile.key] = []), updated = [];
+      var updated = [];
+
+      /* Fetch the next batch of features, if so directed. */
       if (data.next) tile.request = fetch(data.next.href, update);
-      for (var i = 0; i < data.features.length; i++) {
-        var feature = data.features[i],
-            element = geometry(feature.geometry, proj.locationPoint);
-        if (element) {
-          var entry = {element: g.appendChild(element), data: feature};
-          features.push(entry);
-          updated.push(entry);
+
+      /* Convert the GeoJSON to SVG. */
+      switch (data.type) {
+        case "FeatureCollection": {
+          for (var i = 0; i < data.features.length; i++) {
+            var feature = data.features[i],
+                element = geometry(feature.geometry, proj.locationPoint);
+            if (element) updated.push({element: g.appendChild(element), data: feature});
+          }
+          break;
+        }
+        case "Feature": {
+          var element = geometry(data.geometry, proj.locationPoint);
+          if (element) updated.push({element: g.appendChild(element), data: data});
+          break;
+        }
+        default: {
+          var element = geometry(data, proj.locationPoint);
+          if (element) updated.push({element: g.appendChild(element), data: {type: "Feature", geometry: data}});
+          break;
         }
       }
+
       tile.ready = true;
+      updated.push.apply(tiles[tile.key] || (tiles[tile.key] = []), updated);
       geoJson.dispatch({type: "load", tile: tile, features: updated});
     }
 
     if (features) {
-      update({features: features});
+      update({type: "FeatureCollection", features: features});
     } else {
-      tile.request = fetch(url(tile), update);
+      tile.request = fetch(typeof url == "function" ? url(tile) : url, update);
     }
 
     if (clipId) g.setAttribute("clip-path", "url(#" + clipId + ")");
@@ -1141,7 +1186,8 @@ po.geoJson = function(fetch) {
 
   geoJson.url = function(x) {
     if (!arguments.length) return url;
-    url = typeof x == "string" ? po.url(x) : x;
+    url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
+    if (typeof url == "string") geoJson.tile(false);
     return geoJson;
   };
 
@@ -1183,7 +1229,8 @@ po.geoJson = function(fetch) {
 };
 po.dblclick = function() {
   var dblclick = {},
-      map;
+      map,
+      container;
 
   function handle(e) {
     var z = map.zoom();
@@ -1194,10 +1241,14 @@ po.dblclick = function() {
 
   dblclick.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    // TODO remove from old map container?
-    // TODO update if map container changes?
-    map.container().addEventListener("dblclick", handle, false);
+    if (map) {
+      container.removeEventListener("dblclick", handle, false);
+      container = null;
+    }
+    if (map = x) {
+      container = map.container();
+      container.addEventListener("dblclick", handle, false);
+    }
     return dblclick;
   };
 
@@ -1206,6 +1257,7 @@ po.dblclick = function() {
 po.drag = function() {
   var drag = {},
       map,
+      container,
       cursor,
       dragging;
 
@@ -1236,10 +1288,14 @@ po.drag = function() {
 
   drag.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    // TODO remove from old map container?
-    // TODO update if map container changes?
-    map.container().addEventListener("mousedown", mousedown, false);
+    if (map) {
+      container.removeEventListener("mousedown", mousedown, false);
+      container = null;
+    }
+    if (map = x) {
+      container = map.container();
+      container.addEventListener("mousedown", mousedown, false);
+    }
     return drag;
   };
 
@@ -1251,23 +1307,28 @@ po.drag = function() {
 po.wheel = function() {
   var wheel = {},
       timePrev = 0,
+      last = 0,
       smooth = true,
       location,
-      speedBug = /WebKit\/533/.test(navigator.userAgent),
-      speedAvg = .3,
-      map;
+      map,
+      container;
 
   function move(e) {
     location = null;
   }
 
   function mousewheel(e) {
-    var delta = Math.max(-1, Math.min(1, (e.wheelDelta / 120 || -e.detail) * .1)),
+    var delta = (e.wheelDelta / 120 || -e.detail) * .1,
         point = map.mouse(e);
-    if (speedBug) {
-      speedAvg = speedAvg * .95 + Math.abs(delta) * .05;
-      if (speedAvg > .5) delta *= .4;
+
+    /* Detect fast & large wheel events on WebKit. */
+    if (bug40441 < 0) {
+      var now = Date.now(), since = now - last;
+      if ((since > 9) && (Math.abs(e.wheelDelta) / since >= 50)) bug40441 = 1;
+      last = now;
     }
+
+    if (bug40441 == 1) delta *= .03;
     if (!location) location = map.pointLocation(point);
     map.off("move", move);
     if (smooth) {
@@ -1292,18 +1353,28 @@ po.wheel = function() {
 
   wheel.map = function(x) {
     if (!arguments.length) return map;
-    (map = x).on("move", move);
-    // TODO remove from old map container?
-    // TODO update if map container changes?
-    var container = map.container();
-    container.addEventListener("mousemove", move, false);
-    container.addEventListener("mousewheel", mousewheel, false);
-    container.addEventListener("DOMMouseScroll", mousewheel, false);
+    if (map) {
+      container.removeEventListener("mousemove", move, false);
+      container.removeEventListener("mousewheel", mousewheel, false);
+      container.removeEventListener("DOMMouseScroll", mousewheel, false);
+      container = null;
+      map.off("move", move);
+    }
+    if (map = x) {
+      map.on("move", move);
+      container = map.container();
+      container.addEventListener("mousemove", move, false);
+      container.addEventListener("mousewheel", mousewheel, false);
+      container.addEventListener("DOMMouseScroll", mousewheel, false);
+    }
     return wheel;
   };
 
   return wheel;
 };
+
+// https://bugs.webkit.org/show_bug.cgi?id=40441
+var bug40441 = /WebKit\/533/.test(navigator.userAgent) ? -1 : 0;
 po.arrow = function() {
   var arrow = {},
       key = {left: 0, right: 0, up: 0, down: 0, plus: 0, minus: 0},
@@ -1312,7 +1383,8 @@ po.arrow = function() {
       repeatDelay = 250,
       repeatInterval = 50,
       speed = 16,
-      map;
+      map,
+      parent;
 
   function keydown(e) {
     if (e.ctrlKey || e.altKey || e.metaKey) return;
@@ -1397,12 +1469,26 @@ po.arrow = function() {
     e.preventDefault();
   }
 
+  function repeat() {
+    if (!map) return;
+    if (Date.now() < last + repeatDelay) return;
+    var dx = (key.left - key.right) * speed,
+        dy = (key.up - key.down) * speed;
+    if (dx || dy) map.panBy({x: dx, y: dy});
+  }
+
   arrow.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    var p = map.focusableParent();
-    p.addEventListener("keydown", keydown, false);
-    p.addEventListener("keyup", keyup, false);
+    if (map) {
+      parent.removeEventListener("keydown", keydown, false);
+      parent.removeEventListener("keyup", keyup, false);
+      parent = null;
+    }
+    if (map = x) {
+      parent = map.focusableParent();
+      parent.addEventListener("keydown", keydown, false);
+      parent.addEventListener("keyup", keyup, false);
+    }
     return arrow;
   };
 
@@ -1411,14 +1497,6 @@ po.arrow = function() {
     speed = x;
     return arrow;
   };
-
-  function repeat() {
-    if (!map) return;
-    if (Date.now() < last + repeatDelay) return;
-    var dx = (key.left - key.right) * speed,
-        dy = (key.up - key.down) * speed;
-    if (dx || dy) map.panBy({x: dx, y: dy});
-  }
 
   return arrow;
 };
@@ -1452,10 +1530,15 @@ po.hash = function() {
 
   hash.map = function(x) {
     if (!arguments.length) return map;
-    if (map) map.off("move", move);
-    (map = x).on("move", move);
-    window.addEventListener("hashchange", hashchange, false);
-    location.hash ? hashchange() : move();
+    if (map) {
+      map.off("move", move);
+      window.removeEventListener("hashchange", hashchange, false);
+    }
+    if (map = x) {
+      map.on("move", move);
+      window.addEventListener("hashchange", hashchange, false);
+      location.hash ? hashchange() : move();
+    }
     return hash;
   };
 
@@ -1481,7 +1564,7 @@ po.interact = function() {
 };
 po.compass = function() {
   var compass = {},
-      g,
+      g = po.svg("g"),
       ticks = {},
       r = 30,
       speed = 16,
@@ -1495,18 +1578,20 @@ po.compass = function() {
       panDirection,
       map;
 
+  g.setAttribute("class", "compass");
+
   function panStart(e) {
     g.setAttribute("class", "compass active");
-    if (!panTimer) {
-      panTimer = setInterval(function() {
-        if (panDirection && (Date.now() > last + repeatDelay)) {
-          map.panBy(panDirection);
-        }
-      }, repeatInterval);
-    }
+    if (!panTimer) panTimer = setInterval(panRepeat, repeatInterval);
     if (panDirection) map.panBy(panDirection);
     last = Date.now();
-    cancel(e);
+    return cancel(e);
+  }
+
+  function panRepeat() {
+    if (panDirection && (Date.now() > last + repeatDelay)) {
+      map.panBy(panDirection);
+    }
   }
 
   function panStop() {
@@ -1529,14 +1614,14 @@ po.compass = function() {
       g.setAttribute("class", "compass active");
       var z = map.zoom();
       map.zoom(x < 0 ? Math.ceil(z) - 1 : Math.floor(z) + 1);
-      cancel(e);
+      return cancel(e);
     };
   }
 
   function zoomTo(x) {
     return function(e) {
       map.zoom(x);
-      cancel(e);
+      return cancel(e);
     };
   }
 
@@ -1551,6 +1636,7 @@ po.compass = function() {
   function cancel(e) {
     e.stopPropagation();
     e.preventDefault();
+    return false;
   }
 
   function pan(by) {
@@ -1617,10 +1703,7 @@ po.compass = function() {
   }
 
   function move() {
-    if (!g) return;
-    var x = r + 6,
-        y = x,
-        size = map.size();
+    var x = r + 6, y = x, size = map.size();
     switch (position) {
       case "top-left": break;
       case "top-right": x = size.x - x; break;
@@ -1636,8 +1719,7 @@ po.compass = function() {
   }
 
   function draw() {
-    g = map.container().appendChild(po.svg("g"));
-    g.setAttribute("class", "compass");
+    while (g.lastChild) g.removeChild(g.lastChild);
 
     if (panStyle != "none") {
       var d = g.appendChild(po.svg("g"));
@@ -1663,8 +1745,6 @@ po.compass = function() {
       fore.setAttribute("fill", "none");
       fore.setAttribute("class", "fore");
       fore.setAttribute("r", r);
-
-      window.addEventListener("mouseup", panStop, false);
     }
 
     if (zoomStyle != "none") {
@@ -1685,11 +1765,14 @@ po.compass = function() {
       z.appendChild(zoom(+1)).setAttribute("transform", "translate(0," + (-(j + .5) * r * .4) + ")");
       z.appendChild(zoom(-1)).setAttribute("transform", "scale(-1)");
     }
+
+    move();
   }
 
   compass.radius = function(x) {
     if (!arguments.length) return r;
     r = x;
+    if (map) draw();
     return compass;
   };
 
@@ -1702,28 +1785,37 @@ po.compass = function() {
   compass.position = function(x) {
     if (!arguments.length) return position;
     position = x;
+    if (map) draw();
     return compass;
   };
 
   compass.pan = function(x) {
     if (!arguments.length) return panStyle;
     panStyle = x;
+    if (map) draw();
     return compass;
   };
 
   compass.zoom = function(x) {
     if (!arguments.length) return zoomStyle;
     zoomStyle = x;
+    if (map) draw();
     return compass;
   };
 
   compass.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    map.on("move", move);
-    map.on("resize", move);
-    draw();
-    move();
+    if (map) {
+      g.parentNode.removeChild(g);
+      map.off("move", move).off("resize", move);
+      window.removeEventListener("mouseup", panStop, false);
+    }
+    if (map = x) {
+      window.addEventListener("mouseup", panStop, false);
+      map.on("move", move).on("resize", move);
+      map.container().appendChild(g);
+      draw();
+    }
     return compass;
   };
 
@@ -1732,15 +1824,9 @@ po.compass = function() {
 po.grid = function() {
   var grid = {},
       map,
-      g;
-
-  function draw() {
-    if (!g) {
       g = po.svg("g");
-      g.setAttribute("class", "grid");
-    }
-    map.container().appendChild(g);
-  }
+
+  g.setAttribute("class", "grid");
 
   function move(e) {
     var p,
@@ -1784,11 +1870,15 @@ po.grid = function() {
 
   grid.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    map.on("move", move);
-    map.on("resize", move);
-    draw();
-    move();
+    if (map) {
+      g.parentNode.removeChild(g);
+      map.off("move", move).off("resize", move);
+    }
+    if (map = x) {
+      map.on("move", move).on("resize", move);
+      map.container().appendChild(g);
+      map.dispatch({type: "move"});
+    }
     return grid;
   };
 

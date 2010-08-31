@@ -149,12 +149,12 @@ polymaps.js: $(JS_FILES) Makefile
 	chmod a-w $@
 
 %.d: %.m4 Makefile www/m4d.sh
-	www/m4d.sh $< > $@
+	@www/m4d.sh $< > $@
 
 %.d: %.html
-	touch $@
+	@touch $@
 
-include $(patsubst %.html,%.d,$(filter %.html,$(WWW_EX_FILES)))
+-include $(patsubst %.html,%.d,$(filter %.html,$(WWW_EX_FILES)))
 
 html: $(WWW_FILES) $(WWW_EX_FILES) $(WWW_DOCS_FILES) Makefile
 	rm -rf $@
@@ -165,7 +165,7 @@ html: $(WWW_FILES) $(WWW_EX_FILES) $(WWW_DOCS_FILES) Makefile
 
 %.html: %.m4 Makefile
 	rm -f $@
-	pushd $(dir $<) && m4 -P < $(notdir $<) > $(notdir $@) && popd
+	cd $(dir $<) && m4 -P < $(notdir $<) > $(notdir $@)
 	chmod a-w $@
 
 %.js.html: %.js Makefile

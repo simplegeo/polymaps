@@ -31,7 +31,7 @@ po.layer = function(load, unload) {
 
     // set the layer transform
     container.setAttribute("transform",
-        "translate(" + (mapSize.x >> 1) + "," + (mapSize.y >> 1) + ")"
+        "translate(" + (mapSize.x / 2) + "," + (mapSize.y / 2) + ")"
         + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
         + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : "")
         + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
@@ -43,9 +43,9 @@ po.layer = function(load, unload) {
         c3 = map.pointCoordinate(tileCenter, {x: 0, y: mapSize.y});
 
     // round to pixel boundary to avoid anti-aliasing artifacts
-    if (!transform && !mapAngle && !mapZoomFraction) {
-      tileCenter.column = Math.round(tileSize.x * tileCenter.column) / tileSize.x;
-      tileCenter.row = Math.round(tileSize.y * tileCenter.row) / tileSize.y;
+    if (!mapZoomFraction && !mapAngle && !transform) {
+      tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
+      tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
     }
 
     // layer-specific zoom transform
@@ -71,7 +71,7 @@ po.layer = function(load, unload) {
     // tile-specific projection
     function projection(c) {
       var zoom = c.zoom,
-          max = 1 << zoom,
+          max = zoom < 0 ? 1 : 1 << zoom,
           column = c.column % max,
           row = c.row;
       if (column < 0) column += max;
@@ -97,7 +97,7 @@ po.layer = function(load, unload) {
 
     // load the tiles!
     if (visible && tileLevel > -5 && tileLevel < 3) {
-      var ymax = 1 << c0.zoom;
+      var ymax = c0.zoom < 0 ? 1 : 1 << c0.zoom;
       if (tile) {
         scanTriangle(c0, c1, c2, 0, ymax, scanLine);
         scanTriangle(c2, c3, c0, 0, ymax, scanLine);
@@ -301,7 +301,11 @@ function scanSpans(e0, e1, ymin, ymax, scanLine) {
       y1 = Math.min(ymax, Math.ceil(e1.y1));
 
   // sort edges by x-coordinate
-  if (e0.x0 < e1.x0 || e0.x1 < e1.x1) { var t = e0; e0 = e1; e1 = t; }
+  if ((e0.x0 == e1.x0 && e0.y0 == e1.y0)
+      ? (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1)
+      : (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
+    var t = e0; e0 = e1; e1 = t;
+  }
 
   // scan lines!
   var m0 = e0.dx / e0.dy,

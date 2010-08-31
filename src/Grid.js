@@ -1,15 +1,9 @@
 po.grid = function() {
   var grid = {},
       map,
-      g;
-
-  function draw() {
-    if (!g) {
       g = po.svg("g");
-      g.setAttribute("class", "grid");
-    }
-    map.container().appendChild(g);
-  }
+
+  g.setAttribute("class", "grid");
 
   function move(e) {
     var p,
@@ -53,11 +47,15 @@ po.grid = function() {
 
   grid.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    map.on("move", move);
-    map.on("resize", move);
-    draw();
-    move();
+    if (map) {
+      g.parentNode.removeChild(g);
+      map.off("move", move).off("resize", move);
+    }
+    if (map = x) {
+      map.on("move", move).on("resize", move);
+      map.container().appendChild(g);
+      map.dispatch({type: "move"});
+    }
     return grid;
   };
 

@@ -1,6 +1,6 @@
 po.compass = function() {
   var compass = {},
-      g,
+      g = po.svg("g"),
       ticks = {},
       r = 30,
       speed = 16,
@@ -14,18 +14,20 @@ po.compass = function() {
       panDirection,
       map;
 
+  g.setAttribute("class", "compass");
+
   function panStart(e) {
     g.setAttribute("class", "compass active");
-    if (!panTimer) {
-      panTimer = setInterval(function() {
-        if (panDirection && (Date.now() > last + repeatDelay)) {
-          map.panBy(panDirection);
-        }
-      }, repeatInterval);
-    }
+    if (!panTimer) panTimer = setInterval(panRepeat, repeatInterval);
     if (panDirection) map.panBy(panDirection);
     last = Date.now();
-    cancel(e);
+    return cancel(e);
+  }
+
+  function panRepeat() {
+    if (panDirection && (Date.now() > last + repeatDelay)) {
+      map.panBy(panDirection);
+    }
   }
 
   function panStop() {
@@ -48,14 +50,14 @@ po.compass = function() {
       g.setAttribute("class", "compass active");
       var z = map.zoom();
       map.zoom(x < 0 ? Math.ceil(z) - 1 : Math.floor(z) + 1);
-      cancel(e);
+      return cancel(e);
     };
   }
 
   function zoomTo(x) {
     return function(e) {
       map.zoom(x);
-      cancel(e);
+      return cancel(e);
     };
   }
 
@@ -70,6 +72,7 @@ po.compass = function() {
   function cancel(e) {
     e.stopPropagation();
     e.preventDefault();
+    return false;
   }
 
   function pan(by) {
@@ -136,10 +139,7 @@ po.compass = function() {
   }
 
   function move() {
-    if (!g) return;
-    var x = r + 6,
-        y = x,
-        size = map.size();
+    var x = r + 6, y = x, size = map.size();
     switch (position) {
       case "top-left": break;
       case "top-right": x = size.x - x; break;
@@ -155,8 +155,7 @@ po.compass = function() {
   }
 
   function draw() {
-    g = map.container().appendChild(po.svg("g"));
-    g.setAttribute("class", "compass");
+    while (g.lastChild) g.removeChild(g.lastChild);
 
     if (panStyle != "none") {
       var d = g.appendChild(po.svg("g"));
@@ -182,8 +181,6 @@ po.compass = function() {
       fore.setAttribute("fill", "none");
       fore.setAttribute("class", "fore");
       fore.setAttribute("r", r);
-
-      window.addEventListener("mouseup", panStop, false);
     }
 
     if (zoomStyle != "none") {
@@ -204,11 +201,14 @@ po.compass = function() {
       z.appendChild(zoom(+1)).setAttribute("transform", "translate(0," + (-(j + .5) * r * .4) + ")");
       z.appendChild(zoom(-1)).setAttribute("transform", "scale(-1)");
     }
+
+    move();
   }
 
   compass.radius = function(x) {
     if (!arguments.length) return r;
     r = x;
+    if (map) draw();
     return compass;
   };
 
@@ -221,28 +221,37 @@ po.compass = function() {
   compass.position = function(x) {
     if (!arguments.length) return position;
     position = x;
+    if (map) draw();
     return compass;
   };
 
   compass.pan = function(x) {
     if (!arguments.length) return panStyle;
     panStyle = x;
+    if (map) draw();
     return compass;
   };
 
   compass.zoom = function(x) {
     if (!arguments.length) return zoomStyle;
     zoomStyle = x;
+    if (map) draw();
     return compass;
   };
 
   compass.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    map.on("move", move);
-    map.on("resize", move);
-    draw();
-    move();
+    if (map) {
+      g.parentNode.removeChild(g);
+      map.off("move", move).off("resize", move);
+      window.removeEventListener("mouseup", panStop, false);
+    }
+    if (map = x) {
+      window.addEventListener("mouseup", panStop, false);
+      map.on("move", move).on("resize", move);
+      map.container().appendChild(g);
+      draw();
+    }
     return compass;
   };
 
