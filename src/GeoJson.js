@@ -1,6 +1,6 @@
 po.geoJson = function(fetch) {
   var geoJson = po.layer(load, unload),
-      url = po.url("about:blank"),
+      url = "about:blank",
       clip = true,
       clipId,
       zoom = null,
@@ -117,7 +117,7 @@ po.geoJson = function(fetch) {
     if (features) {
       update({features: features});
     } else {
-      tile.request = fetch(url(tile), update);
+      tile.request = fetch(typeof url == "function" ? url(tile) : url, update);
     }
 
     if (clipId) g.setAttribute("clip-path", "url(#" + clipId + ")");
@@ -130,7 +130,8 @@ po.geoJson = function(fetch) {
 
   geoJson.url = function(x) {
     if (!arguments.length) return url;
-    url = typeof x == "string" ? po.url(x) : x;
+    url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
+    if (typeof url == "string") geoJson.tile(false);
     return geoJson;
   };
 
