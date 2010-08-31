@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.2+8"; // This fork not semver!
+  po.version = "2.0.2+9"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -1138,23 +1138,40 @@ po.geoJson = function(fetch) {
     proj = proj(tile);
 
     function update(data) {
-      var features = tiles[tile.key] || (tiles[tile.key] = []), updated = [];
+      var updated = [];
+
+      /* Fetch the next batch of features, if so directed. */
       if (data.next) tile.request = fetch(data.next.href, update);
-      for (var i = 0; i < data.features.length; i++) {
-        var feature = data.features[i],
-            element = geometry(feature.geometry, proj.locationPoint);
-        if (element) {
-          var entry = {element: g.appendChild(element), data: feature};
-          features.push(entry);
-          updated.push(entry);
+
+      /* Convert the GeoJSON to SVG. */
+      switch (data.type) {
+        case "FeatureCollection": {
+          for (var i = 0; i < data.features.length; i++) {
+            var feature = data.features[i],
+                element = geometry(feature.geometry, proj.locationPoint);
+            if (element) updated.push({element: g.appendChild(element), data: feature});
+          }
+          break;
+        }
+        case "Feature": {
+          var element = geometry(data.geometry, proj.locationPoint);
+          if (element) updated.push({element: g.appendChild(element), data: data});
+          break;
+        }
+        default: {
+          var element = geometry(data, proj.locationPoint);
+          if (element) updated.push({element: g.appendChild(element), data: {type: "Feature", geometry: data}});
+          break;
         }
       }
+
       tile.ready = true;
+      updated.push.apply(tiles[tile.key] || (tiles[tile.key] = []), updated);
       geoJson.dispatch({type: "load", tile: tile, features: updated});
     }
 
     if (features) {
-      update({features: features});
+      update({type: "FeatureCollection", features: features});
     } else {
       tile.request = fetch(typeof url == "function" ? url(tile) : url, update);
     }
