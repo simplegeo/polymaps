@@ -121,8 +121,13 @@
             <p>The URL template may be specified either as a string or as a
             function:</p>
 
-            <p>If a string, then the string is converted into a URL template
-            function using <a href="url.html"><tt><i>po</i>.url</tt></a>.</p>
+            <p>If a string, and the string contains placeholders of the form
+            &ldquo;{<em>A</em>}&rdquo;, where <em>A</em> is any character, then
+            the string is converted into a URL template function using <a
+            href="url.html"><tt><i>po</i>.url</tt></a>. If the string does not
+            contain placeholders, then it is left as a string, and <a
+            href="layer.html#tile">tiling</a> and <a href="#clip">clipping</a>
+            are disabled.</p>
 
             <p>If a function, then the given function is invoked, passing in the
             tile coordinate of the GeoJSON file to load. The tile coordinate is
