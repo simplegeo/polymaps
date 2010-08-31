@@ -95,15 +95,17 @@
             <i>wheel</i>.<b>map</b>([<i>x</i>])
           </dt>
           <dd>
-            <p>Adds this control to the specified map <i>x</i>, or returns the
-            current map. This method is typically not called directly, but is
-            needed to support the map&rsquo;s <a href="map.html#add">add</a>
-            method.</p>
+            <p>Adds this control to the specified map <i>x</i>, removes this
+            control from its current map, or returns the current map. This
+            method is typically not called directly, but is needed to support
+            the map&rsquo;s <a href="map.html#add">add</a> method and <a
+            href="map.html#remove">remove</a> methods.</p>
 
-            <p>If the argument <i>x</i> is specified, this control is added to
-            the given map and returns <tt>this</tt>. If no arguments are
-            specified, this method returns the current map, which defaults to
-            null. This method does not currently support removal.</p>
+            <p>If the argument <i>x</i> is specified, this method returns
+            <tt>this</tt>. If <i>x</i> is null, this control is removed from its
+            current map; otherwise, this control is added to the specified map.
+            If no arguments are specified, this method returns the current map,
+            which may be null. Whew!</p>
           </dd>
         </dl>
 
