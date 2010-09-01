@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0.3+1"; // This fork not semver!
+  po.version = "2.0+1.3+1"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -1229,6 +1229,7 @@ po.geoJson = function(fetch) {
 };
 po.dblclick = function() {
   var dblclick = {},
+      zoom = "mouse",
       map,
       container;
 
@@ -1236,8 +1237,14 @@ po.dblclick = function() {
     var z = map.zoom();
     if (e.shiftKey) z = Math.ceil(z) - z - 1;
     else z = 1 - z + Math.floor(z);
-    map.zoomBy(z, map.mouse(e));
+    zoom === "mouse" ? map.zoomBy(z, map.mouse(e)) : map.zoomBy(z);
   }
+
+  dblclick.zoom = function(x) {
+    if (!arguments.length) return zoom;
+    zoom = x;
+    return dblclick;
+  };
 
   dblclick.map = function(x) {
     if (!arguments.length) return map;
@@ -1309,6 +1316,7 @@ po.wheel = function() {
       timePrev = 0,
       last = 0,
       smooth = true,
+      zoom = "mouse",
       location,
       map,
       container;
@@ -1332,11 +1340,12 @@ po.wheel = function() {
     if (!location) location = map.pointLocation(point);
     map.off("move", move);
     if (smooth) {
-      map.zoomBy(delta, point, location);
+      zoom === "mouse" ? map.zoomBy(delta, point, location) : map.zoomBy(delta);
     } else if (delta) {
       var timeNow = Date.now();
       if (timeNow - timePrev > 200) {
-        map.zoomBy(delta > 0 ? +1 : -1, point, location);
+        delta = delta > 0 ? +1 : -1;
+        zoom === "mouse" ? map.zoomBy(delta, point, location) : map.zoomBy(delta);
         timePrev = timeNow;
       }
     }
@@ -1348,6 +1357,12 @@ po.wheel = function() {
   wheel.smooth = function(x) {
     if (!arguments.length) return smooth;
     smooth = x;
+    return wheel;
+  };
+
+  wheel.zoom = function(x) {
+    if (!arguments.length) return zoom;
+    zoom = x;
     return wheel;
   };
 
