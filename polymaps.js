@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0+2.3+3"; // This fork not semver!
+  po.version = "2.0+2.3+4"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -1331,7 +1331,6 @@ po.drag = function() {
   var drag = {},
       map,
       container,
-      cursor,
       dragging;
 
   function mousedown(e) {

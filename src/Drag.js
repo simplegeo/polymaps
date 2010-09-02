@@ -2,7 +2,6 @@ po.drag = function() {
   var drag = {},
       map,
       container,
-      cursor,
       dragging;
 
   function mousedown(e) {
