@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0+1.3+1"; // This fork not semver!
+  po.version = "2.0+1.3+2"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -672,9 +672,47 @@ po.layer = function(load, unload) {
       zoom,
       id,
       map,
-      container,
+      container = po.svg("g"),
       transform,
-      levels;
+      levelZoom,
+      levels = {};
+
+  container.setAttribute("class", "layer");
+  for (var i = -4; i <= -1; i++) levels[i] = container.appendChild(po.svg("g"));
+  for (var i = 2; i >= 1; i--) levels[i] = container.appendChild(po.svg("g"));
+  levels[0] = container.appendChild(po.svg("g"));
+
+  function zoomIn(z) {
+    var end = levels[0].nextSibling;
+    for (; levelZoom < z; levelZoom++) {
+      // -4, -3, -2, -1, +2, +1, =0 // current order
+      // -3, -2, -1, +2, +1, =0, -4 // insertBefore(-4, end)
+      // -3, -2, -1, +1, =0, -4, +2 // insertBefore(+2, end)
+      // -3, -2, -1, =0, -4, +2, +1 // insertBefore(+1, end)
+      // -4, -3, -2, -1, +2, +1, =0 // relabel
+      container.insertBefore(levels[-4], end);
+      container.insertBefore(levels[2], end);
+      container.insertBefore(levels[1], end);
+      var t = levels[-4];
+      for (var dz = -4; dz < 2;) levels[dz] = levels[++dz];
+      levels[dz] = t;
+    }
+  }
+
+  function zoomOut(z) {
+    var end = levels[0].nextSibling;
+    for (; levelZoom > z; levelZoom--) {
+      // -4, -3, -2, -1, +2, +1, =0 // current order
+      // -4, -3, -2, +2, +1, =0, -1 // insertBefore(-1, end)
+      // +2, -4, -3, -2, +1, =0, -1 // insertBefore(+2, -4)
+      // -4, -3, -2, -1, +2, +1, =0 // relabel
+      container.insertBefore(levels[-1], end);
+      container.insertBefore(levels[2], levels[-4]);
+      var t = levels[2];
+      for (var dz = 2; dz > -4;) levels[dz] = levels[--dz];
+      levels[dz] = t;
+    }
+  }
 
   function move() {
     var map = layer.map(), // in case the layer is removed
@@ -691,8 +729,15 @@ po.layer = function(load, unload) {
         : container.setAttribute("visibility", "hidden");
 
     // set the layer zoom levels
-    for (var z = -4; z <= 2; z++) {
-      levels[z].setAttribute("class", "zoom" + (z < 0 ? "" : "+") + z + " zoom" + (mapZoom + z));
+    if (levelZoom != mapZoom) {
+      if (levelZoom < mapZoom) zoomIn(mapZoom);
+      else if (levelZoom > mapZoom) zoomOut(mapZoom);
+      else levelZoom = mapZoom;
+      for (var z = -4; z <= 2; z++) {
+        var l = levels[z];
+        l.setAttribute("class", "zoom" + (z < 0 ? "" : "+") + z + " zoom" + (mapZoom + z));
+        l.setAttribute("transform", "scale(" + Math.pow(2, -z) + ")");
+      }
     }
 
     // set the layer transform
@@ -882,23 +927,10 @@ po.layer = function(load, unload) {
       }
       map.off("move", move).off("resize", move);
       container.parentNode.removeChild(container);
-      container = levels = null;
     }
     map = x;
     if (map) {
-      container = map.container().appendChild(po.svg("g"));
-      if (id) container.setAttribute("id", id);
-      container.setAttribute("class", "layer");
-      levels = {};
-      for (var i = -4; i <= -1; i++) {
-        (levels[i] = container.appendChild(po.svg("g")))
-            .setAttribute("transform", "scale(" + Math.pow(2, -i) + ")");
-      }
-      for (var i = 2; i >= 1; i--) {
-        (levels[i] = container.appendChild(po.svg("g")))
-            .setAttribute("transform", "scale(" + Math.pow(2, -i) + ")");
-      }
-      levels[0] = container.appendChild(po.svg("g"));
+      map.container().appendChild(container);
       if (layer.init) layer.init(container);
       map.on("move", move).on("resize", move);
       move();
@@ -1012,9 +1044,10 @@ po.image = function() {
     element.setAttribute("opacity", 0);
 
     if (typeof url == "function") {
-      tile.request = po.queue.image(element, url(tile), function() {
+      tile.request = po.queue.image(element, url(tile), function(img) {
         delete tile.request;
         tile.ready = true;
+        tile.img = img;
         element.removeAttribute("opacity");
         image.dispatch({type: "load", tile: tile});
       });
@@ -1039,12 +1072,17 @@ po.image = function() {
 };
 po.geoJson = function(fetch) {
   var geoJson = po.layer(load, unload),
+      container = geoJson.container(),
       url = "about:blank",
       clip = true,
       clipId,
+      clipPath,
+      clipRect,
       zoom = null,
       tiles = {},
       features;
+
+  container.setAttribute("fill-rule", "evenodd");
 
   if (!arguments.length) fetch = po.queue.json;
 
@@ -1204,16 +1242,24 @@ po.geoJson = function(fetch) {
     return geoJson;
   };
 
-  geoJson.init = function(g) {
-    if (clip && geoJson.tile()) {
-      var size = geoJson.map().tileSize(),
-          clipPath = g.insertBefore(po.svg("clipPath"), g.firstChild),
-          rect = clipPath.appendChild(po.svg("rect"));
-      clipPath.setAttribute("id", clipId = "org.polymaps." + po.id());
-      rect.setAttribute("width", size.x);
-      rect.setAttribute("height", size.y);
+  var __map__ = geoJson.map;
+  geoJson.map = function(x) {
+    if (x) {
+      if (clip && geoJson.tile()) {
+        if (!clipPath) {
+          clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild);
+          clipRect = clipPath.appendChild(po.svg("rect"));
+          clipPath.setAttribute("id", clipId = "org.polymaps." + po.id());
+        }
+        var size = x.tileSize();
+        clipRect.setAttribute("width", size.x);
+        clipRect.setAttribute("height", size.y);
+      } else if (clipPath) {
+        container.removeChild(clipPath);
+        clipPath = clipRect = clipId = null;
+      }
     }
-    g.setAttribute("fill-rule", "evenodd");
+    return __map__.apply(this, arguments);
   };
 
   geoJson.show = function(tile) {
