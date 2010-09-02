@@ -32,6 +32,14 @@ svg {
   stroke-width: 1.5px;
 }
 
+.compass rect.back.fore {
+  fill: #999;
+  fill-opacity: .3;
+  stroke: #eee;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+
 .compass .direction {
   fill: none;
 }

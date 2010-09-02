@@ -187,7 +187,7 @@ po.geoJson = function(fetch) {
         clipPath = clipRect = clipId = null;
       }
     }
-    return __map__.apply(this, arguments);
+    return __map__.apply(geoJson, arguments);
   };
 
   geoJson.show = function(tile) {

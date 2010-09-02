@@ -246,6 +246,26 @@ po.map = function() {
     return map.zoom(zoom + zoomFraction);
   };
 
+  map.extent = function(x) {
+    if (!arguments.length) return [
+      map.pointLocation({x: 0, y: sizeActual.y}),
+      map.pointLocation({x: sizeActual.x, y: 0})
+    ];
+
+    // compute the extent in points, scale factor, and center
+    var bl = map.locationPoint(x[0]),
+        tr = map.locationPoint(x[1]),
+        k = Math.max((tr.x - bl.x) / sizeActual.x, (bl.y - tr.y) / sizeActual.y),
+        l = map.pointLocation({x: (bl.x + tr.x) / 2, y: (bl.y + tr.y) / 2});
+
+    // update the zoom level
+    zoom = zoom + zoomFraction - Math.log(k) / Math.log(2);
+    rezoom();
+
+    // set the new center
+    return map.center(l);
+  };
+
   map.angle = function(x) {
     if (!arguments.length) return angle;
     angle = x;

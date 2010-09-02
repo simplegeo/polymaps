@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0+1.3+2"; // This fork not semver!
+  po.version = "2.0+2.3+3"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -579,6 +579,26 @@ po.map = function() {
     if (!arguments.length) return zoomRange;
     zoomRange = x;
     return map.zoom(zoom + zoomFraction);
+  };
+
+  map.extent = function(x) {
+    if (!arguments.length) return [
+      map.pointLocation({x: 0, y: sizeActual.y}),
+      map.pointLocation({x: sizeActual.x, y: 0})
+    ];
+
+    // compute the extent in points, scale factor, and center
+    var bl = map.locationPoint(x[0]),
+        tr = map.locationPoint(x[1]),
+        k = Math.max((tr.x - bl.x) / sizeActual.x, (bl.y - tr.y) / sizeActual.y),
+        l = map.pointLocation({x: (bl.x + tr.x) / 2, y: (bl.y + tr.y) / 2});
+
+    // update the zoom level
+    zoom = zoom + zoomFraction - Math.log(k) / Math.log(2);
+    rezoom();
+
+    // set the new center
+    return map.center(l);
   };
 
   map.angle = function(x) {
@@ -1259,7 +1279,7 @@ po.geoJson = function(fetch) {
         clipPath = clipRect = clipId = null;
       }
     }
-    return __map__.apply(this, arguments);
+    return __map__.apply(geoJson, arguments);
   };
 
   geoJson.show = function(tile) {
@@ -1315,14 +1335,14 @@ po.drag = function() {
       dragging;
 
   function mousedown(e) {
+    if (e.shiftKey) return;
     dragging = {
       x: e.clientX,
       y: e.clientY
     };
     map.focusableParent().focus();
     e.preventDefault();
-    cursor = document.body.style.cursor;
-    document.body.style.cursor = "move";
+    document.body.style.setProperty("cursor", "move", null);
   }
 
   function mousemove(e) {
@@ -1336,7 +1356,7 @@ po.drag = function() {
     if (!dragging) return;
     mousemove(e);
     dragging = null;
-    document.body.style.cursor = cursor;
+    document.body.style.removeProperty("cursor");
   }
 
   drag.map = function(x) {
@@ -1622,12 +1642,21 @@ po.compass = function() {
       repeatInterval = 50,
       position = "top-left", // top-left, top-right, bottom-left, bottom-right
       zoomStyle = "small", // none, small, big
+      zoomContainer,
       panStyle = "small", // none, small
       panTimer,
       panDirection,
-      map;
+      panContainer,
+      drag,
+      dragRect = po.svg("rect"),
+      map,
+      container,
+      window;
 
   g.setAttribute("class", "compass");
+  dragRect.setAttribute("class", "back fore");
+  dragRect.setAttribute("pointer-events", "none");
+  dragRect.setAttribute("display", "none");
 
   function panStart(e) {
     g.setAttribute("class", "compass active");
@@ -1643,8 +1672,42 @@ po.compass = function() {
     }
   }
 
-  function panStop() {
+  function mousedown(e) {
+    if (e.shiftKey) {
+      drag = {x0: map.mouse(e)};
+      map.focusableParent().focus();
+      return cancel(e);
+    }
+  }
+
+  function mousemove(e) {
+    if (!drag) return;
+    drag.x1 = map.mouse(e);
+    dragRect.setAttribute("x", Math.min(drag.x0.x, drag.x1.x));
+    dragRect.setAttribute("y", Math.min(drag.x0.y, drag.x1.y));
+    dragRect.setAttribute("width", Math.abs(drag.x0.x - drag.x1.x));
+    dragRect.setAttribute("height", Math.abs(drag.x0.y - drag.x1.y));
+    dragRect.removeAttribute("display");
+  }
+
+  function mouseup(e) {
     g.setAttribute("class", "compass");
+    if (drag) {
+      if (drag.x1) {
+        map.extent([
+          map.pointLocation({
+            x: Math.min(drag.x0.x, drag.x1.x),
+            y: Math.max(drag.x0.y, drag.x1.y)
+          }),
+          map.pointLocation({
+            x: Math.max(drag.x0.x, drag.x1.x),
+            y: Math.min(drag.x0.y, drag.x1.y)
+          })
+        ]);
+        dragRect.setAttribute("display", "none");
+      }
+      drag = null;
+    }
     if (panTimer) {
       clearInterval(panTimer);
       panTimer = 0;
@@ -1759,7 +1822,9 @@ po.compass = function() {
       case "bottom-left": y = size.y - y; break;
       case "bottom-right": x = size.x - x; y = size.y - y; break;
     }
-    g.setAttribute("transform", "translate(" + x + "," + y + ")");
+    var tx = "translate(" + x + "," + y + ")";
+    if (panContainer) panContainer.setAttribute("transform", tx);
+    if (zoomContainer) zoomContainer.setAttribute("transform", tx);
     for (var i in ticks) {
       i == map.zoom()
           ? ticks[i].setAttribute("class", "active")
@@ -1770,49 +1835,55 @@ po.compass = function() {
   function draw() {
     while (g.lastChild) g.removeChild(g.lastChild);
 
-    if (panStyle != "none") {
-      var d = g.appendChild(po.svg("g"));
-      d.setAttribute("class", "pan");
+    g.appendChild(dragRect);
 
-      var back = d.appendChild(po.svg("circle"));
+    if (panStyle != "none") {
+      panContainer = g.appendChild(po.svg("g"));
+      panContainer.setAttribute("class", "pan");
+
+      var back = panContainer.appendChild(po.svg("circle"));
       back.setAttribute("class", "back");
       back.setAttribute("r", r);
 
-      var s = d.appendChild(pan({x: 0, y: -speed}));
+      var s = panContainer.appendChild(pan({x: 0, y: -speed}));
       s.setAttribute("transform", "rotate(0)");
 
-      var w = d.appendChild(pan({x: speed, y: 0}));
+      var w = panContainer.appendChild(pan({x: speed, y: 0}));
       w.setAttribute("transform", "rotate(90)");
 
-      var n = d.appendChild(pan({x: 0, y: speed}));
+      var n = panContainer.appendChild(pan({x: 0, y: speed}));
       n.setAttribute("transform", "rotate(180)");
 
-      var e = d.appendChild(pan({x: -speed, y: 0}));
+      var e = panContainer.appendChild(pan({x: -speed, y: 0}));
       e.setAttribute("transform", "rotate(270)");
 
-      var fore = d.appendChild(po.svg("circle"));
+      var fore = panContainer.appendChild(po.svg("circle"));
       fore.setAttribute("fill", "none");
       fore.setAttribute("class", "fore");
       fore.setAttribute("r", r);
+    } else {
+      panContainer = null;
     }
 
     if (zoomStyle != "none") {
-      var z = g.appendChild(po.svg("g"));
-      z.setAttribute("class", "zoom");
+      zoomContainer = g.appendChild(po.svg("g"));
+      zoomContainer.setAttribute("class", "zoom");
 
       var j = -.5;
       if (zoomStyle == "big") {
         ticks = {};
         for (var i = map.zoomRange()[0], j = 0; i <= map.zoomRange()[1]; i++, j++) {
-          (ticks[i] = z.appendChild(tick(i)))
+          (ticks[i] = zoomContainer.appendChild(tick(i)))
               .setAttribute("transform", "translate(0," + (-(j + .75) * r * .4) + ")");
         }
       }
 
       var p = panStyle == "none" ? .4 : 2;
-      z.setAttribute("transform", "translate(0," + r * (/^top-/.test(position) ? (p + (j + .5) * .4) : -p) + ")");
-      z.appendChild(zoom(+1)).setAttribute("transform", "translate(0," + (-(j + .5) * r * .4) + ")");
-      z.appendChild(zoom(-1)).setAttribute("transform", "scale(-1)");
+      zoomContainer.setAttribute("transform", "translate(0," + r * (/^top-/.test(position) ? (p + (j + .5) * .4) : -p) + ")");
+      zoomContainer.appendChild(zoom(+1)).setAttribute("transform", "translate(0," + (-(j + .5) * r * .4) + ")");
+      zoomContainer.appendChild(zoom(-1)).setAttribute("transform", "scale(-1)");
+    } else {
+      zoomContainer = null;
     }
 
     move();
@@ -1855,14 +1926,22 @@ po.compass = function() {
   compass.map = function(x) {
     if (!arguments.length) return map;
     if (map) {
-      g.parentNode.removeChild(g);
+      container.removeEventListener("mousedown", mousedown, false);
+      container.removeChild(g);
+      container = null;
+      window.removeEventListener("mousemove", mousemove, false);
+      window.removeEventListener("mouseup", mouseup, false);
+      window = null;
       map.off("move", move).off("resize", move);
-      window.removeEventListener("mouseup", panStop, false);
     }
     if (map = x) {
-      window.addEventListener("mouseup", panStop, false);
+      container = map.container();
+      container.appendChild(g);
+      container.addEventListener("mousedown", mousedown, false);
+      window = container.ownerDocument.defaultView;
+      window.addEventListener("mousemove", mousemove, false);
+      window.addEventListener("mouseup", mouseup, false);
       map.on("move", move).on("resize", move);
-      map.container().appendChild(g);
       draw();
     }
     return compass;
