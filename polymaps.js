@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0+2.3+4"; // This fork not semver!
+  po.version = "2.0+2.3+5"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -779,17 +779,6 @@ po.layer = function(load, unload) {
       tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
     }
 
-    // layer-specific zoom transform
-    var tileLevel = zoom ? zoom(mapZoom) - mapZoom : 0;
-    if (tileLevel) {
-      var k = Math.pow(2, tileLevel);
-      c0.column *= k; c0.row *= k;
-      c1.column *= k; c1.row *= k;
-      c2.column *= k; c2.row *= k;
-      c3.column *= k; c3.row *= k;
-      c0.zoom = c1.zoom = c2.zoom = c3.zoom += tileLevel;
-    }
-
     // layer-specific coordinate transform
     if (transform) {
       c0 = transform.unapply(c0);
@@ -797,6 +786,17 @@ po.layer = function(load, unload) {
       c2 = transform.unapply(c2);
       c3 = transform.unapply(c3);
       tileCenter = transform.unapply(tileCenter);
+    }
+
+    // layer-specific zoom transform
+    var tileLevel = zoom ? zoom(c0.zoom) - c0.zoom : 0;
+    if (tileLevel) {
+      var k = Math.pow(2, tileLevel);
+      c0.column *= k; c0.row *= k;
+      c1.column *= k; c1.row *= k;
+      c2.column *= k; c2.row *= k;
+      c3.column *= k; c3.row *= k;
+      c0.zoom = c1.zoom = c2.zoom = c3.zoom += tileLevel;
     }
 
     // tile-specific projection
