@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.1.0"; // semver.org
+  po.version = "2.1.1"; // semver.org
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -966,9 +966,8 @@ po.layer = function(load, unload) {
 
   layer.visible = function(x) {
     if (!arguments.length) return visible;
-    visible = x
-        ? container.removeAttribute("visibility")
-        : container.setAttribute("visibility", "hidden");
+    if (visible = x) container.removeAttribute("visibility")
+    else container.setAttribute("visibility", "hidden");
     if (map) move();
     return layer;
   };
