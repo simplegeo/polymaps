@@ -1,0 +1,3 @@
+<FilesMatch "\\.(js|json|html|css|tsv)$">
+SetOutputFilter DEFLATE
+</FilesMatch>

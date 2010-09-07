@@ -32,6 +32,7 @@ WWW_FILES = \
 	lib/modernizr/modernizr.min.js \
 	lib/colorbrewer/colorbrewer.css \
 	lib/protovis/protodata.min.js \
+	www/.htaccess \
 	www/index.html \
 	www/download.html \
 	www/forkme.png \
