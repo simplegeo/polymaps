@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.0+2.3+5"; // This fork not semver!
+  po.version = "2.0+2.3+6"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -743,11 +743,6 @@ po.layer = function(load, unload) {
         tileSize = map.tileSize(),
         tileCenter = map.locationCoordinate(map.center());
 
-    // set the layer visibility
-    visible
-        ? container.removeAttribute("visibility")
-        : container.setAttribute("visibility", "hidden");
-
     // set the layer zoom levels
     if (levelZoom != mapZoom) {
       if (levelZoom < mapZoom) zoomIn(mapZoom);
@@ -965,12 +960,15 @@ po.layer = function(load, unload) {
   layer.id = function(x) {
     if (!arguments.length) return id;
     id = x;
+    container.setAttribute("id", x);
     return layer;
   };
 
   layer.visible = function(x) {
     if (!arguments.length) return visible;
-    visible = x;
+    visible = x
+        ? container.removeAttribute("visibility")
+        : container.setAttribute("visibility", "hidden");
     if (map) move();
     return layer;
   };
