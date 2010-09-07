@@ -72,19 +72,18 @@
         </div>
 
         <div class="span-4">
-        <a href="#init">init</a><br>
         <a href="#po.layer">layer</a><br>
         <a href="#map">map</a><br>
+        <a href="#show">show</a><br>
         </div>
 
         <div class="span-4">
-        <a href="#show">show</a><br>
         <a href="#tile">tile</a><br>
         <a href="#transform">transform</a><br>
+        <a href="#visible">visible</a><br>
         </div>
 
         <div class="span-4">
-        <a href="#visible">visible</a><br>
         <a href="#zoom">zoom</a><br>
         </div>
 
@@ -159,21 +158,19 @@
             <i>layer</i>.<b>container</b>()
           </dt>
           <dd>
-            <p>Returns the layer&rsquo;s container element. The container element
-            is set only if the layer is currently bound to a map. The container
-            is an SVG <tt>g</tt> element with the class attribute &ldquo;layer&rdquo;.</p>
+            <p>Returns the layer&rsquo;s container element. The container is an
+            SVG <tt>g</tt> element with the class attribute
+            &ldquo;layer&rdquo;.</p>
 
             <p>The container initially has seven child <tt>g</tt> elements that
             correspond to the tiles at various zoom levels relative to the
             map&rsquo;s (rounded) zoom level. When all needed tiles are loaded,
-            the proxy tiles are removed from the map and only the
-            last <tt>g</tt> element contains tiles.</p>
-
-            <p>These group elements have class attributes to allow
-            zoom-dependent styling. This includes both relative zoom classes,
-            such as &ldquo;zoom-1&rdquo; and &ldquo;zoom+1&rdquo;, and absolute
-            zoom classes, such as &ldquo;zoom9&rdquo; and
-            &ldquo;zoom13&rdquo;.</p>
+            the proxy tiles are removed from the map and only the last
+            <tt>g</tt> element contains tiles. These group elements have class
+            attributes to allow zoom-dependent styling. This includes both
+            relative zoom classes, such as &ldquo;zoom-1&rdquo; and
+            &ldquo;zoom+1&rdquo;, and absolute zoom classes, such as
+            &ldquo;zoom9&rdquo; and &ldquo;zoom13&rdquo;.</p>
 
             <p>The layer container, the zoom-specific group elements, and the
             tiles themselves have transform attributes to control how tiles are
@@ -198,9 +195,6 @@
             arguments are specified, this method returns the current id. The id
             defaults to null, which means that no id attribute should be set on
             the container.</p>
-
-            <p>This method must be called before the layer is bound to a map,
-            and cannot be called while the layer is bound to a map.</p>
           </dd>
         </dl>
 
@@ -300,17 +294,6 @@
         <p>Layers use the <a href="dispatch.html">dispatch</a> mechanism to notify
         interested parties of events. Layers currently support only the
         &ldquo;load&rdquo; event.</p>
-
-        <dl class="function" id="init">
-          <dt>
-            <i>layer</i>.<b>init</b>(<i>g</i>)
-          </dt>
-          <dd>
-            This method may be implemented by subclasses to initialize the layer
-            container. The <tt>init</tt> method is called when the map is set
-            and after the layer container element is added to the map container.
-          </dd>
-        </dl>
 
         <dl class="function" id="show">
           <dt>

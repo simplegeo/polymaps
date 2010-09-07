@@ -75,6 +75,10 @@
         <a href="#po.wheel">wheel</a><br>
         </div>
 
+        <div class="span-4">
+        <a href="#zoom">zoom</a><br>
+        </div>
+
         <hr class="space"/>
 
         <dl class="function" id="po.wheel">
@@ -123,6 +127,23 @@
             <p>Smooth zooming is enabled by default. It allows the map to be
             zoomed by arbitrary (fractional) amounts, rather than only at
             integer levels.</p>
+          </dd>
+        </dl>
+
+        <dl class="function" id="zoom">
+          <dt>
+            <i>wheel</i>.<b>zoom</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the zoom mode of this control. If the argument
+            <i>x</i> is specified, this method sets the zoom mode to the
+            given named value and returns <tt>this</tt>. If no arguments are
+            specified, this method returns the current named zoom mode.</p>
+
+            <p>The following zoom modes are supported: &ldquo;mouse&rdquo;,
+            &ldquo;center&rdquo;. The default mode is &ldquo;mouse&rdquo;, which
+            causes the control to zoom around the location at the mouse cursor.
+            The &ldquo;center&rdquo; mode will zoom around the map center.</p>
           </dd>
         </dl>
 
