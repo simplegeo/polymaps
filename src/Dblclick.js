@@ -1,5 +1,6 @@
 po.dblclick = function() {
   var dblclick = {},
+      zoom = "mouse",
       map,
       container;
 
@@ -7,8 +8,14 @@ po.dblclick = function() {
     var z = map.zoom();
     if (e.shiftKey) z = Math.ceil(z) - z - 1;
     else z = 1 - z + Math.floor(z);
-    map.zoomBy(z, map.mouse(e));
+    zoom === "mouse" ? map.zoomBy(z, map.mouse(e)) : map.zoomBy(z);
   }
+
+  dblclick.zoom = function(x) {
+    if (!arguments.length) return zoom;
+    zoom = x;
+    return dblclick;
+  };
 
   dblclick.map = function(x) {
     if (!arguments.length) return map;

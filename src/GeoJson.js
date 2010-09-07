@@ -1,11 +1,16 @@
 po.geoJson = function(fetch) {
   var geoJson = po.layer(load, unload),
+      container = geoJson.container(),
       url = "about:blank",
       clip = true,
       clipId,
+      clipPath,
+      clipRect,
       zoom = null,
       tiles = {},
       features;
+
+  container.setAttribute("fill-rule", "evenodd");
 
   if (!arguments.length) fetch = po.queue.json;
 
@@ -165,16 +170,24 @@ po.geoJson = function(fetch) {
     return geoJson;
   };
 
-  geoJson.init = function(g) {
-    if (clip && geoJson.tile()) {
-      var size = geoJson.map().tileSize(),
-          clipPath = g.insertBefore(po.svg("clipPath"), g.firstChild),
-          rect = clipPath.appendChild(po.svg("rect"));
-      clipPath.setAttribute("id", clipId = "org.polymaps." + po.id());
-      rect.setAttribute("width", size.x);
-      rect.setAttribute("height", size.y);
+  var __map__ = geoJson.map;
+  geoJson.map = function(x) {
+    if (x) {
+      if (clip && geoJson.tile()) {
+        if (!clipPath) {
+          clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild);
+          clipRect = clipPath.appendChild(po.svg("rect"));
+          clipPath.setAttribute("id", clipId = "org.polymaps." + po.id());
+        }
+        var size = x.tileSize();
+        clipRect.setAttribute("width", size.x);
+        clipRect.setAttribute("height", size.y);
+      } else if (clipPath) {
+        container.removeChild(clipPath);
+        clipPath = clipRect = clipId = null;
+      }
     }
-    g.setAttribute("fill-rule", "evenodd");
+    return __map__.apply(geoJson, arguments);
   };
 
   geoJson.show = function(tile) {
