@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.1.1"; // semver.org
+  po.version = "2.1+1.1"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -1389,7 +1389,7 @@ po.wheel = function() {
 
   function mousewheel(e) {
     var delta = (e.wheelDelta / 120 || -e.detail) * .1,
-        point = map.mouse(e);
+        point;
 
     /* Detect fast & large wheel events on WebKit. */
     if (bug40441 < 0) {
@@ -1397,21 +1397,38 @@ po.wheel = function() {
       if ((since > 9) && (Math.abs(e.wheelDelta) / since >= 50)) bug40441 = 1;
       last = now;
     }
-
     if (bug40441 == 1) delta *= .03;
-    if (!location) location = map.pointLocation(point);
-    map.off("move", move);
-    if (smooth) {
-      zoom === "mouse" ? map.zoomBy(delta, point, location) : map.zoomBy(delta);
-    } else if (delta) {
+
+    /* If smooth zooming is disabled, batch events into unit steps. */
+    if (!smooth && delta) {
       var timeNow = Date.now();
       if (timeNow - timePrev > 200) {
         delta = delta > 0 ? +1 : -1;
-        zoom === "mouse" ? map.zoomBy(delta, point, location) : map.zoomBy(delta);
         timePrev = timeNow;
+      } else {
+        delta = 0;
       }
     }
-    map.on("move", move);
+
+    if (delta) {
+      switch (zoom) {
+        case "mouse": {
+          point = map.mouse(e);
+          if (!location) location = map.pointLocation(point);
+          map.off("move", move).zoomBy(delta, point, location).on("move", move);
+          break;
+        }
+        case "location": {
+          map.zoomBy(delta, map.locationPoint(location), location);
+          break;
+        }
+        default: { // center
+          map.zoomBy(delta);
+          break;
+        }
+      }
+    }
+
     e.preventDefault();
     return false; // for Firefox
   }
@@ -1422,9 +1439,14 @@ po.wheel = function() {
     return wheel;
   };
 
-  wheel.zoom = function(x) {
+  wheel.zoom = function(x, l) {
     if (!arguments.length) return zoom;
     zoom = x;
+    location = l;
+    if (map) {
+      if (zoom == "mouse") map.on("move", move);
+      else map.off("move", move);
+    }
     return wheel;
   };
 
@@ -1438,7 +1460,7 @@ po.wheel = function() {
       map.off("move", move);
     }
     if (map = x) {
-      map.on("move", move);
+      if (zoom == "mouse") map.on("move", move);
       container = map.container();
       container.addEventListener("mousemove", move, false);
       container.addEventListener("mousewheel", mousewheel, false);
