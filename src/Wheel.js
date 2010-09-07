@@ -3,6 +3,7 @@ po.wheel = function() {
       timePrev = 0,
       last = 0,
       smooth = true,
+      zoom = "mouse",
       location,
       map,
       container;
@@ -26,11 +27,12 @@ po.wheel = function() {
     if (!location) location = map.pointLocation(point);
     map.off("move", move);
     if (smooth) {
-      map.zoomBy(delta, point, location);
+      zoom === "mouse" ? map.zoomBy(delta, point, location) : map.zoomBy(delta);
     } else if (delta) {
       var timeNow = Date.now();
       if (timeNow - timePrev > 200) {
-        map.zoomBy(delta > 0 ? +1 : -1, point, location);
+        delta = delta > 0 ? +1 : -1;
+        zoom === "mouse" ? map.zoomBy(delta, point, location) : map.zoomBy(delta);
         timePrev = timeNow;
       }
     }
@@ -42,6 +44,12 @@ po.wheel = function() {
   wheel.smooth = function(x) {
     if (!arguments.length) return smooth;
     smooth = x;
+    return wheel;
+  };
+
+  wheel.zoom = function(x) {
+    if (!arguments.length) return zoom;
+    zoom = x;
     return wheel;
   };
 

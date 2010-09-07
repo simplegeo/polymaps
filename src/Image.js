@@ -10,9 +10,10 @@ po.image = function() {
     element.setAttribute("opacity", 0);
 
     if (typeof url == "function") {
-      tile.request = po.queue.image(element, url(tile), function() {
+      tile.request = po.queue.image(element, url(tile), function(img) {
         delete tile.request;
         tile.ready = true;
+        tile.img = img;
         element.removeAttribute("opacity");
         image.dispatch({type: "load", tile: tile});
       });
