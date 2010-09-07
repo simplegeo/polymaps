@@ -4,7 +4,7 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <title>Polymaps - k-Means Clustering</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
-    <script type="text/javascript" src="../polymaps.min.js?2.1.0"></script>
+    <script type="text/javascript" src="../polymaps.min.js?2.1.1"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
     <script type="text/javascript" src="kmeans.js?2.0.2"></script>
     <style type="text/css">

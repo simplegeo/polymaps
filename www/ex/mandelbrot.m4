@@ -4,7 +4,7 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <title>Polymaps - Mandelbrot Set</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
-    <script type="text/javascript" src="../polymaps.min.js?2.1.0"></script>
+    <script type="text/javascript" src="../polymaps.min.js?2.1.1"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
     <script type="text/javascript" src="procedural.js?2.0.2"></script>
     <script type="text/javascript" src="mandelbrot-worker.js?2.0.2"></script>
