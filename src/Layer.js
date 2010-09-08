@@ -232,6 +232,9 @@ po.layer = function(load, unload) {
         if (layer.show) layer.show(t);
       }
     }
+
+    // flush the cache, clearing no-longer-needed tiles
+    cache.flush();
   }
 
   // remove proxy tiles when tiles load
@@ -296,12 +299,20 @@ po.layer = function(load, unload) {
   layer.zoom = function(x) {
     if (!arguments.length) return zoom;
     zoom = typeof x == "function" || x == null ? x : function() { return x; };
+    if (map) move();
     return layer;
   };
 
   layer.tile = function(x) {
     if (!arguments.length) return tile;
     tile = x;
+    if (map) move();
+    return layer;
+  };
+
+  layer.reload = function() {
+    cache.clear();
+    if (map) move();
     return layer;
   };
 

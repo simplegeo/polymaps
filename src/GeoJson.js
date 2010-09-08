@@ -154,14 +154,14 @@ po.geoJson = function(fetch) {
     if (!arguments.length) return url;
     url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
     if (typeof url == "string") geoJson.tile(false);
-    return geoJson;
+    return geoJson.reload();
   };
 
   geoJson.features = function(x) {
     if (!arguments.length) return features;
     if (x) geoJson.tile(false);
     features = x;
-    return geoJson;
+    return geoJson.reload();
   };
 
   geoJson.clip = function(x) {
@@ -192,11 +192,13 @@ po.geoJson = function(fetch) {
 
   geoJson.show = function(tile) {
     geoJson.dispatch({type: "show", tile: tile, features: tiles[tile.key] || []});
+    return geoJson;
   };
 
   geoJson.reshow = function() {
     var locks = geoJson.cache.locks();
     for (var key in locks) geoJson.show(locks[key]);
+    return geoJson;
   };
 
   return geoJson;

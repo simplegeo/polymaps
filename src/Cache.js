@@ -61,7 +61,6 @@ po.cache = function(load, unload) {
     else tail = tile;
     head = tile;
     n++;
-    flush();
     return tile;
   };
 
@@ -71,7 +70,6 @@ po.cache = function(load, unload) {
     tile.lock = 0;
     delete locks[key];
     if (tile.request && tile.request.abort(false)) remove(tile);
-    else flush();
     return tile;
   };
 
@@ -83,6 +81,28 @@ po.cache = function(load, unload) {
     if (!arguments.length) return size;
     size = x;
     flush();
+    return cache;
+  };
+
+  cache.flush = function() {
+    flush();
+    return cache;
+  };
+
+  cache.clear = function() {
+    for (var key in map) {
+      var tile = map[key];
+      if (tile.request) tile.request.abort(false);
+      if (unload) unload(map[key]);
+      if (tile.lock) {
+        tile.lock = 0;
+        tile.element.parentNode.removeChild(tile.element);
+      }
+    }
+    locks = {};
+    map = {};
+    head = tail = null;
+    n = 0;
     return cache;
   };
 

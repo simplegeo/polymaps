@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.1+1.1"; // This fork not semver!
+  po.version = "2.1+2.1"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.id = (function() {
@@ -127,7 +127,6 @@ po.cache = function(load, unload) {
     else tail = tile;
     head = tile;
     n++;
-    flush();
     return tile;
   };
 
@@ -137,7 +136,6 @@ po.cache = function(load, unload) {
     tile.lock = 0;
     delete locks[key];
     if (tile.request && tile.request.abort(false)) remove(tile);
-    else flush();
     return tile;
   };
 
@@ -149,6 +147,28 @@ po.cache = function(load, unload) {
     if (!arguments.length) return size;
     size = x;
     flush();
+    return cache;
+  };
+
+  cache.flush = function() {
+    flush();
+    return cache;
+  };
+
+  cache.clear = function() {
+    for (var key in map) {
+      var tile = map[key];
+      if (tile.request) tile.request.abort(false);
+      if (unload) unload(map[key]);
+      if (tile.lock) {
+        tile.lock = 0;
+        tile.element.parentNode.removeChild(tile.element);
+      }
+    }
+    locks = {};
+    map = {};
+    head = tail = null;
+    n = 0;
     return cache;
   };
 
@@ -918,6 +938,9 @@ po.layer = function(load, unload) {
         if (layer.show) layer.show(t);
       }
     }
+
+    // flush the cache, clearing no-longer-needed tiles
+    cache.flush();
   }
 
   // remove proxy tiles when tiles load
@@ -982,12 +1005,20 @@ po.layer = function(load, unload) {
   layer.zoom = function(x) {
     if (!arguments.length) return zoom;
     zoom = typeof x == "function" || x == null ? x : function() { return x; };
+    if (map) move();
     return layer;
   };
 
   layer.tile = function(x) {
     if (!arguments.length) return tile;
     tile = x;
+    if (map) move();
+    return layer;
+  };
+
+  layer.reload = function() {
+    cache.clear();
+    if (map) move();
     return layer;
   };
 
@@ -1082,7 +1113,7 @@ po.image = function() {
   image.url = function(x) {
     if (!arguments.length) return url;
     url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
-    return image;
+    return image.reload();
   };
 
   return image;
@@ -1243,14 +1274,14 @@ po.geoJson = function(fetch) {
     if (!arguments.length) return url;
     url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
     if (typeof url == "string") geoJson.tile(false);
-    return geoJson;
+    return geoJson.reload();
   };
 
   geoJson.features = function(x) {
     if (!arguments.length) return features;
     if (x) geoJson.tile(false);
     features = x;
-    return geoJson;
+    return geoJson.reload();
   };
 
   geoJson.clip = function(x) {
@@ -1281,11 +1312,13 @@ po.geoJson = function(fetch) {
 
   geoJson.show = function(tile) {
     geoJson.dispatch({type: "show", tile: tile, features: tiles[tile.key] || []});
+    return geoJson;
   };
 
   geoJson.reshow = function() {
     var locks = geoJson.cache.locks();
     for (var key in locks) geoJson.show(locks[key]);
+    return geoJson;
   };
 
   return geoJson;
