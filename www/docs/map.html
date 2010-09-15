@@ -37,6 +37,7 @@
           <li><a href="compass.html">compass</a></li>
           <li><a href="dblclick.html">dblclick</a></li>
           <li><a href="drag.html">drag</a></li>
+          <li><a href="grid.html">grid</a></li>
           <li><a href="hash.html">hash</a></li>
           <li><a href="interact.html">interact</a></li>
           <li><a href="wheel.html">wheel</a></li>
@@ -47,6 +48,7 @@
           <li><a href="cache.html">cache</a></li>
           <li><a href="dispatch.html">dispatch</a></li>
           <li><a href="queue.html">queue</a></li>
+          <li><a href="stylist.html">stylist</a></li>
           <li><a href="svg.html">svg</a></li>
           <li><a href="transform.html">transform</a></li>
           <li><a href="url.html">url</a></li>
@@ -72,29 +74,30 @@
         <a href="#centerRange">centerRange</a><br>
         <a href="#container">container</a><br>
         <a href="#coordinateLocation">coordinateLocation</a><br>
+        <a href="#po.map.coordinateLocation">coordinateLocation</a><br>
         </div>
 
         <div class="span-4">
-        <a href="#po.map.coordinateLocation">coordinateLocation</a><br>
         <a href="#coordinatePoint">coordinatePoint</a><br>
+        <a href="#extent">extent</a><br>
         <a href="#focusableParent">focusableParent</a><br>
         <a href="#locationCoordinate">locationCoordinate</a><br>
         <a href="#po.map.locationCoordinate">locationCoordinate</a><br>
         <a href="#locationPoint">locationPoint</a><br>
+        <a href="#po.map">map</a><br>
         </div>
 
         <div class="span-4">
-        <a href="#po.map">map</a><br>
         <a href="#mouse">mouse</a><br>
         <a href="#panBy">panBy</a><br>
         <a href="#pointCoordinate">pointCoordinate</a><br>
         <a href="#pointLocation">pointLocation</a><br>
         <a href="#remove">remove</a><br>
+        <a href="#resize">resize</a><br>
+        <a href="#size">size</a><br>
         </div>
 
         <div class="span-4">
-        <a href="#resize">resize</a><br>
-        <a href="#size">size</a><br>
         <a href="#tileSize">tileSize</a><br>
         <a href="#zoom">zoom</a><br>
         <a href="#zoomBy">zoomBy</a><br>
@@ -226,6 +229,33 @@
           </dd>
         </dl>
 
+        <dl class="function" id="extent">
+          <dt>
+            <i>map</i>.<b>extent</b>([<i>x</i>])
+          </dt>
+          <dd>
+            <p>Sets or gets the extent of the map. If the argument <i>x</i> is
+            specified, it sets the new extent, and returns <tt>this</tt>. If no
+            arguments are specified, it returns the current extent.</p>
+
+            <p>The extent is defined as a two-element location array, similar to
+            the <a href="#centerRange">center range</a>: the locations of the
+            south-west and north-east corners of the visible region. The current
+            extent is computed as:
+
+            <pre>[<i>map</i>.pointLocation({x:      0, y: <i>size</i>.y}),
+ <i>map</i>.pointLocation({x: <i>size</i>.x, y:      0})]</pre>
+
+            where <i>size</i> is the current <a href="#size">map size</a>.</p>
+
+            <p>If the aspect ratio of the specified extent does not match the
+            aspect ratio of the current map size, then the extent is expanded to
+            match the current aspect ratio; the extent is fully-visible after
+            this method returns. Note that the zoom level may not be an integer
+            after setting the extent.</p>
+          </dd>
+        </dl>
+
         <dl class="function" id="angle">
           <dt>
             <i>map</i>.<b>angle</b>([<i>x</i>])
@@ -252,7 +282,9 @@
             256}</tt>.</p>
 
             <p>Note: currently the tile size must be set before any tiles are
-            loaded, and may not be changed after tiles are loaded.</p>
+            loaded, and may not be changed after tiles are loaded. Tiles may be
+            reloaded using <a href="layer.html#reload"><tt><i>layer</i>.reload</tt></a>,
+            but changing tile size is not yet supported.</p>
           </dd>
         </dl>
 
@@ -293,8 +325,8 @@
             will be set to &ldquo;map&rdquo;.</p>
 
             <p>Note: currently the container must be set before any objects are
-            added to the map, and may not be changed after objects are
-            added.</p>
+            added to the map, and may not be changed after objects are added.
+            This restriction may be removed in a future release.</p>
           </dd>
         </dl>
 

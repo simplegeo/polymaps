@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
-    <title>Polymaps - Documentation - arrow</title>
+    <title>Polymaps - Documentation - ns</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
     <script type="text/javascript" src="../polymaps.min.js?2.0.0"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
@@ -33,7 +33,7 @@
 
         <h4>Controls</h4>
         <ul class="no-indent">
-          <li><a class="active" href="arrow.html">arrow</a></li>
+          <li><a href="arrow.html">arrow</a></li>
           <li><a href="compass.html">compass</a></li>
           <li><a href="dblclick.html">dblclick</a></li>
           <li><a href="drag.html">drag</a></li>
@@ -47,6 +47,7 @@
         <ul class="no-indent">
           <li><a href="cache.html">cache</a></li>
           <li><a href="dispatch.html">dispatch</a></li>
+          <li><a class="active" href="ns.html">ns</a></li>
           <li><a href="queue.html">queue</a></li>
           <li><a href="stylist.html">stylist</a></li>
           <li><a href="svg.html">svg</a></li>
@@ -63,63 +64,24 @@
       <hr class="space"/>
       <div class="span-18 prepend-6 last">
 
-        <h2>arrow</h2>
+        <h2>ns</h2>
 
         <div class="span-4">
-        <a href="#po.arrow">arrow</a><br>
-        </div>
-
-        <div class="span-4">
-        <a href="#map">map</a><br>
-        </div>
-
-        <div class="span-4">
-        <a href="#speed">speed</a><br>
+        <a href="#po.ns">ns</a><br>
         </div>
 
         <hr class="space"/>
 
-        <dl class="function" id="po.arrow">
+        <dl class="function" id="po.ns">
           <dt>
-            <i>po</i>.<b>arrow</b>()
+            <i>po</i>.<b>ns</b>
           </dt>
           <dd>
-            Constructs an arrow control with default settings. The arrow control
-            provides key listeners for the arrow keys for panning, and the plus
-            and minus keys for zooming. The arrow control allows multiple keys
-            to be pressed simultaneously; for example, the pressing the left and
-            down arrows simultaneously will cause the map to pan diagonally.
-          </dd>
-        </dl>
-
-        <dl class="function" id="map">
-          <dt>
-            <i>arrow</i>.<b>map</b>([<i>x</i>])
-          </dt>
-          <dd>
-            <p>Adds this control to the specified map <i>x</i>, removes this
-            control from its current map, or returns the current map. This
-            method is typically not called directly, but is needed to support
-            the map&rsquo;s <a href="map.html#add">add</a> method and <a
-            href="map.html#remove">remove</a> methods.</p>
-
-            <p>If the argument <i>x</i> is specified, this method returns
-            <tt>this</tt>. If <i>x</i> is null, this control is removed from its
-            current map; otherwise, this control is added to the specified map.
-            If no arguments are specified, this method returns the current map,
-            which may be null. Whew!</p>
-          </dd>
-        </dl>
-
-        <dl class="function" id="speed">
-          <dt>
-            <i>arrow</i>.<b>speed</b>([<i>x</i>])
-          </dt>
-          <dd>
-            Sets or gets the pan speed. If the argument <i>x</i> is specified,
-            this method sets the pan speed to the given pixel amount and
-            returns <tt>this</tt>. If no arguments are specified, this method
-            returns the current pan speed, which defaults to 16.
+            The namespace-prefix map. By default, two namespace prefixes are
+            registered: <a href="http://www.w3.org/2000/svg">svg</a> and
+            <a href="http://www.w3.org/1999/xlink">xlink</a>. Prefixes may be
+            assigned externally, for example to support additional namespaces
+            for <a href="stylist.html">stylist</a> attributes.
           </dd>
         </dl>
 
