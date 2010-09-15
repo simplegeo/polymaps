@@ -2,22 +2,29 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.1+2.1+1"; // This fork not semver!
+  po.version = "2.1+3.1+1"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
+po.ns = {
+  svg: "http://www.w3.org/2000/svg",
+  xlink: "http://www.w3.org/1999/xlink"
+};
+
+function ns(name) {
+  var i = name.indexOf(":");
+  return i < 0 ? name : {
+    space: po.ns[name.substring(0, i)],
+    local: name.substring(i + 1)
+  };
+}
 po.id = (function() {
   var id = 0;
   return function() {
     return ++id;
   };
 })();
- po.svg = function(type) {
+po.svg = function(type) {
   return document.createElementNS(po.ns.svg, type);
-};
-
-po.ns = {
-  svg: "http://www.w3.org/2000/svg",
-  xlink: "http://www.w3.org/1999/xlink"
 };
 po.transform = function(a, b, c, d, e, f) {
   var transform = {},
@@ -2065,5 +2072,65 @@ po.grid = function() {
   };
 
   return grid;
+};
+po.stylist = function() {
+  var attrs = [],
+      styles = [],
+      title;
+
+  function stylist(e) {
+    var ne = e.features.length,
+        na = attrs.length,
+        ns = styles.length,
+        f, // feature
+        d, // data
+        o, // element
+        x, // attr or style or title descriptor
+        v, // attr or style or title value
+        i,
+        j;
+    for (i = 0; i < ne; ++i) {
+      if (!(o = (f = e.features[i]).element)) continue;
+      d = f.data;
+      for (j = 0; j < na; ++j) {
+        v = (x = attrs[j]).value;
+        if (typeof v === "function") v = v.call(null, d);
+        v == null ? (x.name.local
+            ? o.removeAttributeNS(x.name.space, x.name.local)
+            : o.removeAttribute(x.name)) : (x.name.local
+            ? o.setAttributeNS(x.name.space, x.name.local, v)
+            : o.setAttribute(x.name, v));
+      }
+      for (j = 0; j < ns; ++j) {
+        v = (x = styles[j]).value;
+        if (typeof v === "function") v = v.call(null, d);
+        v == null
+            ? o.style.removeProperty(x.name)
+            : o.style.setProperty(x.name, v, x.priority);
+      }
+      if (v = title) {
+        if (typeof v === "function") v = v.call(null, d);
+        while (o.lastChild) o.removeChild(o.lastChild);
+        if (v != null) o.appendChild(po.svg("title")).appendChild(document.createTextNode(v));
+      }
+    }
+  }
+
+  stylist.attr = function(n, v) {
+    attrs.push({name: ns(n), value: v});
+    return stylist;
+  };
+
+  stylist.style = function(n, v, p) {
+    styles.push({name: n, value: v, priority: arguments.length < 3 ? null : p});
+    return stylist;
+  };
+
+  stylist.title = function(v) {
+    title = v;
+    return stylist;
+  };
+
+  return stylist;
 };
 })(org.polymaps);

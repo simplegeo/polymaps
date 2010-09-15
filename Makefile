@@ -1,5 +1,6 @@
 JS_FILES = \
 	src/start.js \
+	src/ns.js \
 	src/Id.js \
 	src/Svg.js \
 	src/Transform.js \
@@ -19,6 +20,7 @@ JS_FILES = \
 	src/Interact.js \
 	src/Compass.js \
 	src/Grid.js \
+	src/Stylist.js \
 	src/end.js
 
 JS_COMPILER = \
