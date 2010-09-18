@@ -31,7 +31,7 @@ po.image = function() {
   image.url = function(x) {
     if (!arguments.length) return url;
     url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
-    return image;
+    return image.reload();
   };
 
   return image;

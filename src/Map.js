@@ -162,7 +162,7 @@ po.map = function() {
         rect.setAttribute("height", "100%");
         e = rect;
       }
-      b = e.getBoundingClientRect();
+      b = e.getClientRects()[0];
       sizeActual = {x: b.width, y: b.height};
       resizer.add(map);
     } else {

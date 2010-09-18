@@ -37,6 +37,7 @@
           <li><a href="compass.html">compass</a></li>
           <li><a href="dblclick.html">dblclick</a></li>
           <li><a href="drag.html">drag</a></li>
+          <li><a href="grid.html">grid</a></li>
           <li><a href="hash.html">hash</a></li>
           <li><a href="interact.html">interact</a></li>
           <li><a href="wheel.html">wheel</a></li>
@@ -47,6 +48,7 @@
           <li><a href="cache.html">cache</a></li>
           <li><a href="dispatch.html">dispatch</a></li>
           <li><a href="queue.html">queue</a></li>
+          <li><a href="stylist.html">stylist</a></li>
           <li><a href="svg.html">svg</a></li>
           <li><a href="transform.html">transform</a></li>
           <li><a href="url.html">url</a></li>
@@ -178,9 +180,7 @@
 
             <p>Tiles are clipped by default. Disabling clipping is useful for
             GeoJSON features that may extend beyond the tile boundary, such as
-            points. Clipping can only be disabled before any tiles are loaded;
-            this method should be called (if at all) before the layer is added
-            to the map.</p>
+            points.</p>
           </dd>
         </dl>
 
@@ -190,7 +190,9 @@
         to notify interested parties of events. In addition to the standard load
         event, GeoJSON layers support the &ldquo;show&rdquo; event that is
         triggered for each tile as it becomes visible. The show event allows
-        tiles to be styled dynamically through JavaScript.</p>
+        tiles to be styled dynamically through JavaScript. The <a href="stylist.html"
+        >stylist</a> convenience class may be used to simplify implementation of
+        load and show event handlers.</p>
 
         <dl class="function" id="reshow">
           <dt>

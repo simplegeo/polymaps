@@ -37,6 +37,7 @@
           <li><a href="compass.html">compass</a></li>
           <li><a href="dblclick.html">dblclick</a></li>
           <li><a href="drag.html">drag</a></li>
+          <li><a href="grid.html">grid</a></li>
           <li><a href="hash.html">hash</a></li>
           <li><a href="interact.html">interact</a></li>
           <li><a href="wheel.html">wheel</a></li>
@@ -47,6 +48,7 @@
           <li><a href="cache.html">cache</a></li>
           <li><a href="dispatch.html">dispatch</a></li>
           <li><a href="queue.html">queue</a></li>
+          <li><a href="stylist.html">stylist</a></li>
           <li><a href="svg.html">svg</a></li>
           <li><a href="transform.html">transform</a></li>
           <li><a href="url.html">url</a></li>
@@ -74,16 +76,17 @@
         <div class="span-4">
         <a href="#po.layer">layer</a><br>
         <a href="#map">map</a><br>
-        <a href="#show">show</a><br>
+        <a href="#reload">reload</a><br>
         </div>
 
         <div class="span-4">
+        <a href="#show">show</a><br>
         <a href="#tile">tile</a><br>
         <a href="#transform">transform</a><br>
-        <a href="#visible">visible</a><br>
         </div>
 
         <div class="span-4">
+        <a href="#visible">visible</a><br>
         <a href="#zoom">zoom</a><br>
         </div>
 
@@ -133,12 +136,12 @@
             cached &ldquo;proxy&rdquo; tiles at neighboring zoom levels while
             tiles are loading.</p>
 
-            <p>When the tile is ready, the load function must dispatch a load
-            event on the layer. The load event must have a <tt>type</tt> string
-            attribute with the value &ldquo;load&rdquo;, and a <tt>tile</tt>
-            attribute referencing the tile object. The layer requires this load
-            event in order to hide any proxy tiles that were displayed while the
-            tile was loading.</p>
+            <p>When the tile is ready, the load function must <a href="dispatch.html#dispatch"
+            >dispatch</a> a load event on the layer. The load event must have
+            a <tt>type</tt> string attribute with the value &ldquo;load&rdquo;,
+            and a <tt>tile</tt> attribute referencing the tile object. The layer
+            requires this load event in order to hide any proxy tiles that were
+            displayed while the tile was loading.</p>
 
             <p>If tiles are loaded asynchronously, the load function should
             store the request object returned by the <a href="queue.html"
@@ -306,6 +309,21 @@
             href="geoJson.html">geoJson</a> uses this to dispatch the show
             event, which then allows users to customize the appearance of
             visible tiles before they are displayed.
+          </dd>
+        </dl>
+
+        <dl class="function" id="reload">
+          <dt>
+            <i>layer</i>.<b>reload</b>()
+          </dt>
+          <dd>
+            Clears the cache, re-requests any currently-visible tiles, and
+            returns <tt>this</tt>. This method is used internally by some layer
+            implementations; for example, when the <a href="image.html#url">URL
+            template</a> of an image layer is changed. This method may be called
+            directly to clear the cache and force a reload of the tiles. Note
+            that this method does not clear the browser cache, and thus tiles
+            may not be re-fetched from the server.
           </dd>
         </dl>
 

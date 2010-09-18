@@ -2,22 +2,29 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.1.1"; // semver.org
+  po.version = "2.2.0"; // semver.org
 
   var zero = {x: 0, y: 0};
+po.ns = {
+  svg: "http://www.w3.org/2000/svg",
+  xlink: "http://www.w3.org/1999/xlink"
+};
+
+function ns(name) {
+  var i = name.indexOf(":");
+  return i < 0 ? name : {
+    space: po.ns[name.substring(0, i)],
+    local: name.substring(i + 1)
+  };
+}
 po.id = (function() {
   var id = 0;
   return function() {
     return ++id;
   };
 })();
- po.svg = function(type) {
+po.svg = function(type) {
   return document.createElementNS(po.ns.svg, type);
-};
-
-po.ns = {
-  svg: "http://www.w3.org/2000/svg",
-  xlink: "http://www.w3.org/1999/xlink"
 };
 po.transform = function(a, b, c, d, e, f) {
   var transform = {},
@@ -127,7 +134,6 @@ po.cache = function(load, unload) {
     else tail = tile;
     head = tile;
     n++;
-    flush();
     return tile;
   };
 
@@ -137,7 +143,6 @@ po.cache = function(load, unload) {
     tile.lock = 0;
     delete locks[key];
     if (tile.request && tile.request.abort(false)) remove(tile);
-    else flush();
     return tile;
   };
 
@@ -149,6 +154,28 @@ po.cache = function(load, unload) {
     if (!arguments.length) return size;
     size = x;
     flush();
+    return cache;
+  };
+
+  cache.flush = function() {
+    flush();
+    return cache;
+  };
+
+  cache.clear = function() {
+    for (var key in map) {
+      var tile = map[key];
+      if (tile.request) tile.request.abort(false);
+      if (unload) unload(map[key]);
+      if (tile.lock) {
+        tile.lock = 0;
+        tile.element.parentNode.removeChild(tile.element);
+      }
+    }
+    locks = {};
+    map = {};
+    head = tail = null;
+    n = 0;
     return cache;
   };
 
@@ -497,7 +524,7 @@ po.map = function() {
         rect.setAttribute("height", "100%");
         e = rect;
       }
-      b = e.getBoundingClientRect();
+      b = e.getClientRects()[0];
       sizeActual = {x: b.width, y: b.height};
       resizer.add(map);
     } else {
@@ -918,6 +945,9 @@ po.layer = function(load, unload) {
         if (layer.show) layer.show(t);
       }
     }
+
+    // flush the cache, clearing no-longer-needed tiles
+    cache.flush();
   }
 
   // remove proxy tiles when tiles load
@@ -982,12 +1012,20 @@ po.layer = function(load, unload) {
   layer.zoom = function(x) {
     if (!arguments.length) return zoom;
     zoom = typeof x == "function" || x == null ? x : function() { return x; };
+    if (map) move();
     return layer;
   };
 
   layer.tile = function(x) {
     if (!arguments.length) return tile;
     tile = x;
+    if (map) move();
+    return layer;
+  };
+
+  layer.reload = function() {
+    cache.clear();
+    if (map) move();
     return layer;
   };
 
@@ -1082,7 +1120,7 @@ po.image = function() {
   image.url = function(x) {
     if (!arguments.length) return url;
     url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
-    return image;
+    return image.reload();
   };
 
   return image;
@@ -1092,14 +1130,15 @@ po.geoJson = function(fetch) {
       container = geoJson.container(),
       url = "about:blank",
       clip = true,
-      clipId,
-      clipPath,
-      clipRect,
+      clipId = "org.polymaps." + po.id(),
+      clipHref = "url(#" + clipId + ")",
+      clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild),
+      clipRect = clipPath.appendChild(po.svg("rect")),
       zoom = null,
-      tiles = {},
       features;
 
   container.setAttribute("fill-rule", "evenodd");
+  clipPath.setAttribute("id", clipId);
 
   if (!arguments.length) fetch = po.queue.json;
 
@@ -1189,6 +1228,7 @@ po.geoJson = function(fetch) {
 
   function load(tile, proj) {
     var g = tile.element = po.svg("g");
+    tile.features = [];
 
     proj = proj(tile);
 
@@ -1221,7 +1261,7 @@ po.geoJson = function(fetch) {
       }
 
       tile.ready = true;
-      updated.push.apply(tiles[tile.key] || (tiles[tile.key] = []), updated);
+      updated.push.apply(tile.features, updated);
       geoJson.dispatch({type: "load", tile: tile, features: updated});
     }
 
@@ -1230,62 +1270,65 @@ po.geoJson = function(fetch) {
     } else {
       tile.request = fetch(typeof url == "function" ? url(tile) : url, update);
     }
-
-    if (clipId) g.setAttribute("clip-path", "url(#" + clipId + ")");
   }
 
   function unload(tile) {
     if (tile.request) tile.request.abort(true);
-    delete tiles[tile.key];
   }
 
   geoJson.url = function(x) {
     if (!arguments.length) return url;
     url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
     if (typeof url == "string") geoJson.tile(false);
-    return geoJson;
+    return geoJson.reload();
   };
 
   geoJson.features = function(x) {
     if (!arguments.length) return features;
     if (x) geoJson.tile(false);
     features = x;
-    return geoJson;
+    return geoJson.reload();
   };
 
   geoJson.clip = function(x) {
     if (!arguments.length) return clip;
-    clip = x;
+    if (clip) container.removeChild(clipPath);
+    if (clip = x) container.insertBefore(clipPath, container.firstChild);
+    var locks = geoJson.cache.locks();
+    for (var key in locks) {
+      if (clip) locks[key].element.setAttribute("clip-path", clipHref);
+      else locks[key].element.removeAttribute("clip-path");
+    }
     return geoJson;
+  };
+
+  var __tile__ = geoJson.tile;
+  geoJson.tile = function(x) {
+    if (arguments.length && !x) geoJson.clip(x);
+    return __tile__.apply(geoJson, arguments);
   };
 
   var __map__ = geoJson.map;
   geoJson.map = function(x) {
-    if (x) {
-      if (clip && geoJson.tile()) {
-        if (!clipPath) {
-          clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild);
-          clipRect = clipPath.appendChild(po.svg("rect"));
-          clipPath.setAttribute("id", clipId = "org.polymaps." + po.id());
-        }
-        var size = x.tileSize();
-        clipRect.setAttribute("width", size.x);
-        clipRect.setAttribute("height", size.y);
-      } else if (clipPath) {
-        container.removeChild(clipPath);
-        clipPath = clipRect = clipId = null;
-      }
+    if (x && clipRect) {
+      var size = x.tileSize();
+      clipRect.setAttribute("width", size.x);
+      clipRect.setAttribute("height", size.y);
     }
     return __map__.apply(geoJson, arguments);
   };
 
   geoJson.show = function(tile) {
-    geoJson.dispatch({type: "show", tile: tile, features: tiles[tile.key] || []});
+    if (clip) tile.element.setAttribute("clip-path", clipHref);
+    else tile.element.removeAttribute("clip-path");
+    geoJson.dispatch({type: "show", tile: tile, features: tile.features});
+    return geoJson;
   };
 
   geoJson.reshow = function() {
     var locks = geoJson.cache.locks();
     for (var key in locks) geoJson.show(locks[key]);
+    return geoJson;
   };
 
   return geoJson;
@@ -1389,7 +1432,7 @@ po.wheel = function() {
 
   function mousewheel(e) {
     var delta = (e.wheelDelta / 120 || -e.detail) * .1,
-        point = map.mouse(e);
+        point;
 
     /* Detect fast & large wheel events on WebKit. */
     if (bug40441 < 0) {
@@ -1397,21 +1440,38 @@ po.wheel = function() {
       if ((since > 9) && (Math.abs(e.wheelDelta) / since >= 50)) bug40441 = 1;
       last = now;
     }
-
     if (bug40441 == 1) delta *= .03;
-    if (!location) location = map.pointLocation(point);
-    map.off("move", move);
-    if (smooth) {
-      zoom === "mouse" ? map.zoomBy(delta, point, location) : map.zoomBy(delta);
-    } else if (delta) {
+
+    /* If smooth zooming is disabled, batch events into unit steps. */
+    if (!smooth && delta) {
       var timeNow = Date.now();
       if (timeNow - timePrev > 200) {
         delta = delta > 0 ? +1 : -1;
-        zoom === "mouse" ? map.zoomBy(delta, point, location) : map.zoomBy(delta);
         timePrev = timeNow;
+      } else {
+        delta = 0;
       }
     }
-    map.on("move", move);
+
+    if (delta) {
+      switch (zoom) {
+        case "mouse": {
+          point = map.mouse(e);
+          if (!location) location = map.pointLocation(point);
+          map.off("move", move).zoomBy(delta, point, location).on("move", move);
+          break;
+        }
+        case "location": {
+          map.zoomBy(delta, map.locationPoint(location), location);
+          break;
+        }
+        default: { // center
+          map.zoomBy(delta);
+          break;
+        }
+      }
+    }
+
     e.preventDefault();
     return false; // for Firefox
   }
@@ -1422,9 +1482,14 @@ po.wheel = function() {
     return wheel;
   };
 
-  wheel.zoom = function(x) {
+  wheel.zoom = function(x, l) {
     if (!arguments.length) return zoom;
     zoom = x;
+    location = l;
+    if (map) {
+      if (zoom == "mouse") map.on("move", move);
+      else map.off("move", move);
+    }
     return wheel;
   };
 
@@ -1438,7 +1503,7 @@ po.wheel = function() {
       map.off("move", move);
     }
     if (map = x) {
-      map.on("move", move);
+      if (zoom == "mouse") map.on("move", move);
       container = map.container();
       container.addEventListener("mousemove", move, false);
       container.addEventListener("mousewheel", mousewheel, false);
@@ -2007,5 +2072,65 @@ po.grid = function() {
   };
 
   return grid;
+};
+po.stylist = function() {
+  var attrs = [],
+      styles = [],
+      title;
+
+  function stylist(e) {
+    var ne = e.features.length,
+        na = attrs.length,
+        ns = styles.length,
+        f, // feature
+        d, // data
+        o, // element
+        x, // attr or style or title descriptor
+        v, // attr or style or title value
+        i,
+        j;
+    for (i = 0; i < ne; ++i) {
+      if (!(o = (f = e.features[i]).element)) continue;
+      d = f.data;
+      for (j = 0; j < na; ++j) {
+        v = (x = attrs[j]).value;
+        if (typeof v === "function") v = v.call(null, d);
+        v == null ? (x.name.local
+            ? o.removeAttributeNS(x.name.space, x.name.local)
+            : o.removeAttribute(x.name)) : (x.name.local
+            ? o.setAttributeNS(x.name.space, x.name.local, v)
+            : o.setAttribute(x.name, v));
+      }
+      for (j = 0; j < ns; ++j) {
+        v = (x = styles[j]).value;
+        if (typeof v === "function") v = v.call(null, d);
+        v == null
+            ? o.style.removeProperty(x.name)
+            : o.style.setProperty(x.name, v, x.priority);
+      }
+      if (v = title) {
+        if (typeof v === "function") v = v.call(null, d);
+        while (o.lastChild) o.removeChild(o.lastChild);
+        if (v != null) o.appendChild(po.svg("title")).appendChild(document.createTextNode(v));
+      }
+    }
+  }
+
+  stylist.attr = function(n, v) {
+    attrs.push({name: ns(n), value: v});
+    return stylist;
+  };
+
+  stylist.style = function(n, v, p) {
+    styles.push({name: n, value: v, priority: arguments.length < 3 ? null : p});
+    return stylist;
+  };
+
+  stylist.title = function(v) {
+    title = v;
+    return stylist;
+  };
+
+  return stylist;
 };
 })(org.polymaps);

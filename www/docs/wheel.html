@@ -37,6 +37,7 @@
           <li><a href="compass.html">compass</a></li>
           <li><a href="dblclick.html">dblclick</a></li>
           <li><a href="drag.html">drag</a></li>
+          <li><a href="grid.html">grid</a></li>
           <li><a href="hash.html">hash</a></li>
           <li><a href="interact.html">interact</a></li>
           <li><a class="active" href="wheel.html">wheel</a></li>
@@ -47,6 +48,7 @@
           <li><a href="cache.html">cache</a></li>
           <li><a href="dispatch.html">dispatch</a></li>
           <li><a href="queue.html">queue</a></li>
+          <li><a href="stylist.html">stylist</a></li>
           <li><a href="svg.html">svg</a></li>
           <li><a href="transform.html">transform</a></li>
           <li><a href="url.html">url</a></li>
@@ -132,7 +134,7 @@
 
         <dl class="function" id="zoom">
           <dt>
-            <i>wheel</i>.<b>zoom</b>([<i>x</i>])
+            <i>wheel</i>.<b>zoom</b>([<i>x</i>[, <i>l</i>]])
           </dt>
           <dd>
             <p>Sets or gets the zoom mode of this control. If the argument
@@ -141,9 +143,12 @@
             specified, this method returns the current named zoom mode.</p>
 
             <p>The following zoom modes are supported: &ldquo;mouse&rdquo;,
-            &ldquo;center&rdquo;. The default mode is &ldquo;mouse&rdquo;, which
-            causes the control to zoom around the location at the mouse cursor.
-            The &ldquo;center&rdquo; mode will zoom around the map center.</p>
+            &ldquo;center&rdquo;, &ldquo;location&rdquo;. The default mode is
+            &ldquo;mouse&rdquo;, which causes the control to zoom around the
+            location at the mouse cursor. The &ldquo;center&rdquo; mode will
+            zoom around the map center. The &ldquo;location&rdquo; mode requires
+            the second argument <i>l</i>, which specifies the location around
+            which to zoom.</p>
           </dd>
         </dl>
 

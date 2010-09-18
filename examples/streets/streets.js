@@ -19,21 +19,12 @@ map.add(po.image()
 
 map.add(po.geoJson()
     .url("streets.json")
+    .id("streets")
     .zoom(12)
     .tile(false)
-    .on("load", load)
-    .id("streets"));
+  .on("load", po.stylist()
+    .attr("stroke", function(d) { return color(d.properties.PCI).color; })
+    .title(function(d) { return d.properties.STREET + ": " + d.properties.PCI + " PCI"; })));
 
 map.add(po.compass()
     .pan("none"));
-
-function load(e) {
-  for (var i = 0; i < e.features.length; i++) {
-    var feature = e.features[i], d = feature.data.properties.PCI;
-    if (!feature.element) continue;
-    feature.element.setAttribute("stroke", color(d).color);
-    feature.element.appendChild(po.svg("title").appendChild(
-        document.createTextNode(feature.data.properties.STREET + ": " + d + " PCI"))
-        .parentNode);
-  }
-}

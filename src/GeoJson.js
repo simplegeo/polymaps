@@ -3,14 +3,15 @@ po.geoJson = function(fetch) {
       container = geoJson.container(),
       url = "about:blank",
       clip = true,
-      clipId,
-      clipPath,
-      clipRect,
+      clipId = "org.polymaps." + po.id(),
+      clipHref = "url(#" + clipId + ")",
+      clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild),
+      clipRect = clipPath.appendChild(po.svg("rect")),
       zoom = null,
-      tiles = {},
       features;
 
   container.setAttribute("fill-rule", "evenodd");
+  clipPath.setAttribute("id", clipId);
 
   if (!arguments.length) fetch = po.queue.json;
 
@@ -100,6 +101,7 @@ po.geoJson = function(fetch) {
 
   function load(tile, proj) {
     var g = tile.element = po.svg("g");
+    tile.features = [];
 
     proj = proj(tile);
 
@@ -132,7 +134,7 @@ po.geoJson = function(fetch) {
       }
 
       tile.ready = true;
-      updated.push.apply(tiles[tile.key] || (tiles[tile.key] = []), updated);
+      updated.push.apply(tile.features, updated);
       geoJson.dispatch({type: "load", tile: tile, features: updated});
     }
 
@@ -141,62 +143,65 @@ po.geoJson = function(fetch) {
     } else {
       tile.request = fetch(typeof url == "function" ? url(tile) : url, update);
     }
-
-    if (clipId) g.setAttribute("clip-path", "url(#" + clipId + ")");
   }
 
   function unload(tile) {
     if (tile.request) tile.request.abort(true);
-    delete tiles[tile.key];
   }
 
   geoJson.url = function(x) {
     if (!arguments.length) return url;
     url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
     if (typeof url == "string") geoJson.tile(false);
-    return geoJson;
+    return geoJson.reload();
   };
 
   geoJson.features = function(x) {
     if (!arguments.length) return features;
     if (x) geoJson.tile(false);
     features = x;
-    return geoJson;
+    return geoJson.reload();
   };
 
   geoJson.clip = function(x) {
     if (!arguments.length) return clip;
-    clip = x;
+    if (clip) container.removeChild(clipPath);
+    if (clip = x) container.insertBefore(clipPath, container.firstChild);
+    var locks = geoJson.cache.locks();
+    for (var key in locks) {
+      if (clip) locks[key].element.setAttribute("clip-path", clipHref);
+      else locks[key].element.removeAttribute("clip-path");
+    }
     return geoJson;
+  };
+
+  var __tile__ = geoJson.tile;
+  geoJson.tile = function(x) {
+    if (arguments.length && !x) geoJson.clip(x);
+    return __tile__.apply(geoJson, arguments);
   };
 
   var __map__ = geoJson.map;
   geoJson.map = function(x) {
-    if (x) {
-      if (clip && geoJson.tile()) {
-        if (!clipPath) {
-          clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild);
-          clipRect = clipPath.appendChild(po.svg("rect"));
-          clipPath.setAttribute("id", clipId = "org.polymaps." + po.id());
-        }
-        var size = x.tileSize();
-        clipRect.setAttribute("width", size.x);
-        clipRect.setAttribute("height", size.y);
-      } else if (clipPath) {
-        container.removeChild(clipPath);
-        clipPath = clipRect = clipId = null;
-      }
+    if (x && clipRect) {
+      var size = x.tileSize();
+      clipRect.setAttribute("width", size.x);
+      clipRect.setAttribute("height", size.y);
     }
     return __map__.apply(geoJson, arguments);
   };
 
   geoJson.show = function(tile) {
-    geoJson.dispatch({type: "show", tile: tile, features: tiles[tile.key] || []});
+    if (clip) tile.element.setAttribute("clip-path", clipHref);
+    else tile.element.removeAttribute("clip-path");
+    geoJson.dispatch({type: "show", tile: tile, features: tile.features});
+    return geoJson;
   };
 
   geoJson.reshow = function() {
     var locks = geoJson.cache.locks();
     for (var key in locks) geoJson.show(locks[key]);
+    return geoJson;
   };
 
   return geoJson;

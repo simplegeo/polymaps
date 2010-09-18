@@ -1,5 +1,6 @@
 JS_FILES = \
 	src/start.js \
+	src/ns.js \
 	src/Id.js \
 	src/Svg.js \
 	src/Transform.js \
@@ -19,6 +20,7 @@ JS_FILES = \
 	src/Interact.js \
 	src/Compass.js \
 	src/Grid.js \
+	src/Stylist.js \
 	src/end.js
 
 JS_COMPILER = \
@@ -120,13 +122,16 @@ WWW_DOCS_FILES = \
 	www/docs/dispatch.html \
 	www/docs/drag.html \
 	www/docs/geoJson.html \
+	www/docs/grid.html \
 	www/docs/hash.html \
 	www/docs/image.html \
 	www/docs/index.html \
 	www/docs/interact.html \
 	www/docs/layer.html \
 	www/docs/map.html \
+	www/docs/ns.html \
 	www/docs/queue.html \
+	www/docs/stylist.html \
 	www/docs/svg.html \
 	www/docs/transform.html \
 	www/docs/url.html \
