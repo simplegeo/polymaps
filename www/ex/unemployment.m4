@@ -11,7 +11,7 @@
     <style type="text/css">
 
 @import url("../screen.css?0.9");
-@import url("../style.css?2.1.0");
+@import url("../style.css?2.2.0");
 @import url("../colorbrewer.css?1.0.0");
 
 div#map {
