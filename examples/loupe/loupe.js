@@ -48,6 +48,7 @@
 
     // update the center point if the center is set explicitly
     function loupemove() {
+      if (!map) return;
       loupe.centerPoint(map.locationPoint(loupe.center()));
     }
 
