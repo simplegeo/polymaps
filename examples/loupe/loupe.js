@@ -6,9 +6,14 @@
         clipHref = "url(#" + clipId + ")",
         clipPath = container.appendChild(po.svg("clipPath")),
         clipCircle = clipPath.appendChild(po.svg("circle")),
+        back = po.svg("circle"),
+        fore = po.svg("circle"),
         visible = true,
-        r = 64,
+        r = 128,
+        rr = [64, 384],
+        k = 1,
         map,
+        f0,
         m0,
         p0,
         p1 = {x: 0, y: 0},
@@ -23,14 +28,14 @@
         .zoomRange(null)
         .on("move", move);
 
-    clipCircle.setAttribute("cx", r);
-    clipCircle.setAttribute("cy", r);
-    clipCircle.setAttribute("r", r);
+    container.appendChild(back).setAttribute("class", "back");
+    container.appendChild(fore).setAttribute("class", "fore");
     clipPath.setAttribute("id", clipId);
-    container.setAttribute("clip-path", clipHref);
     container.setAttribute("class", "map loupe");
 
-    container.addEventListener("mousedown", mousedown, false);
+    back.addEventListener("mousedown", mousedown, false);
+    fore.addEventListener("mousedown", foredown, false);
+    fore.setAttribute("cursor", "ew-resize");
     window.addEventListener("mouseup", mouseup, false);
     window.addEventListener("mousemove", mousemove, false);
 
@@ -38,8 +43,28 @@
       var p = map.locationPoint(loupe.center()),
           z0 = map.zoom(),
           z1 = loupe.zoom();
-      if (z0 != z1) loupe.off("move", move).zoom(z0).on("move", move);
+      if (z0 != z1) {
+        loupe.off("move", move).zoom(z0).on("move", move);
+        clipCircle.setAttribute("r", r * (k = Math.pow(2, Math.round(z0) - z0)));
+      }
       container.setAttribute("transform", "translate(" + (p.x - r) + "," + (p.y - r) + ")");
+    }
+
+    function foredown(e) {
+      f0 = true;
+      document.body.style.setProperty("cursor", "ew-resize", null);
+      map.focusableParent().focus();
+      return cancel(e);
+    }
+
+    function foremove(e) {
+      var p0 = map.mouse(e),
+          p1 = map.locationPoint(loupe.center()),
+          dx = p1.x - p0.x,
+          dy = p1.y - p0.y,
+           r = Math.sqrt(dx * dx + dy * dy);
+      loupe.radius(r ^ (r & 1));
+      return cancel(e);
     }
 
     function mousedown(e) {
@@ -50,6 +75,7 @@
     }
 
     function mousemove(e) {
+      if (f0) return foremove(e);
       if (!m0) return;
       var m1 = map.mouse(e),
           size = map.size();
@@ -79,11 +105,15 @@
     }
 
     function mouseup(e) {
+      if (f0) {
+        f0 = null;
+        document.body.style.removeProperty("cursor");
+      }
       if (m0) {
         if (repeatInterval) repeatInterval = clearInterval(repeatInterval);
-        m0 = null;
-        return cancel(e);
+        m0 = p0 = null;
       }
+      return cancel(e);
     }
 
     function cancel(e) {
@@ -106,12 +136,35 @@
       return loupe;
     };
 
+    var __add__ = loupe.add;
+    loupe.add = function(x) {
+      x.map(loupe);
+      if (x.container) {
+        x = x.container();
+        x.setAttribute("clip-path", clipHref);
+        x.setAttribute("pointer-events", "none");
+      }
+      container.appendChild(fore); // move to end
+      return loupe;
+    };
+
+    loupe.radiusRange = function(x) {
+      if (!arguments.length) return rr;
+      rr = x;
+      return loupe.radius(r);
+    };
+
     loupe.radius = function(x) {
       if (!arguments.length) return r;
-      r = x;
-      clipCircle.setAttribute("cx", r);
-      clipCircle.setAttribute("cy", r);
-      clipCircle.setAttribute("r", r);
+      r = rr ? Math.max(rr[0], Math.min(rr[1], x)) : x;
+      back.setAttribute("cx", r);
+      back.setAttribute("cy", r);
+      back.setAttribute("r", r);
+      fore.setAttribute("cx", r);
+      fore.setAttribute("cy", r);
+      fore.setAttribute("r", r);
+      clipCircle.setAttribute("r", r * k);
+      loupe.size({x: r * 2, y: r * 2})
       if (map) move();
       return loupe;
     };
@@ -123,6 +176,8 @@
       else g.setAttribute("visibility", "hidden");
       return loupe;
     };
+
+    loupe.radius(r); // initialize circles
 
     return loupe;
   };
