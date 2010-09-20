@@ -8,6 +8,8 @@
         clipCircle = clipPath.appendChild(po.svg("circle")),
         back = po.svg("circle"),
         fore = po.svg("circle"),
+        centerPoint = null,
+        zoomDelta = 0,
         visible = true,
         r = 128,
         rr = [64, 384],
@@ -16,7 +18,6 @@
         f0,
         m0,
         p0,
-        p1 = {x: 0, y: 0},
         repeatInterval,
         repeatRate = 30,
         repeatPan = {x: 0, y: 0};
@@ -26,7 +27,7 @@
         .container(container)
         .centerRange(null)
         .zoomRange(null)
-        .on("move", move);
+        .on("move", loupemove);
 
     container.appendChild(back).setAttribute("class", "back");
     container.appendChild(fore).setAttribute("class", "fore");
@@ -40,16 +41,21 @@
     window.addEventListener("mouseup", mouseup, false);
     window.addEventListener("mousemove", mousemove, false);
 
-    function move() {
+    // update the center point if the center is set explicitly
+    function loupemove() {
+      loupe.centerPoint(map.locationPoint(loupe.center()));
+    }
+
+    // update the center and zoom level if the underlying map moves
+    function mapmove() {
       if (!map) return;
-      var p = map.locationPoint(loupe.center()),
-          z0 = map.zoom(),
+      var z0 = map.zoom() + zoomDelta,
           z1 = loupe.zoom();
-      if (z0 != z1) {
-        loupe.off("move", move).zoom(z0).on("move", move);
-        clipCircle.setAttribute("r", r * (k = Math.pow(2, Math.round(z0) - z0)));
-      }
-      container.setAttribute("transform", "translate(" + (p.x - r) + "," + (p.y - r) + ")");
+      loupe.off("move", loupemove)
+        .zoomBy(z0 - z1, {x: r, y: r}, map.pointLocation(centerPoint))
+        .on("move", loupemove);
+      clipCircle.setAttribute("r", r * (k = Math.pow(2, Math.round(z0) - z0)));
+      container.setAttribute("transform", "translate(" + (centerPoint.x - r) + "," + (centerPoint.y - r) + ")");
     }
 
     function foredown(e) {
@@ -61,7 +67,7 @@
 
     function foremove(e) {
       var p0 = map.mouse(e),
-          p1 = map.locationPoint(loupe.center()),
+          p1 = loupe.centerPoint(),
           dx = p1.x - p0.x,
           dy = p1.y - p0.y,
            r = Math.sqrt(dx * dx + dy * dy);
@@ -71,7 +77,7 @@
 
     function mousedown(e) {
       m0 = map.mouse(e);
-      p0 = map.locationPoint(loupe.center());
+      p0 = loupe.centerPoint();
       map.focusableParent().focus();
       return cancel(e);
     }
@@ -80,13 +86,13 @@
       if (f0) return foremove(e);
       if (!m0) return;
       var m1 = map.mouse(e),
-          size = map.size();
+          size = map.size(),
+          x = p0.x - m0.x + m1.x,
+          y = p0.y - m0.y + m1.y;
 
-      // determine the new loupe point, and whether it's offscreen
-      p1.x = p0.x - m0.x + m1.x;
-      p1.y = p0.y - m0.y + m1.y;
-      repeatPan.x = p1.x < 0 ? -p1.x : p1.x > size.x ? size.x - p1.x : 0;
-      repeatPan.y = p1.y < 0 ? -p1.y : p1.y > size.y ? size.y - p1.y : 0;
+      // determine whether we're offscreen
+      repeatPan.x = x < 0 ? -x : x > size.x ? size.x - x : 0;
+      repeatPan.y = y < 0 ? -y : y > size.y ? size.y - y : 0;
 
       // if the loupe is offscreen, start a new pan interval
       if (repeatPan.x || repeatPan.y) {
@@ -97,13 +103,13 @@
         repeatInterval = clearInterval(repeatInterval);
       }
 
-      loupe.center(map.pointLocation(p1));
+      centerPoint = {x: Math.round(x), y: Math.round(y)};
+      mapmove();
       return cancel(e);
     }
 
     function mouserepeat() {
       map.panBy(repeatPan);
-      loupe.center(map.pointLocation(p1));
     }
 
     function mouseup(e) {
@@ -131,22 +137,33 @@
         map.off("move", move).off("resize", move);
       }
       if (map = x) {
-        map.on("move", move).on("resize", move);
+        if (!centerPoint) {
+          var size = map.size();
+          centerPoint = {x: size.x >> 1, y: size.y >> 1};
+        }
+        map.on("move", mapmove).on("resize", mapmove);
         map.container().appendChild(loupe.container());
-        move();
+        mapmove();
       }
       return loupe;
     };
 
     var __add__ = loupe.add;
     loupe.add = function(x) {
-      x.map(loupe);
+      __add__(x);
       if (x.container) {
         x = x.container();
         x.setAttribute("clip-path", clipHref);
         x.setAttribute("pointer-events", "none");
       }
       container.appendChild(fore); // move to end
+      return loupe;
+    };
+
+    loupe.centerPoint = function(x) {
+      if (!arguments.length) return centerPoint;
+      centerPoint = {x: Math.round(x.x), y: Math.round(x.y)};
+      if (map) mapmove();
       return loupe;
     };
 
@@ -167,7 +184,14 @@
       fore.setAttribute("r", r);
       clipCircle.setAttribute("r", r * k);
       loupe.size({x: r * 2, y: r * 2})
-      if (map) move();
+      if (map) mapmove();
+      return loupe;
+    };
+
+    loupe.zoomDelta = function(x) {
+      if (!arguments.length) return zoomDelta;
+      zoomDelta = x;
+      if (map) mapmove();
       return loupe;
     };
 
