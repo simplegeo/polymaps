@@ -35,11 +35,13 @@
 
     back.addEventListener("mousedown", mousedown, false);
     fore.addEventListener("mousedown", foredown, false);
+    fore.setAttribute("fill", "none");
     fore.setAttribute("cursor", "ew-resize");
     window.addEventListener("mouseup", mouseup, false);
     window.addEventListener("mousemove", mousemove, false);
 
     function move() {
+      if (!map) return;
       var p = map.locationPoint(loupe.center()),
           z0 = map.zoom(),
           z1 = loupe.zoom();
