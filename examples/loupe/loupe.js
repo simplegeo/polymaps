@@ -7,9 +7,12 @@
         clipPath = container.appendChild(po.svg("clipPath")),
         clipCircle = clipPath.appendChild(po.svg("circle")),
         back = po.svg("circle"),
+        tab = po.svg("path"),
         fore = po.svg("circle"),
         centerPoint = null,
         zoomDelta = 0,
+        tabPosition = "bottom-right",
+        tabAngles = {"top-left": 180, "top-right": 270, "bottom-left": 90},
         visible = true,
         r = 128,
         rr = [64, 384],
@@ -30,11 +33,13 @@
         .on("move", loupemove);
 
     container.appendChild(back).setAttribute("class", "back");
+    container.appendChild(tab).setAttribute("class", "tab");
     container.appendChild(fore).setAttribute("class", "fore");
     clipPath.setAttribute("id", clipId);
     container.setAttribute("class", "map loupe");
 
     back.addEventListener("mousedown", mousedown, false);
+    tab.addEventListener("mousedown", mousedown, false);
     fore.addEventListener("mousedown", foredown, false);
     fore.setAttribute("fill", "none");
     fore.setAttribute("cursor", "ew-resize");
@@ -176,6 +181,8 @@
     loupe.radius = function(x) {
       if (!arguments.length) return r;
       r = rr ? Math.max(rr[0], Math.min(rr[1], x)) : x;
+
+      // update back, fore and clip
       back.setAttribute("cx", r);
       back.setAttribute("cy", r);
       back.setAttribute("r", r);
@@ -183,9 +190,35 @@
       fore.setAttribute("cy", r);
       fore.setAttribute("r", r);
       clipCircle.setAttribute("r", r * k);
+
+      // update the tab path
+      tab.setAttribute("d", "M" + r + "," + 2 * r
+          + "H" + 1.9 * r
+          + "A" + r * .1 + "," + r * .1 + " 0 0,0 " + 2 * r + "," + 1.9 * r
+          + "V" + r
+          + "A" + r + "," + r + " 0 0,1 " + r + "," + 2 * r
+          + "Z");
+
+      // update the tab position
+      if (tabPosition == "none") tab.setAttribute("display", "none");
+      else {
+        tab.removeAttribute("display");
+        var a = tabAngles[tabPosition];
+        if (a) tab.setAttribute("transform", "rotate(" + a + " " + r + "," + r + ")");
+        else tab.removeAttribute("transform");
+      }
+
+      // update map size
       loupe.size({x: r * 2, y: r * 2})
+
       if (map) mapmove();
       return loupe;
+    };
+
+    loupe.tab = function(x) {
+      if (!arguments.length) return tabPosition;
+      tabPosition = x;
+      return loupe.radius(r);
     };
 
     loupe.zoomDelta = function(x) {
