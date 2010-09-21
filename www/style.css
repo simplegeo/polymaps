@@ -1,6 +1,15 @@
+html, body {
+  height: 100%;
+}
+
 body {
   font-size: 14px;
   text-rendering: optimizeLegibility;
+}
+
+svg {
+  display: block;
+  overflow: hidden;
 }
 
 code, tt, pre {

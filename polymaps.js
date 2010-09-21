@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.1+3.1+2"; // This fork not semver!
+  po.version = "2.2.0"; // semver.org
 
   var zero = {x: 0, y: 0};
 po.ns = {
