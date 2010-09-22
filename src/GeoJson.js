@@ -7,6 +7,7 @@ po.geoJson = function(fetch) {
       clipHref = "url(#" + clipId + ")",
       clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild),
       clipRect = clipPath.appendChild(po.svg("rect")),
+      scale = "auto",
       zoom = null,
       features;
 
@@ -15,27 +16,35 @@ po.geoJson = function(fetch) {
 
   if (!arguments.length) fetch = po.queue.json;
 
+  function projection(proj) {
+    var l = {lat: 0, lon: 0};
+    return function(coordinates) {
+      l.lat = coordinates[1];
+      l.lon = coordinates[0];
+      var p = proj(l);
+      coordinates.x = p.x;
+      coordinates.y = p.y;
+      return p;
+    };
+  }
+
   function geometry(o, proj) {
     return o && o.type in types && types[o.type](o, proj);
   }
 
   function point(coordinates, proj) {
-    var p = proj({lat: coordinates[1], lon: coordinates[0]}),
+    var p = proj(coordinates),
         c = po.svg("circle");
     c.setAttribute("r", 4.5);
-    c.setAttribute("cx", p.x);
-    c.setAttribute("cy", p.y);
+    c.setAttribute("transform", "translate(" + p.x + "," + p.y + ")");
     return c;
   }
 
   function line(coordinates, closed, proj, d) {
     d.push("M");
     for (var i = 0; i < coordinates.length - closed; i++) {
-      p = proj({lat: coordinates[i][1], lon: coordinates[i][0]});
-      d.push(p.x);
-      d.push(",");
-      d.push(p.y);
-      d.push("L");
+      var p = proj(coordinates[i]);
+      d.push(p.x, ",", p.y, "L");
     }
     d.pop();
   }
@@ -103,7 +112,7 @@ po.geoJson = function(fetch) {
     var g = tile.element = po.svg("g");
     tile.features = [];
 
-    proj = proj(tile);
+    proj = projection(proj(tile).locationPoint);
 
     function update(data) {
       var updated = [];
@@ -116,18 +125,18 @@ po.geoJson = function(fetch) {
         case "FeatureCollection": {
           for (var i = 0; i < data.features.length; i++) {
             var feature = data.features[i],
-                element = geometry(feature.geometry, proj.locationPoint);
+                element = geometry(feature.geometry, proj);
             if (element) updated.push({element: g.appendChild(element), data: feature});
           }
           break;
         }
         case "Feature": {
-          var element = geometry(data.geometry, proj.locationPoint);
+          var element = geometry(data.geometry, proj);
           if (element) updated.push({element: g.appendChild(element), data: data});
           break;
         }
         default: {
-          var element = geometry(data, proj.locationPoint);
+          var element = geometry(data, proj);
           if (element) updated.push({element: g.appendChild(element), data: {type: "Feature", geometry: data}});
           break;
         }
@@ -147,6 +156,49 @@ po.geoJson = function(fetch) {
 
   function unload(tile) {
     if (tile.request) tile.request.abort(true);
+  }
+
+  function rescale() {
+    if (scale != "fixed") return; // TODO clear scale
+    var locks = geoJson.cache.locks(),
+        zoom = geoJson.map().zoom(),
+        transform = ["translate(", null, ",", null, null],
+        i,
+        j,
+        key, // key in locks
+        tile, // locks[key]
+        features, // tile.features
+        feature, // tile.features[i]
+        geometry, // feature.data.geometry
+        element, // feature.element
+        coordinates, // geometry.coordinates
+        coordinate; // coordinates[j]
+    for (key in locks) {
+      transform[4] = ")scale(" + Math.pow(2, (tile = locks[key]).zoom - zoom) + ")";
+      features = tile.features;
+      for (i = 0; i < features.length; i++) {
+        element = (feature = features[i]).element;
+        coordinates = (geometry = feature.data.geometry).coordinates;
+        switch (geometry.type) {
+          case "Point": {
+            transform[1] = coordinates.x;
+            transform[3] = coordinates.y;
+            element.setAttribute("transform", transform.join(""));
+            break;
+          }
+          case "MultiPoint": {
+            for (j = 0, element = element.firstChild;
+                 j < coordinates.length;
+                 j++, element = element.nextSibling) {
+              transform[1] = (coordinate = coordinates[j]).x;
+              transform[3] = coordinate.y;
+              element.setAttribute("transform", transform.join(""));
+            }
+            break;
+          }
+        }
+      }
+    }
   }
 
   geoJson.url = function(x) {
@@ -184,11 +236,18 @@ po.geoJson = function(fetch) {
   var __map__ = geoJson.map;
   geoJson.map = function(x) {
     if (x && clipRect) {
-      var size = x.tileSize();
+      var size = map.tileSize();
       clipRect.setAttribute("width", size.x);
       clipRect.setAttribute("height", size.y);
     }
     return __map__.apply(geoJson, arguments);
+  };
+
+  geoJson.scale = function(x) {
+    if (!arguments.length) return scale;
+    if (scale = x) geoJson.on("scale", rescale);
+    else geoJson.off("scale", rescale);
+    return geoJson;
   };
 
   geoJson.show = function(tile) {

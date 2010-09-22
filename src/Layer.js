@@ -8,6 +8,7 @@ po.layer = function(load, unload) {
       map,
       container = po.svg("g"),
       transform,
+      layerZoom,
       levelZoom,
       levels = {};
 
@@ -235,6 +236,13 @@ po.layer = function(load, unload) {
 
     // flush the cache, clearing no-longer-needed tiles
     cache.flush();
+
+    // dispatch a "scale" event if the zoom level changed
+    mapZoom += mapZoomFraction;
+    if (layerZoom != mapZoom) {
+      layerZoom = mapZoom;
+      layer.dispatch({type: "scale"});
+    }
   }
 
   // remove proxy tiles when tiles load

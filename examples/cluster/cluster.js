@@ -55,11 +55,7 @@ function load(e) {
       .size(64));
 
   for (var i = 0; i < e.features.length; i++) {
-    var feature = e.features[i];
-    cluster.add({
-      x: Number(feature.element.getAttribute("cx")),
-      y: Number(feature.element.getAttribute("cy"))
-    });
+    cluster.add(e.features[i].data.geometry.coordinates);
   }
 
   var tile = e.tile, g = tile.element;

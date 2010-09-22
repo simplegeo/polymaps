@@ -14,7 +14,8 @@ defs.appendChild(icons.marker()).setAttribute("id", "marker");
 var map = po.map()
     .container(svg)
     .center({lat: 37.787, lon: -122.228})
-    .zoomRange([12,12])
+    .zoomRange([11,16])
+    .zoom(12)
     .add(po.interact());
 
 map.add(po.image()
@@ -33,20 +34,28 @@ map.add(po.geoJson()
         + "&dend=2010-04-01"))
     .on("load", load)
     .clip(false)
+    .scale("fixed")
     .zoom(12));
+
+map.add(po.compass()
+    .pan("none"));
 
 /* Post-process the GeoJSON points and replace them with markers! */
 function load(e) {
+  e.features.sort(function(a, b) {
+    return b.data.geometry.coordinates[1] - a.data.geometry.coordinates[1];
+  });
   for (var i = 0; i < e.features.length; i++) {
     var f = e.features[i],
         d = f.data,
         c = f.element,
-        u = po.svg("use");
+        p = c.parentNode,
+        u = f.element = po.svg("use");
     u.setAttributeNS(po.ns.xlink, "href", "url(#marker)");
-    u.setAttribute("x", c.getAttribute("cx"));
-    u.setAttribute("y", c.getAttribute("cy"));
+    u.setAttribute("transform", c.getAttribute("transform"));
     u.setAttribute("fill", "url(#gradient-" + crimespotting.categorize(d) + ")");
-    c.parentNode.replaceChild(u, c);
+    p.removeChild(c);
+    p.appendChild(u);
   }
 }
 
