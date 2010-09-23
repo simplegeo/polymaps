@@ -158,7 +158,7 @@ po.geoJson = function(fetch) {
     if (tile.request) tile.request.abort(true);
   }
 
-  function rescale() {
+  function rezoom() {
     if (scale != "fixed") return; // TODO clear scale
     var locks = geoJson.cache.locks(),
         zoom = geoJson.map().zoom(),
@@ -236,7 +236,7 @@ po.geoJson = function(fetch) {
   var __map__ = geoJson.map;
   geoJson.map = function(x) {
     if (x && clipRect) {
-      var size = map.tileSize();
+      var size = x.tileSize();
       clipRect.setAttribute("width", size.x);
       clipRect.setAttribute("height", size.y);
     }
@@ -245,8 +245,8 @@ po.geoJson = function(fetch) {
 
   geoJson.scale = function(x) {
     if (!arguments.length) return scale;
-    if (scale = x) geoJson.on("scale", rescale);
-    else geoJson.off("scale", rescale);
+    if (scale = x) geoJson.on("zoom", rezoom);
+    else geoJson.off("zoom", rezoom);
     return geoJson;
   };
 

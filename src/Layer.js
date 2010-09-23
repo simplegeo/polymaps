@@ -237,11 +237,11 @@ po.layer = function(load, unload) {
     // flush the cache, clearing no-longer-needed tiles
     cache.flush();
 
-    // dispatch a "scale" event if the zoom level changed
+    // dispatch a "zoom" event if the zoom level changed
     mapZoom += mapZoomFraction;
     if (layerZoom != mapZoom) {
       layerZoom = mapZoom;
-      layer.dispatch({type: "scale"});
+      layer.dispatch({type: "zoom"});
     }
   }
 
