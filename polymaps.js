@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.2+1.0+1"; // This fork not semver!
+  po.version = "2.2+1.0+2"; // This fork not semver!
 
   var zero = {x: 0, y: 0};
 po.ns = {
@@ -1089,16 +1089,16 @@ function scanTriangle(a, b, c, ymin, ymax, scanLine) {
 }
 po.image = function() {
   var image = po.layer(load, unload),
-      url = "about:blank";
+      url;
 
   function load(tile) {
     var element = tile.element = po.svg("image"), size = image.map().tileSize();
     element.setAttribute("preserveAspectRatio", "none");
     element.setAttribute("width", size.x);
     element.setAttribute("height", size.y);
-    element.setAttribute("opacity", 0);
 
     if (typeof url == "function") {
+      element.setAttribute("opacity", 0);
       tile.request = po.queue.image(element, url(tile), function(img) {
         delete tile.request;
         tile.ready = true;
@@ -1108,7 +1108,7 @@ po.image = function() {
       });
     } else {
       tile.ready = true;
-      element.setAttributeNS(po.ns.xlink, "href", url);
+      if (url) element.setAttributeNS(po.ns.xlink, "href", url);
       image.dispatch({type: "load", tile: tile});
     }
   }
@@ -1128,7 +1128,7 @@ po.image = function() {
 po.geoJson = function(fetch) {
   var geoJson = po.layer(load, unload),
       container = geoJson.container(),
-      url = "about:blank",
+      url,
       clip = true,
       clipId = "org.polymaps." + po.id(),
       clipHref = "url(#" + clipId + ")",
@@ -1274,10 +1274,10 @@ po.geoJson = function(fetch) {
       geoJson.dispatch({type: "load", tile: tile, features: updated});
     }
 
-    if (features) {
-      update({type: "FeatureCollection", features: features});
-    } else {
+    if (url != null) {
       tile.request = fetch(typeof url == "function" ? url(tile) : url, update);
+    } else {
+      update({type: "FeatureCollection", features: features || []});
     }
   }
 
@@ -1331,14 +1331,17 @@ po.geoJson = function(fetch) {
   geoJson.url = function(x) {
     if (!arguments.length) return url;
     url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
+    if (url != null) features = null;
     if (typeof url == "string") geoJson.tile(false);
     return geoJson.reload();
   };
 
   geoJson.features = function(x) {
     if (!arguments.length) return features;
-    if (x) geoJson.tile(false);
-    features = x;
+    if (features = x) {
+      url = null;
+      geoJson.tile(false);
+    }
     return geoJson.reload();
   };
 
