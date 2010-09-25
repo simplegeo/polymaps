@@ -55,7 +55,7 @@
         }
         if (f.geometry) features.push(f);
       }
-      return {features: features};
+      return {type: "FeatureCollection", features: features};
     }
 
     return kml;
