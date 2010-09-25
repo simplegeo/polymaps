@@ -32,78 +32,156 @@ po.geoJson = function(fetch) {
     return o && o.type in types && types[o.type](o, proj);
   }
 
-  function point(coordinates, proj) {
-    var p = proj(coordinates),
-        c = po.svg("circle");
-    c.setAttribute("r", 4.5);
-    c.setAttribute("transform", "translate(" + p.x + "," + p.y + ")");
-    return c;
-  }
-
-  function line(coordinates, closed, proj, d) {
-    d.push("M");
-    for (var i = 0; i < coordinates.length - closed; i++) {
-      var p = proj(coordinates[i]);
-      d.push(p.x, ",", p.y, "L");
-    }
-    d.pop();
-  }
-
-  function polygon(coordinates, closed, proj, d) {
-    for (var i = 0; i < coordinates.length; i++) {
-      line(coordinates[i], closed, proj, d);
-    }
-    if (closed) d.push("Z");
-  }
-
-  function multi(type, coordinates, closed, proj) {
-    var d = [];
-    for (var i = 0; i < coordinates.length; i++) {
-      type(coordinates[i], closed, proj, d);
-    }
-    if (!d.length) return;
-    var path = po.svg("path");
-    path.setAttribute("d", d.join(""));
-    return path;
-  }
-
   var types = {
 
     Point: function(o, proj) {
-      return point(o.coordinates, proj);
+      var p = proj(o.coordinates),
+          c = po.svg("circle");
+      c.setAttribute("r", 4.5);
+      c.setAttribute("transform", "translate(" + p.x + "," + p.y + ")");
+      return c;
     },
 
     MultiPoint: function(o, proj) {
-      var g = po.svg("g");
-      for (var i = 0; i < o.coordinates.length; i++) {
-        g.appendChild(point(o.coordinates[i], proj));
+      var g = po.svg("g"),
+          c = o.coordinates,
+          p, // proj(c[i])
+          x, // svg:circle
+          i = -1,
+          n = c.length;
+      while (++i < n) {
+        x = g.appendChild(po.svg("circle"));
+        x.setAttribute("r", 4.5);
+        x.setAttribute("transform", "translate(" + (p = proj(c[i])).x + "," + p.y + ")");
       }
       return g;
     },
 
     LineString: function(o, proj) {
-      return multi(line, [o.coordinates], 0, proj);
+      var x = po.svg("path"),
+          d = ["M"],
+          c = o.coordinates,
+          p, // proj(c[i])
+          i = -1,
+          n = c.length;
+      while (++i < n) d.push((p = proj(c[i])).x, ",", p.y, "L");
+      d.pop();
+      if (!d.length) return;
+      x.setAttribute("d", d.join(""));
+      return x;
     },
 
     MultiLineString: function(o, proj) {
-      return multi(line, o.coordinates, 0, proj);
+      var x = po.svg("path"),
+          d = [],
+          ci = o.coordinates,
+          cj, // ci[i]
+          i = -1,
+          j,
+          n = ci.length,
+          m;
+      while (++i < n) {
+        cj = ci[i];
+        j = -1;
+        m = cj.length;
+        d.push("M");
+        while (++j < m) d.push((p = proj(cj[j])).x, ",", p.y, "L");
+        d.pop();
+      }
+      if (!d.length) return;
+      x.setAttribute("d", d.join(""));
+      return x;
     },
 
     Polygon: function(o, proj) {
-      return multi(polygon, [o.coordinates], 1, proj);
+      var x = po.svg("path"),
+          d = [],
+          ci = o.coordinates,
+          cj, // ci[i]
+          i = -1,
+          j,
+          n = ci.length,
+          m;
+      while (++i < n) {
+        cj = ci[i];
+        j = -1;
+        m = cj.length - 1;
+        d.push("M");
+        while (++j < m) d.push((p = proj(cj[j])).x, ",", p.y, "L");
+        d[d.length - 1] = "Z";
+      }
+      if (!d.length) return;
+      x.setAttribute("d", d.join(""));
+      return x;
     },
 
     MultiPolygon: function(o, proj) {
-      return multi(polygon, o.coordinates || o.coords, 1, proj); // TODO coords
+      var x = po.svg("path"),
+          d = [],
+          ci = o.coordinates,
+          cj, // ci[i]
+          ck, // cj[j]
+          i = -1,
+          j,
+          k,
+          n = ci.length,
+          m,
+          l;
+      while (++i < n) {
+        cj = ci[i];
+        j = -1;
+        m = cj.length;
+        while (++j < m) {
+          ck = cj[j];
+          k = -1;
+          l = ck.length - 1;
+          d.push("M");
+          while (++k < l) d.push((p = proj(ck[k])).x, ",", p.y, "L");
+          d[d.length - 1] = "Z";
+        }
+      }
+      if (!d.length) return;
+      x.setAttribute("d", d.join(""));
+      return x;
     },
 
     GeometryCollection: function(o, proj) {
-      var g = po.svg("g");
-      for (var i = 0; i < o.geometries.length; i++) {
-        var element = geometry(o.geometries[i], proj);
-        if (element) g.appendChild(element);
+      var g = po.svg("g"),
+          i = -1,
+          c = o.geometries,
+          n = c.length,
+          x;
+      while (++i < n) {
+        x = geometry(c[i], proj);
+        if (x) g.appendChild(x);
       }
       return g;
+    }
+
+  };
+
+  function rescale(o, e, k) {
+    return o.type in rescales && rescales[o.type](o, e, k);
+  }
+
+  var rescales = {
+
+    Point: function (o, e, k) {
+      var p = o.coordinates;
+      e.setAttribute("transform", "translate(" + p.x + "," + p.y + ")" + k);
+    },
+
+    MultiPoint: function (o, e, k) {
+      var c = o.coordinates,
+          i = -1,
+          n = p.length,
+          x = e.firstChild,
+          p;
+      while (++i < n) {
+        p = c[i];
+        x.setAttribute("transform", "translate(" + p.x + "," + p.y + ")" + k);
+        x = x.nextSibling;
+      }
     }
 
   };
@@ -158,45 +236,32 @@ po.geoJson = function(fetch) {
     if (tile.request) tile.request.abort(true);
   }
 
-  function rezoom() {
-    if (scale != "fixed") return; // TODO clear scale
-    var locks = geoJson.cache.locks(),
-        zoom = geoJson.map().zoom(),
-        transform = ["translate(", null, ",", null, null],
-        i,
-        j,
+  function move() {
+    var zoom = geoJson.map().zoom(),
+        tiles = geoJson.cache.locks(), // visible tiles
         key, // key in locks
         tile, // locks[key]
         features, // tile.features
-        feature, // tile.features[i]
-        geometry, // feature.data.geometry
-        element, // feature.element
-        coordinates, // geometry.coordinates
-        coordinate; // coordinates[j]
-    for (key in locks) {
-      transform[4] = ")scale(" + Math.pow(2, (tile = locks[key]).zoom - zoom) + ")";
-      features = tile.features;
-      for (i = 0; i < features.length; i++) {
-        element = (feature = features[i]).element;
-        coordinates = (geometry = feature.data.geometry).coordinates;
-        switch (geometry.type) {
-          case "Point": {
-            transform[1] = coordinates.x;
-            transform[3] = coordinates.y;
-            element.setAttribute("transform", transform.join(""));
-            break;
-          }
-          case "MultiPoint": {
-            for (j = 0, element = element.firstChild;
-                 j < coordinates.length;
-                 j++, element = element.nextSibling) {
-              transform[1] = (coordinate = coordinates[j]).x;
-              transform[3] = coordinate.y;
-              element.setAttribute("transform", transform.join(""));
-            }
-            break;
-          }
+        i, // current feature index
+        n, // current feature count, features.length
+        feature, // features[i]
+        k; // scale transform
+    if (scale == "fixed") {
+      for (key in tiles) {
+        if ((tile = tiles[key]).scale != zoom) {
+          k = "scale(" + Math.pow(2, tile.zoom - zoom) + ")";
+          i = -1;
+          n = (features = tile.features).length;
+          while (++i < n) rescale((feature = features[i]).data.geometry, feature.element, k);
+          tile.scale = zoom;
         }
+      }
+    } else {
+      for (key in tiles) {
+        i = -1;
+        n = (features = (tile = tiles[key]).features).length;
+        while (++i < n) rescale((feature = features[i]).data.geometry, feature.element, "");
+        delete tile.scale;
       }
     }
   }
@@ -245,8 +310,9 @@ po.geoJson = function(fetch) {
 
   geoJson.scale = function(x) {
     if (!arguments.length) return scale;
-    if (scale = x) geoJson.on("zoom", rezoom);
-    else geoJson.off("zoom", rezoom);
+    if (scale = x) geoJson.on("move", move);
+    else geoJson.off("move", move);
+    if (geoJson.map()) move();
     return geoJson;
   };
 
