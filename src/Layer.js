@@ -8,7 +8,6 @@ po.layer = function(load, unload) {
       map,
       container = po.svg("g"),
       transform,
-      layerZoom,
       levelZoom,
       levels = {};
 
