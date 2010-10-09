@@ -2,36 +2,40 @@ JS_COMPILER = \
 	java -jar compiler.jar \
 	--charset UTF-8
 
-JS_FILES = \
-	bing.js \
-	blue-marble.js \
-	cluster.js \
-	flickr.js \
-	fullscreen.js \
-	grid.js \
-	mandelbrot.js \
-	midnight-commander.js \
-	overlay.js \
-	pale-dawn.js \
-	population.js \
-	shadow.js \
-	statehood.js \
-	streets.js \
-	tiles.js \
-	transform.js \
-	unemployment.js \
-	world.js
+FILES = \
+	../colorbrewer.css \
+	../modernizr.min.js \
+	../nns.min.js \
+	../polymaps.min.js \
+	../protodata.min.js \
+	bing.min.js \
+	blue-marble.min.js \
+	cluster.min.js \
+	flickr.min.js \
+	fullscreen.min.js \
+	grid.min.js \
+	mandelbrot.min.js \
+	midnight-commander.min.js \
+	overlay.min.js \
+	pale-dawn.min.js \
+	population.min.js \
+	shadow.min.js \
+	statehood.min.js \
+	streets.min.js \
+	tiles.min.js \
+	transform.min.js \
+	unemployment.min.js \
+	world.min.js
 
-all: $(JS_FILES:.js=.min.js)
-$(JS_FILES) compiler.jar: ../.git/refs/heads/master Makefile
-$(JS_FILES): compiler.jar
+all: $(FILES)
+$(FILES) compiler.jar: ../.git/refs/heads/master Makefile
 .INTERMEDIATE: compiler.jar
 
 clean:
 	rm -f *.min.js
 
-%.min.js: %.js
-	$(JS_COMPILER) < $^ > $@
+%.min.js: %.js compiler.jar
+	$(JS_COMPILER) < $< > $@
 
 compiler.jar:
 	git cat-file blob master:lib/google-compiler/compiler-20100616.jar > $@
@@ -86,3 +90,18 @@ unemployment.js:
 
 world.js:
 	git cat-file blob master:examples/world/world.js > $@
+
+../colorbrewer.css:
+	git cat-file blob master:lib/colorbrewer/colorbrewer.css > $@
+
+../modernizr.min.js:
+	git cat-file blob master:lib/modernizr/modernizr.min.js > $@
+
+../nns.min.js:
+	git cat-file blob master:lib/nns/nns.min.js > $@
+
+../polymaps.min.js:
+	git cat-file blob master:polymaps.min.js > $@
+
+../protodata.min.js:
+	git cat-file blob master:lib/protovis/protodata.min.js > $@
