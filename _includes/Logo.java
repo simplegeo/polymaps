@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 public class Logo {
   public static void main(String[] args) {
     String fontName = args.length > 0 ? args[0] : "Helvetica Neue";
-    int fontSize = args.length > 1 ? Integer.parseInt(args[1]) : 162;
+    int fontSize = args.length > 1 ? Integer.parseInt(args[1]) : 154;
     String string = "Polymaps";
 
     Font f = new Font(fontName, Font.BOLD, fontSize);
