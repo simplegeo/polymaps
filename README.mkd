@@ -1,0 +1,40 @@
+---
+---
+# Polymaps
+
+Polymaps is a free JavaScript library for making dynamic, interactive maps in
+modern web browsers. See <http://polymaps.org> for more details.
+
+This is the `gh-pages` branch, which contains the Polymaps website, running on
+GitHub Pages. If you're looking for the source code to Polymaps, you should
+checkout the `master` branch instead.
+
+### Build Instructions
+
+To edit and preview the website locally, you must first [install
+Jekyll](http://github.com/mojombo/jekyll/wiki/install). You can then launch
+Jekyll from this repo's root directory. For example:
+
+    jekyll --pygments --auto --server
+
+You should now be able to view the site at <http://0.0.0.0:4000/>.
+
+Some of the files in the `gh-pages` branch are copies of files in the `master`
+branch; for example, the ColorBrewer CSS file and Modernizr are copied from
+the `lib` directory in the master branch. This allows the examples in the
+master branch to function as simple, standalone files, whilst not duplicating
+code that is integrated into the pretty example pages on the website.
+
+If you want to update the website to pull the latest files from master, then
+run the following command:
+
+    make -C _includes
+
+The `Makefile` is in the `_includes` directory for convenience; that's where
+most of the generated files are, and Jekyll won't serve any files that start
+with an underscore.
+
+Building the website requires that you have `git` and `make` installed, and
+that you've pulled both the `master` and `gh-pages` branch; you can't update
+the website just by downloading the tarball from GitHub. You'll also need Java
+to run the Google Closure compiler, which minifies JavaScript.
