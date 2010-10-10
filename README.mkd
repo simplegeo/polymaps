@@ -49,16 +49,17 @@ tools included with
 your development environment, you can rebuild Polymaps by running the
 following command from the repo's root directory:
 
-   make
+    make
 
 The Polymaps build process is exceptionally simple. First, all the JavaScript
 files are concatenated (using `cat`); the order of files is important to
 preserve dependencies. This produces the file `polymaps.js`. Second, this file
 is put through Google's [Closure
-Compiler](http://code.google.com/closure/compiler/) to minify the JavaScript.
+Compiler](http://code.google.com/closure/compiler/) to minify the JavaScript,
+resulting in a smaller `polymaps.min.js`.
 
 If you are doing development, it is highly recommended that you use the
-non-minified JavaScript so that it is easier to debug. The minified JavaScript
-is only intended for production, where file size matters. Note that the
-development version is marked as read-only so that you don't accidentally
-overwrite your edits after a re-build.
+non-minified JavaScript for easier debugging. The minified JavaScript is only
+intended for production, where file size matters. Note that the development
+version is marked as read-only so that you don't accidentally overwrite your
+edits after a re-build.
