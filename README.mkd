@@ -1,5 +1,3 @@
----
----
 # Polymaps
 
 Polymaps is a free JavaScript library for making dynamic, interactive maps in
