@@ -28,11 +28,8 @@ FILES = \
 	world.min.js
 
 all: $(FILES)
-$(FILES) compiler.jar: ../.git/refs/heads/master Makefile
+.PHONY: $(FILES:.min.js=.js)
 .INTERMEDIATE: compiler.jar
-
-clean:
-	rm -f *.min.js
 
 %.min.js: %.js compiler.jar
 	$(JS_COMPILER) < $< > $@
