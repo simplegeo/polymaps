@@ -8,6 +8,7 @@ FILES = \
 	../nns.min.js \
 	../polymaps.min.js \
 	../protodata.min.js \
+	../screen.css \
 	bing.min.js \
 	blue-marble.min.js \
 	cluster.min.js \
@@ -102,3 +103,6 @@ world.js:
 
 ../protodata.min.js:
 	git cat-file blob master:lib/protovis/protodata.min.js > $@
+
+../screen.css:
+	git cat-file blob master:lib/blueprint/screen.css > $@
