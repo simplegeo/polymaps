@@ -209,10 +209,10 @@ po.layer = function(load, unload) {
     // position tiles
     for (var key in newLocks) {
       var t = newLocks[key],
-          k = Math.pow(2, t.level = t.zoom - tileCenter.zoom),
-          x = tileSize.x * (t.column - tileCenter.column * k),
-          y = tileSize.y * (t.row - tileCenter.row * k);
-      t.element.setAttribute("transform", "translate(" + x + "," + y + ")");
+          k = Math.pow(2, t.level = t.zoom - tileCenter.zoom);
+      t.element.setAttribute("transform", "translate("
+        + (t.x = tileSize.x * (t.column - tileCenter.column * k)) + ","
+        + (t.y = tileSize.y * (t.row - tileCenter.row * k)) + ")");
     }
 
     // remove tiles that are no longer visible
@@ -235,6 +235,9 @@ po.layer = function(load, unload) {
 
     // flush the cache, clearing no-longer-needed tiles
     cache.flush();
+
+    // dispatch the move event
+    layer.dispatch({type: "move"});
   }
 
   // remove proxy tiles when tiles load
@@ -272,6 +275,10 @@ po.layer = function(load, unload) {
 
   layer.container = function() {
     return container;
+  };
+
+  layer.levels = function() {
+    return levels;
   };
 
   layer.id = function(x) {

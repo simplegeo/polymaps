@@ -152,17 +152,9 @@ po.map = function() {
 
   map.resize = function() {
     if (!size) {
-      /*
-       * Firefox does not correctly report the dimensions of SVG elements.
-       * However, it does correctly report the size of the child rect!
-       */
-      var e = container.ownerSVGElement || container;
-      if (e.offsetWidth == null) {
-        rect.setAttribute("width", "100%");
-        rect.setAttribute("height", "100%");
-        e = rect;
-      }
-      b = e.getClientRects()[0];
+      rect.setAttribute("width", "100%");
+      rect.setAttribute("height", "100%");
+      b = rect.getBBox();
       sizeActual = {x: b.width, y: b.height};
       resizer.add(map);
     } else {

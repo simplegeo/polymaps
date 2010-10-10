@@ -1,36 +1,25 @@
 <html>
   <head>
     <script type="text/javascript" src="../../polymaps.js"></script>
-    <script type="text/javascript" src="../../lib/crimespotting/crimespotting.js"></script>
-    <script type="text/javascript" src="kmeans.js"></script>
+    <script type="text/javascript" src="loupe.js"></script>
     <style type="text/css">
 
 @import url("../example.css");
 
-#map {
-  background: #E6E6E6;
+.loupe .back {
+  stroke: #000;
+  stroke-width: 8px;
 }
 
-.layer circle {
-  fill: lightcoral;
-  fill-opacity: .5;
-  stroke: brown;
-  vector-effect: non-scaling-stroke;
-}
-
-#copy {
-  color: #000;
-  opacity: .5;
-}
-
-#copy a {
-  color: #000;
+.loupe .fore {
+  stroke: #ccc;
+  stroke-width: 6px;
 }
 
     </style>
   </head>
   <body id="map">
-    <script type="text/javascript" src="cluster.js"></script>
+    <script type="text/javascript" src="loupe-map.js"></script>
     <span id="copy">
       &copy; 2010
       <a href="http://www.cloudmade.com/">CloudMade</a>,

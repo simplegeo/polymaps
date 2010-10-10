@@ -1,15 +1,15 @@
 po.image = function() {
   var image = po.layer(load, unload),
-      url = "about:blank";
+      url;
 
   function load(tile) {
     var element = tile.element = po.svg("image"), size = image.map().tileSize();
     element.setAttribute("preserveAspectRatio", "none");
     element.setAttribute("width", size.x);
     element.setAttribute("height", size.y);
-    element.setAttribute("opacity", 0);
 
     if (typeof url == "function") {
+      element.setAttribute("opacity", 0);
       tile.request = po.queue.image(element, url(tile), function(img) {
         delete tile.request;
         tile.ready = true;
@@ -19,7 +19,7 @@ po.image = function() {
       });
     } else {
       tile.ready = true;
-      element.setAttributeNS(po.ns.xlink, "href", url);
+      if (url) element.setAttributeNS(po.ns.xlink, "href", url);
       image.dispatch({type: "load", tile: tile});
     }
   }

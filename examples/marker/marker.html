@@ -1,8 +1,8 @@
 <html>
   <head>
     <script type="text/javascript" src="../../polymaps.js"></script>
+    <script type="text/javascript" src="../../lib/raphaeljs/icons.js"></script>
     <script type="text/javascript" src="../../lib/crimespotting/crimespotting.js"></script>
-    <script type="text/javascript" src="kmeans.js"></script>
     <style type="text/css">
 
 @import url("../example.css");
@@ -11,11 +11,9 @@
   background: #E6E6E6;
 }
 
-.layer circle {
-  fill: lightcoral;
-  fill-opacity: .5;
-  stroke: brown;
-  vector-effect: non-scaling-stroke;
+.layer use {
+  stroke: #ccc;
+  stroke-opacity: .5;
 }
 
 #copy {
@@ -30,7 +28,7 @@
     </style>
   </head>
   <body id="map">
-    <script type="text/javascript" src="cluster.js"></script>
+    <script type="text/javascript" src="marker.js"></script>
     <span id="copy">
       &copy; 2010
       <a href="http://www.cloudmade.com/">CloudMade</a>,
