@@ -28,38 +28,13 @@ map.add(po.geoJson()
 map.add(po.compass()
     .pan("none"));
 
-function crimespotting(template) {
-  return function(c) {
-    var max = 1 << c.zoom, column = c.column % max;
-    if (column < 0) column += max;
-    return template.replace(/{(.)}/g, function(s, v) {
-      switch (v) {
-        case "B": {
-          var nw = map.coordinateLocation({row: c.row, column: column, zoom: c.zoom}),
-              se = map.coordinateLocation({row: c.row + 1, column: column + 1, zoom: c.zoom}),
-              pn = Math.ceil(Math.log(c.zoom) / Math.LN2);
-          return nw.lon.toFixed(pn)
-              + "," + se.lat.toFixed(pn)
-              + "," + se.lon.toFixed(pn)
-              + "," + nw.lat.toFixed(pn);
-        }
-      }
-      return v;
-    });
-  };
-}
-
 function load(e) {
   var cluster = e.tile.cluster || (e.tile.cluster = kmeans()
       .iterations(16)
       .size(64));
 
   for (var i = 0; i < e.features.length; i++) {
-    var feature = e.features[i];
-    cluster.add({
-      x: Number(feature.element.getAttribute("cx")),
-      y: Number(feature.element.getAttribute("cy"))
-    });
+    cluster.add(e.features[i].data.geometry.coordinates);
   }
 
   var tile = e.tile, g = tile.element;
