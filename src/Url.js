@@ -1,10 +1,16 @@
 po.url = function(template) {
-  var hosts = [];
+  var hosts = [],
+      repeat = true;
 
   function format(c) {
     var max = c.zoom < 0 ? 1 : 1 << c.zoom,
-        column = c.column % max;
-    if (column < 0) column += max;
+        column = c.column;
+    if (repeat) {
+      column = c.column % max;
+      if (column < 0) column += max;
+    } else if ((column < 0) || (column >= max)) {
+      return "about:blank";
+    }
     return template.replace(/{(.)}/g, function(s, v) {
       switch (v) {
         case "S": return hosts[(Math.abs(c.zoom) + c.row + column) % hosts.length];
@@ -34,6 +40,12 @@ po.url = function(template) {
   format.hosts = function(x) {
     if (!arguments.length) return hosts;
     hosts = x;
+    return format;
+  };
+
+  format.repeat = function(x) {
+    if (!arguments.length) return repeat;
+    repeat = x;
     return format;
   };
 

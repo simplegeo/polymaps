@@ -2,6 +2,6 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.3.0"; // semver.org
+  po.version = "2.3+1.0"; // not semver!
 
   var zero = {x: 0, y: 0};
