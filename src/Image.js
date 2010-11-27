@@ -11,7 +11,7 @@ po.image = function() {
     if (typeof url == "function") {
       element.setAttribute("opacity", 0);
       var tileUrl = url(tile);
-      if (tileUrl !== null) {
+      if (tileUrl != null) {
         tile.request = po.queue.image(element, tileUrl, function(img) {
           delete tile.request;
           tile.ready = true;
@@ -25,7 +25,7 @@ po.image = function() {
       }
     } else {
       tile.ready = true;
-      if (url) element.setAttributeNS(po.ns.xlink, "href", url);
+      if (url != null) element.setAttributeNS(po.ns.xlink, "href", url);
       image.dispatch({type: "load", tile: tile});
     }
   }
