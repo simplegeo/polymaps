@@ -192,7 +192,7 @@ po.url = function(template) {
       column = c.column % max;
       if (column < 0) column += max;
     } else if ((column < 0) || (column >= max)) {
-      return "about:blank";
+      return null;
     }
     return template.replace(/{(.)}/g, function(s, v) {
       switch (v) {
@@ -1110,13 +1110,19 @@ po.image = function() {
 
     if (typeof url == "function") {
       element.setAttribute("opacity", 0);
-      tile.request = po.queue.image(element, url(tile), function(img) {
-        delete tile.request;
+      var tileUrl = url(tile);
+      if (tileUrl !== null) {
+        tile.request = po.queue.image(element, tileUrl, function(img) {
+          delete tile.request;
+          tile.ready = true;
+          tile.img = img;
+          element.removeAttribute("opacity");
+          image.dispatch({type: "load", tile: tile});
+        });
+      } else {
         tile.ready = true;
-        tile.img = img;
-        element.removeAttribute("opacity");
         image.dispatch({type: "load", tile: tile});
-      });
+      }
     } else {
       tile.ready = true;
       if (url) element.setAttributeNS(po.ns.xlink, "href", url);

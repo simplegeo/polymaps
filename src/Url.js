@@ -9,7 +9,7 @@ po.url = function(template) {
       column = c.column % max;
       if (column < 0) column += max;
     } else if ((column < 0) || (column >= max)) {
-      return "about:blank";
+      return null;
     }
     return template.replace(/{(.)}/g, function(s, v) {
       switch (v) {
