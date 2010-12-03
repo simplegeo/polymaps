@@ -9,6 +9,7 @@ FILES = \
 	../polymaps.min.js \
 	../protodata.min.js \
 	../screen.css \
+	../ex/crimespotting.js \
 	bing.min.js \
 	blue-marble.min.js \
 	cluster.min.js \
@@ -106,3 +107,6 @@ world.js:
 
 ../screen.css:
 	git cat-file blob master:lib/blueprint/screen.css > $@
+
+../ex/crimespotting.js:
+	git cat-file blob master:lib/crimespotting/crimespotting.js > $@
