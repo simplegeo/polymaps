@@ -4,19 +4,27 @@ po.hash = function() {
       lat = 90 - 1e-8, // allowable latitude range
       map;
 
-  function move() {
+  var parse = function(s) {
+    return s.split("/").map(Number);
+  };
+
+  var format = function(map) {
     var center = map.center(),
         zoom = map.zoom(),
-        precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2)),
-        s1 = "#" + zoom.toFixed(2)
+        precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
+    return "#" + zoom.toFixed(2)
              + "/" + center.lat.toFixed(precision)
              + "/" + center.lon.toFixed(precision);
+  };
+
+  function move() {
+    var s1 = format(map);
     if (s0 !== s1) location.replace(s0 = s1); // don't recenter the map!
   }
 
   function hashchange() {
     if (location.hash === s0) return; // ignore spurious hashchange events
-    var args = (s0 = location.hash).substring(1).split("/").map(Number);
+    var args = parse((s0 = location.hash).substring(1));
     if (args.length < 3 || args.some(isNaN)) move(); // replace bogus hash
     else {
       var size = map.size();
@@ -39,6 +47,18 @@ po.hash = function() {
     }
     return hash;
   };
+
+  hash.parse = function(x) {
+    if (!arguments.length) return parse;
+    parse = x;
+    return hash;
+  }
+
+  hash.format = function(x) {
+    if (!arguments.length) return format;
+    format = x;
+    return hash;
+  }
 
   return hash;
 };
