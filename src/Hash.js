@@ -6,8 +6,7 @@ po.hash = function() {
 
   var parser = function(map, s) {
     var args = s.split("/").map(Number);
-    if (args.length < 3 || args.some(isNaN))
-      move(); // replace bogus hash
+    if (args.length < 3 || args.some(isNaN)) return true; // replace bogus hash
     else {
       var size = map.size();
       map.zoomBy(args[0] - map.zoom(),
@@ -32,7 +31,8 @@ po.hash = function() {
 
   function hashchange() {
     if (location.hash === s0) return; // ignore spurious hashchange events
-    parser(map, (s0 = location.hash).substring(1));
+    if (parser(map, (s0 = location.hash).substring(1)))
+      move(); // replace bogus hash
   }
 
   hash.map = function(x) {
