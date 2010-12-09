@@ -53,13 +53,13 @@ po.hash = function() {
     if (!arguments.length) return parse;
     parse = x;
     return hash;
-  }
+  };
 
   hash.format = function(x) {
     if (!arguments.length) return format;
     format = x;
     return hash;
-  }
+  };
 
   return hash;
 };
