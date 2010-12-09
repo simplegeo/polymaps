@@ -4,7 +4,7 @@ po.hash = function() {
       lat = 90 - 1e-8, // allowable latitude range
       map;
 
-  var parser = function(s) {
+  var parser = function(map, s) {
     var args = s.split("/").map(Number);
     if (args.length < 3 || args.some(isNaN))
       move(); // replace bogus hash
@@ -32,7 +32,7 @@ po.hash = function() {
 
   function hashchange() {
     if (location.hash === s0) return; // ignore spurious hashchange events
-    parser((s0 = location.hash).substring(1));
+    parser(map, (s0 = location.hash).substring(1));
   }
 
   hash.map = function(x) {
