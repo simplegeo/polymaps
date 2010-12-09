@@ -1784,7 +1784,8 @@ po.hash = function() {
   function hashchange() {
     if (location.hash === s0) return; // ignore spurious hashchange events
     var args = parse((s0 = location.hash).substring(1));
-    if (args.length < 3 || args.some(isNaN)) move(); // replace bogus hash
+    if (!args || args.length == undefined || args.length < 3 || args.some(isNaN))
+      move(); // replace bogus hash
     else {
       var size = map.size();
       map.zoomBy(args[0] - map.zoom(),
