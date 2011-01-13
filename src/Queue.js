@@ -112,7 +112,7 @@ po.queue = (function() {
       };
       img.onload = function() {
         active--;
-        callback();
+        callback(img);
         process();
       };
       img.src = src;

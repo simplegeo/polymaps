@@ -5,7 +5,7 @@
     var kml = po.geoJson(fetch);
 
     function fetch(url, update) {
-      po.queue.xml(url, function(xml) {
+      return po.queue.xml(url, function(xml) {
         update(geoJson(xml));
       });
     }

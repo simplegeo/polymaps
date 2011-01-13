@@ -9,6 +9,8 @@ body {
 }
 
 svg {
+  display: block;
+  overflow: hidden;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -36,6 +38,14 @@ svg {
 .compass .fore {
   stroke: #999;
   stroke-width: 1.5px;
+}
+
+.compass rect.back.fore {
+  fill: #999;
+  fill-opacity: .3;
+  stroke: #eee;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
 }
 
 .compass .direction {

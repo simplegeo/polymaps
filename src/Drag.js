@@ -1,18 +1,18 @@
 po.drag = function() {
   var drag = {},
       map,
-      cursor,
+      container,
       dragging;
 
   function mousedown(e) {
+    if (e.shiftKey) return;
     dragging = {
       x: e.clientX,
       y: e.clientY
     };
     map.focusableParent().focus();
     e.preventDefault();
-    cursor = document.body.style.cursor;
-    document.body.style.cursor = "move";
+    document.body.style.setProperty("cursor", "move", null);
   }
 
   function mousemove(e) {
@@ -26,15 +26,19 @@ po.drag = function() {
     if (!dragging) return;
     mousemove(e);
     dragging = null;
-    document.body.style.cursor = cursor;
+    document.body.style.removeProperty("cursor");
   }
 
   drag.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    // TODO remove from old map container?
-    // TODO update if map container changes?
-    map.container().addEventListener("mousedown", mousedown, false);
+    if (map) {
+      container.removeEventListener("mousedown", mousedown, false);
+      container = null;
+    }
+    if (map = x) {
+      container = map.container();
+      container.addEventListener("mousedown", mousedown, false);
+    }
     return drag;
   };
 
