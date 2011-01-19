@@ -2028,9 +2028,8 @@ po.compass = function() {
       case "bottom-left": y = size.y - y; break;
       case "bottom-right": x = size.x - x; y = size.y - y; break;
     }
-    var tx = "translate(" + x + "," + y + ")";
-    if (panContainer) panContainer.setAttribute("transform", tx);
-    if (zoomContainer) zoomContainer.setAttribute("transform", tx);
+    g.setAttribute("transform", "translate(" + x + "," + y + ")");
+    dragRect.setAttribute("transform", "translate(" + -x + "," + -y + ")");
     for (var i in ticks) {
       i == map.zoom()
           ? ticks[i].setAttribute("class", "active")
