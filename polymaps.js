@@ -2,7 +2,7 @@ if (!org) var org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
-  po.version = "2.2+1.0+2"; // This fork not semver!
+  po.version = "2.4.0+1"; // not semver!
 
   var zero = {x: 0, y: 0};
 po.ns = {
@@ -182,12 +182,18 @@ po.cache = function(load, unload) {
   return cache;
 };
 po.url = function(template) {
-  var hosts = [];
+  var hosts = [],
+      repeat = true;
 
   function format(c) {
     var max = c.zoom < 0 ? 1 : 1 << c.zoom,
-        column = c.column % max;
-    if (column < 0) column += max;
+        column = c.column;
+    if (repeat) {
+      column = c.column % max;
+      if (column < 0) column += max;
+    } else if ((column < 0) || (column >= max)) {
+      return null;
+    }
     return template.replace(/{(.)}/g, function(s, v) {
       switch (v) {
         case "S": return hosts[(Math.abs(c.zoom) + c.row + column) % hosts.length];
@@ -217,6 +223,12 @@ po.url = function(template) {
   format.hosts = function(x) {
     if (!arguments.length) return hosts;
     hosts = x;
+    return format;
+  };
+
+  format.repeat = function(x) {
+    if (!arguments.length) return repeat;
+    repeat = x;
     return format;
   };
 
@@ -1098,16 +1110,22 @@ po.image = function() {
 
     if (typeof url == "function") {
       element.setAttribute("opacity", 0);
-      tile.request = po.queue.image(element, url(tile), function(img) {
-        delete tile.request;
+      var tileUrl = url(tile);
+      if (tileUrl != null) {
+        tile.request = po.queue.image(element, tileUrl, function(img) {
+          delete tile.request;
+          tile.ready = true;
+          tile.img = img;
+          element.removeAttribute("opacity");
+          image.dispatch({type: "load", tile: tile});
+        });
+      } else {
         tile.ready = true;
-        tile.img = img;
-        element.removeAttribute("opacity");
         image.dispatch({type: "load", tile: tile});
-      });
+      }
     } else {
       tile.ready = true;
-      if (url) element.setAttributeNS(po.ns.xlink, "href", url);
+      if (url != null) element.setAttributeNS(po.ns.xlink, "href", url);
       image.dispatch({type: "load", tile: tile});
     }
   }
@@ -1763,26 +1781,35 @@ po.hash = function() {
       lat = 90 - 1e-8, // allowable latitude range
       map;
 
-  function move() {
-    var center = map.center(),
-        zoom = map.zoom(),
-        precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2)),
-        s1 = "#" + zoom.toFixed(2)
-             + "/" + center.lat.toFixed(precision)
-             + "/" + center.lon.toFixed(precision);
-    if (s0 !== s1) location.replace(s0 = s1); // don't recenter the map!
-  }
-
-  function hashchange() {
-    if (location.hash === s0) return; // ignore spurious hashchange events
-    var args = (s0 = location.hash).substring(1).split("/").map(Number);
-    if (args.length < 3 || args.some(isNaN)) move(); // replace bogus hash
+  var parser = function(map, s) {
+    var args = s.split("/").map(Number);
+    if (args.length < 3 || args.some(isNaN)) return true; // replace bogus hash
     else {
       var size = map.size();
       map.zoomBy(args[0] - map.zoom(),
           {x: size.x / 2, y: size.y / 2},
           {lat: Math.min(lat, Math.max(-lat, args[1])), lon: args[2]});
     }
+  };
+
+  var formatter = function(map) {
+    var center = map.center(),
+        zoom = map.zoom(),
+        precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
+    return "#" + zoom.toFixed(2)
+             + "/" + center.lat.toFixed(precision)
+             + "/" + center.lon.toFixed(precision);
+  };
+
+  function move() {
+    var s1 = formatter(map);
+    if (s0 !== s1) location.replace(s0 = s1); // don't recenter the map!
+  }
+
+  function hashchange() {
+    if (location.hash === s0) return; // ignore spurious hashchange events
+    if (parser(map, (s0 = location.hash).substring(1)))
+      move(); // replace bogus hash
   }
 
   hash.map = function(x) {
@@ -1796,6 +1823,18 @@ po.hash = function() {
       window.addEventListener("hashchange", hashchange, false);
       location.hash ? hashchange() : move();
     }
+    return hash;
+  };
+
+  hash.parser = function(x) {
+    if (!arguments.length) return parser;
+    parser = x;
+    return hash;
+  };
+
+  hash.formatter = function(x) {
+    if (!arguments.length) return formatter;
+    formatter = x;
     return hash;
   };
 
@@ -2010,9 +2049,8 @@ po.compass = function() {
       case "bottom-left": y = size.y - y; break;
       case "bottom-right": x = size.x - x; y = size.y - y; break;
     }
-    var tx = "translate(" + x + "," + y + ")";
-    if (panContainer) panContainer.setAttribute("transform", tx);
-    if (zoomContainer) zoomContainer.setAttribute("transform", tx);
+    g.setAttribute("transform", "translate(" + x + "," + y + ")");
+    dragRect.setAttribute("transform", "translate(" + -x + "," + -y + ")");
     for (var i in ticks) {
       i == map.zoom()
           ? ticks[i].setAttribute("class", "active")
