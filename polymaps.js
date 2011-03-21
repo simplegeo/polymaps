@@ -840,7 +840,11 @@ po.layer = function(load, unload) {
       oldLocks[key].proxyCount = 0;
     }
 
-    // load the tiles!
+    // determine visible tiles
+    var visibleTiles = [];
+    var z = c0.zoom,
+        z0 = 2 - tileLevel,
+        z1 = 4 + tileLevel;
     if (visible && tileLevel > -5 && tileLevel < 3) {
       var ymax = c0.zoom < 0 ? 1 : 1 << c0.zoom;
       if (tile) {
@@ -855,60 +859,66 @@ po.layer = function(load, unload) {
         scanLine(x, x + 1, y);
       }
     }
-
-    // scan-line conversion
     function scanLine(x0, x1, y) {
-      var z = c0.zoom,
-          z0 = 2 - tileLevel,
-          z1 = 4 + tileLevel;
-
       for (var x = x0; x < x1; x++) {
-        var t = cache.load({column: x, row: y, zoom: z}, projection);
-        if (!t.ready && !(t.key in newLocks)) {
-          t.proxyRefs = {};
-          var c, full, proxy;
+        visibleTiles.push({column: x, row: y, zoom: z});
+      }
+    }
+    
+    // load the tiles, from tileCenter in order of taxicab distance
+    visibleTiles.sort(function (infoA, infoB) {
+      var dA = Math.abs(infoA.row - tileCenter.row) + Math.abs(infoA.column - tileCenter.column);
+      var dB = Math.abs(infoB.row - tileCenter.row) + Math.abs(infoB.column - tileCenter.column);
+      return dA - dB;
+    });
+    for (var tileIdx = 0, tilesLen = visibleTiles.length; tileIdx < tilesLen; tileIdx++) {
+      var tileInfo = visibleTiles[tileIdx],
+          t = cache.load(tileInfo, projection);
+      if (!t.ready && !(t.key in newLocks)) {
+        var x = tileInfo.column, y = tileInfo.row;
+        t.proxyRefs = {};
+        var c, full, proxy;
 
-          // downsample high-resolution tiles
-          for (var dz = 1; dz <= z0; dz++) {
-            full = true;
-            for (var dy = 0, k = 1 << dz; dy <= k; dy++) {
-              for (var dx = 0; dx <= k; dx++) {
-                proxy = cache.peek(c = {
-                  column: (x << dz) + dx,
-                  row: (y << dz) + dy,
-                  zoom: z + dz
-                });
-                if (proxy && proxy.ready) {
-                  newLocks[proxy.key] = cache.load(c);
-                  proxy.proxyCount++;
-                  t.proxyRefs[proxy.key] = proxy;
-                } else {
-                  full = false;
-                }
-              }
-            }
-            if (full) break;
-          }
-
-          // upsample low-resolution tiles
-          if (!full) {
-            for (var dz = 1; dz <= z1; dz++) {
+        // downsample high-resolution tiles
+        for (var dz = 1; dz <= z0; dz++) {
+          full = true;
+          for (var dy = 0, k = 1 << dz; dy <= k; dy++) {
+            for (var dx = 0; dx <= k; dx++) {
               proxy = cache.peek(c = {
-                column: x >> dz,
-                row: y >> dz,
-                zoom: z - dz
+                column: (x << dz) + dx,
+                row: (y << dz) + dy,
+                zoom: z + dz
               });
               if (proxy && proxy.ready) {
                 newLocks[proxy.key] = cache.load(c);
                 proxy.proxyCount++;
                 t.proxyRefs[proxy.key] = proxy;
-                break;
+              } else {
+                full = false;
               }
             }
           }
+          if (full) break;
         }
-        newLocks[t.key] = t;
+
+        // upsample low-resolution tiles
+        if (!full) {
+          for (var dz = 1; dz <= z1; dz++) {
+            proxy = cache.peek(c = {
+              column: x >> dz,
+              row: y >> dz,
+              zoom: z - dz
+            });
+            if (proxy && proxy.ready) {
+              newLocks[proxy.key] = cache.load(c);
+              proxy.proxyCount++;
+              t.proxyRefs[proxy.key] = proxy;
+              break;
+            }
+          }
+        }
       }
+      newLocks[t.key] = t;
     }
 
     // position tiles
@@ -1763,10 +1773,9 @@ po.hash = function() {
       lat = 90 - 1e-8, // allowable latitude range
       map;
 
-  var parser = function(s) {
+  var parser = function(map, s) {
     var args = s.split("/").map(Number);
-    if (args.length < 3 || args.some(isNaN))
-      move(); // replace bogus hash
+    if (args.length < 3 || args.some(isNaN)) return true; // replace bogus hash
     else {
       var size = map.size();
       map.zoomBy(args[0] - map.zoom(),
@@ -1791,7 +1800,8 @@ po.hash = function() {
 
   function hashchange() {
     if (location.hash === s0) return; // ignore spurious hashchange events
-    parser((s0 = location.hash).substring(1));
+    if (parser(map, (s0 = location.hash).substring(1)))
+      move(); // replace bogus hash
   }
 
   hash.map = function(x) {
