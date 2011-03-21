@@ -102,6 +102,7 @@ po.map = function() {
 
   map.container = function(x) {
     if (!arguments.length) return container;
+    map.dispatch({type: "container", 'old':container, 'new':x});
     container = x;
     container.setAttribute("class", "map");
     container.appendChild(rect);
