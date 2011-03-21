@@ -1550,14 +1550,20 @@ po.touch = function() {
 
   touch.map = function(x) {
     if (!arguments.length) return map;
-    map = x;
-    // TODO remove from old map container?
-    // TODO update if map container changes?
-    var container = map.container();
-    container.addEventListener("touchstart", touchstart, false);
-    container.addEventListener("touchmove", touchmove, false);
-    container.addEventListener("touchend", touchend, false);
-    container.addEventListener("touchcancel", touchend, false);
+    if (map) {
+      var container = map.container();
+      container.removeEventListener("touchstart", touchstart, false);
+      container.removeEventListener("touchmove", touchmove, false);
+      container.removeEventListener("touchend", touchend, false);
+      container.removeEventListener("touchcancel", touchend, false);
+    }
+    if (map = x) {
+      var container = map.container();
+      container.addEventListener("touchstart", touchstart, false);
+      container.addEventListener("touchmove", touchmove, false);
+      container.addEventListener("touchend", touchend, false);
+      container.addEventListener("touchcancel", touchend, false);
+    }
     return touch;
   }
   
@@ -1610,7 +1616,9 @@ po.touch = function() {
 		}
 		return {
 			clientX: sumX / touches.length,
+      pageX: sumX / touches.length,
       clientY: sumY / touches.length,
+      pageY: sumY / touches.length,
       scale: e.scale
     };
 	}
