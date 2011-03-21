@@ -42,26 +42,13 @@ po.wheel = function() {
 
   wheel.map = function(x) {
     if (!arguments.length) return map;
-    
-    if (map) {
-      map.off("move", move);
-      var container = map.container();
-      container.removeEventListener("mousemove", move, false);
-      container.removeEventListener("mousewheel", mousewheel, false);
-      container.removeEventListener("DOMMouseScroll", mousewheel, false);
-    }
-    
-    map = x;
-    
-    if (map) {
-      map.on("move", move);
-      var container = map.container();
-      container.addEventListener("mousemove", move, false);
-      container.addEventListener("mousewheel", mousewheel, false);
-      container.addEventListener("DOMMouseScroll", mousewheel, false);
-      // TODO update if map container changes?
-    }
-    
+    (map = x).on("move", move);
+    // TODO remove from old map container?
+    // TODO update if map container changes?
+    var container = map.container();
+    container.addEventListener("mousemove", move, false);
+    container.addEventListener("mousewheel", mousewheel, false);
+    container.addEventListener("DOMMouseScroll", mousewheel, false);
     return wheel;
   };
 
