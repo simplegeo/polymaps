@@ -2,35 +2,27 @@ po.touch = function() {
   var touch = {},
       map,
       last;
-  
-  function container(c) {
-    if (c['old']) {
-      c['old'].removeEventListener("touchstart", touchstart, false);
-      c['old'].removeEventListener("touchmove", touchmove, false);
-      c['old'].removeEventListener("touchend", touchend, false);
-      c['old'].removeEventListener("touchcancel", touchend, false);
-    }
-    if (c['new']) {
-      console.log(c['new']);
-      c['new'].addEventListener("touchstart", touchstart, false);
-      c['new'].addEventListener("touchmove", touchmove, false);
-      c['new'].addEventListener("touchend", touchend, false);
-      c['new'].addEventListener("touchcancel", touchend, false);
-    }
-  }
-  
+
   touch.map = function(x) {
     if (!arguments.length) return map;
     
     if (map) {
-      map.off("container", container);
+      var container = map.container();
+      container.removeEventListener("touchstart", touchstart, false);
+      container.removeEventListener("touchmove", touchmove, false);
+      container.removeEventListener("touchend", touchend, false);
+      container.removeEventListener("touchcancel", touchend, false);
     }
     
-    container({'old':(map && map.container()), 'new':(x && x.container())});
     map = x;
     
     if (map) {
-      map.on("container", container);
+      var container = map.container();
+      container.addEventListener("touchstart", touchstart, false);
+      container.addEventListener("touchmove", touchmove, false);
+      container.addEventListener("touchend", touchend, false);
+      container.addEventListener("touchcancel", touchend, false);
+      // TODO update if map container changes?
     }
     
     return touch;

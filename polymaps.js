@@ -436,7 +436,6 @@ po.map = function() {
 
   map.container = function(x) {
     if (!arguments.length) return container;
-    map.dispatch({type: "container", 'old':container, 'new':x});
     container = x;
     container.setAttribute("class", "map");
     container.appendChild(rect);
@@ -1253,37 +1252,17 @@ po.touch = function() {
   var touch = {},
       map,
       last;
-  
-  function container(c) {
-    if (c['old']) {
-      c['old'].removeEventListener("touchstart", touchstart, false);
-      c['old'].removeEventListener("touchmove", touchmove, false);
-      c['old'].removeEventListener("touchend", touchend, false);
-      c['old'].removeEventListener("touchcancel", touchend, false);
-    }
-    if (c['new']) {
-      console.log(c['new']);
-      c['new'].addEventListener("touchstart", touchstart, false);
-      c['new'].addEventListener("touchmove", touchmove, false);
-      c['new'].addEventListener("touchend", touchend, false);
-      c['new'].addEventListener("touchcancel", touchend, false);
-    }
-  }
-  
+
   touch.map = function(x) {
     if (!arguments.length) return map;
-    
-    if (map) {
-      map.off("container", container);
-    }
-    
-    container({'old':(map && map.container()), 'new':(x && x.container())});
     map = x;
-    
-    if (map) {
-      map.on("container", container);
-    }
-    
+    // TODO remove from old map container?
+    // TODO update if map container changes?
+    var container = map.container();
+    container.addEventListener("touchstart", touchstart, false);
+    container.addEventListener("touchmove", touchmove, false);
+    container.addEventListener("touchend", touchend, false);
+    container.addEventListener("touchcancel", touchend, false);
     return touch;
   }
   
@@ -1384,37 +1363,16 @@ po.wheel = function() {
     smooth = x;
     return wheel;
   };
-  
-  
-  function container(c) {
-    if (c['old']) {
-      c['old'].removeEventListener("mousemove", move, false);
-      c['old'].removeEventListener("mousewheel", mousewheel, false);
-      c['old'].removeEventListener("DOMMouseScroll", mousewheel, false);
-    }
-    if (c['new']) {
-      c['new'].addEventListener("mousemove", move, false);
-      c['new'].addEventListener("mousewheel", mousewheel, false);
-      c['new'].addEventListener("DOMMouseScroll", mousewheel, false);
-    }
-  }
-  
+
   wheel.map = function(x) {
     if (!arguments.length) return map;
-    
-    if (map) {
-      map.off("move", move);
-      map.off("container", container);
-    }
-    
-    container({'old':(map && map.container()), 'new':(x && x.container())});
-    map = x;
-    
-    if (map) {
-      map.on("move", move);
-      map.on("container", container);
-    }
-    
+    (map = x).on("move", move);
+    // TODO remove from old map container?
+    // TODO update if map container changes?
+    var container = map.container();
+    container.addEventListener("mousemove", move, false);
+    container.addEventListener("mousewheel", mousewheel, false);
+    container.addEventListener("DOMMouseScroll", mousewheel, false);
     return wheel;
   };
 

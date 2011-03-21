@@ -39,35 +39,27 @@ po.wheel = function() {
     smooth = x;
     return wheel;
   };
-  
-  
-  function container(c) {
-    if (c['old']) {
-      c['old'].removeEventListener("mousemove", move, false);
-      c['old'].removeEventListener("mousewheel", mousewheel, false);
-      c['old'].removeEventListener("DOMMouseScroll", mousewheel, false);
-    }
-    if (c['new']) {
-      c['new'].addEventListener("mousemove", move, false);
-      c['new'].addEventListener("mousewheel", mousewheel, false);
-      c['new'].addEventListener("DOMMouseScroll", mousewheel, false);
-    }
-  }
-  
+
   wheel.map = function(x) {
     if (!arguments.length) return map;
     
     if (map) {
       map.off("move", move);
-      map.off("container", container);
+      var container = map.container();
+      container.removeEventListener("mousemove", move, false);
+      container.removeEventListener("mousewheel", mousewheel, false);
+      container.removeEventListener("DOMMouseScroll", mousewheel, false);
     }
     
-    container({'old':(map && map.container()), 'new':(x && x.container())});
     map = x;
     
     if (map) {
       map.on("move", move);
-      map.on("container", container);
+      var container = map.container();
+      container.addEventListener("mousemove", move, false);
+      container.addEventListener("mousewheel", mousewheel, false);
+      container.addEventListener("DOMMouseScroll", mousewheel, false);
+      // TODO update if map container changes?
     }
     
     return wheel;
