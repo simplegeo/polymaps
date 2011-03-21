@@ -1,171 +1,335 @@
 po.geoJson = function(fetch) {
   var geoJson = po.layer(load, unload),
-      url = po.url("about:blank"),
+      container = geoJson.container(),
+      url,
       clip = true,
-      clipId,
+      clipId = "org.polymaps." + po.id(),
+      clipHref = "url(#" + clipId + ")",
+      clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild),
+      clipRect = clipPath.appendChild(po.svg("rect")),
+      scale = "auto",
       zoom = null,
-      tiles = {},
       features;
 
+  container.setAttribute("fill-rule", "evenodd");
+  clipPath.setAttribute("id", clipId);
+
   if (!arguments.length) fetch = po.queue.json;
+
+  function projection(proj) {
+    var l = {lat: 0, lon: 0};
+    return function(coordinates) {
+      l.lat = coordinates[1];
+      l.lon = coordinates[0];
+      var p = proj(l);
+      coordinates.x = p.x;
+      coordinates.y = p.y;
+      return p;
+    };
+  }
 
   function geometry(o, proj) {
     return o && o.type in types && types[o.type](o, proj);
   }
 
-  function point(coordinates, proj) {
-    var p = proj({lat: coordinates[1], lon: coordinates[0]}),
-        c = po.svg("circle");
-    c.setAttribute("r", 4.5);
-    c.setAttribute("cx", p.x);
-    c.setAttribute("cy", p.y);
-    return c;
-  }
-
-  function line(coordinates, closed, proj, d) {
-    d.push("M");
-    for (var i = 0; i < coordinates.length - closed; i++) {
-      p = proj({lat: coordinates[i][1], lon: coordinates[i][0]});
-      d.push(p.x);
-      d.push(",");
-      d.push(p.y);
-      d.push("L");
-    }
-    d.pop();
-  }
-
-  function polygon(coordinates, closed, proj, d) {
-    for (var i = 0; i < coordinates.length; i++) {
-      line(coordinates[i], closed, proj, d);
-    }
-    if (closed) d.push("Z");
-  }
-
-  function multi(type, coordinates, closed, proj) {
-    var d = [];
-    for (var i = 0; i < coordinates.length; i++) {
-      type(coordinates[i], closed, proj, d);
-    }
-    if (!d.length) return;
-    var path = po.svg("path");
-    path.setAttribute("d", d.join(""));
-    return path;
-  }
-
   var types = {
 
     Point: function(o, proj) {
-      return point(o.coordinates, proj);
+      var p = proj(o.coordinates),
+          c = po.svg("circle");
+      c.setAttribute("r", 4.5);
+      c.setAttribute("transform", "translate(" + p.x + "," + p.y + ")");
+      return c;
     },
 
     MultiPoint: function(o, proj) {
-      var g = po.svg("g");
-      for (var i = 0; i < o.coordinates.length; i++) {
-        g.appendChild(point(o.coordinates[i], proj));
+      var g = po.svg("g"),
+          c = o.coordinates,
+          p, // proj(c[i])
+          x, // svg:circle
+          i = -1,
+          n = c.length;
+      while (++i < n) {
+        x = g.appendChild(po.svg("circle"));
+        x.setAttribute("r", 4.5);
+        x.setAttribute("transform", "translate(" + (p = proj(c[i])).x + "," + p.y + ")");
       }
       return g;
     },
 
     LineString: function(o, proj) {
-      return multi(line, [o.coordinates], 0, proj);
+      var x = po.svg("path"),
+          d = ["M"],
+          c = o.coordinates,
+          p, // proj(c[i])
+          i = -1,
+          n = c.length;
+      while (++i < n) d.push((p = proj(c[i])).x, ",", p.y, "L");
+      d.pop();
+      if (!d.length) return;
+      x.setAttribute("d", d.join(""));
+      return x;
     },
 
     MultiLineString: function(o, proj) {
-      return multi(line, o.coordinates, 0, proj);
+      var x = po.svg("path"),
+          d = [],
+          ci = o.coordinates,
+          cj, // ci[i]
+          i = -1,
+          j,
+          n = ci.length,
+          m;
+      while (++i < n) {
+        cj = ci[i];
+        j = -1;
+        m = cj.length;
+        d.push("M");
+        while (++j < m) d.push((p = proj(cj[j])).x, ",", p.y, "L");
+        d.pop();
+      }
+      if (!d.length) return;
+      x.setAttribute("d", d.join(""));
+      return x;
     },
 
     Polygon: function(o, proj) {
-      return multi(polygon, [o.coordinates], 1, proj);
+      var x = po.svg("path"),
+          d = [],
+          ci = o.coordinates,
+          cj, // ci[i]
+          i = -1,
+          j,
+          n = ci.length,
+          m;
+      while (++i < n) {
+        cj = ci[i];
+        j = -1;
+        m = cj.length - 1;
+        d.push("M");
+        while (++j < m) d.push((p = proj(cj[j])).x, ",", p.y, "L");
+        d[d.length - 1] = "Z";
+      }
+      if (!d.length) return;
+      x.setAttribute("d", d.join(""));
+      return x;
     },
 
     MultiPolygon: function(o, proj) {
-      return multi(polygon, o.coordinates || o.coords, 1, proj); // TODO coords
+      var x = po.svg("path"),
+          d = [],
+          ci = o.coordinates,
+          cj, // ci[i]
+          ck, // cj[j]
+          i = -1,
+          j,
+          k,
+          n = ci.length,
+          m,
+          l;
+      while (++i < n) {
+        cj = ci[i];
+        j = -1;
+        m = cj.length;
+        while (++j < m) {
+          ck = cj[j];
+          k = -1;
+          l = ck.length - 1;
+          d.push("M");
+          while (++k < l) d.push((p = proj(ck[k])).x, ",", p.y, "L");
+          d[d.length - 1] = "Z";
+        }
+      }
+      if (!d.length) return;
+      x.setAttribute("d", d.join(""));
+      return x;
     },
 
     GeometryCollection: function(o, proj) {
-      var g = po.svg("g");
-      for (var i = 0; i < o.geometries.length; i++) {
-        var element = geometry(o.geometries[i], proj);
-        if (element) g.appendChild(element);
+      var g = po.svg("g"),
+          i = -1,
+          c = o.geometries,
+          n = c.length,
+          x;
+      while (++i < n) {
+        x = geometry(c[i], proj);
+        if (x) g.appendChild(x);
       }
       return g;
+    }
+
+  };
+
+  function rescale(o, e, k) {
+    return o.type in rescales && rescales[o.type](o, e, k);
+  }
+
+  var rescales = {
+
+    Point: function (o, e, k) {
+      var p = o.coordinates;
+      e.setAttribute("transform", "translate(" + p.x + "," + p.y + ")" + k);
+    },
+
+    MultiPoint: function (o, e, k) {
+      var c = o.coordinates,
+          i = -1,
+          n = p.length,
+          x = e.firstChild,
+          p;
+      while (++i < n) {
+        p = c[i];
+        x.setAttribute("transform", "translate(" + p.x + "," + p.y + ")" + k);
+        x = x.nextSibling;
+      }
     }
 
   };
 
   function load(tile, proj) {
     var g = tile.element = po.svg("g");
+    tile.features = [];
 
-    proj = proj(tile);
+    proj = projection(proj(tile).locationPoint);
 
     function update(data) {
-      var features = tiles[tile.key] || (tiles[tile.key] = []), updated = [];
+      var updated = [];
+
+      /* Fetch the next batch of features, if so directed. */
       if (data.next) tile.request = fetch(data.next.href, update);
-      for (var i = 0; i < data.features.length; i++) {
-        var feature = data.features[i],
-            element = geometry(feature.geometry, proj.locationPoint);
-        if (element) {
-          var entry = {element: g.appendChild(element), data: feature};
-          features.push(entry);
-          updated.push(entry);
+
+      /* Convert the GeoJSON to SVG. */
+      switch (data.type) {
+        case "FeatureCollection": {
+          for (var i = 0; i < data.features.length; i++) {
+            var feature = data.features[i],
+                element = geometry(feature.geometry, proj);
+            if (element) updated.push({element: g.appendChild(element), data: feature});
+          }
+          break;
+        }
+        case "Feature": {
+          var element = geometry(data.geometry, proj);
+          if (element) updated.push({element: g.appendChild(element), data: data});
+          break;
+        }
+        default: {
+          var element = geometry(data, proj);
+          if (element) updated.push({element: g.appendChild(element), data: {type: "Feature", geometry: data}});
+          break;
         }
       }
+
       tile.ready = true;
+      updated.push.apply(tile.features, updated);
       geoJson.dispatch({type: "load", tile: tile, features: updated});
     }
 
-    if (features) {
-      update({features: features});
+    if (url != null) {
+      tile.request = fetch(typeof url == "function" ? url(tile) : url, update);
     } else {
-      tile.request = fetch(url(tile), update);
+      update({type: "FeatureCollection", features: features || []});
     }
-
-    if (clipId) g.setAttribute("clip-path", "url(#" + clipId + ")");
   }
 
   function unload(tile) {
     if (tile.request) tile.request.abort(true);
-    delete tiles[tile.key];
+  }
+
+  function move() {
+    var zoom = geoJson.map().zoom(),
+        tiles = geoJson.cache.locks(), // visible tiles
+        key, // key in locks
+        tile, // locks[key]
+        features, // tile.features
+        i, // current feature index
+        n, // current feature count, features.length
+        feature, // features[i]
+        k; // scale transform
+    if (scale == "fixed") {
+      for (key in tiles) {
+        if ((tile = tiles[key]).scale != zoom) {
+          k = "scale(" + Math.pow(2, tile.zoom - zoom) + ")";
+          i = -1;
+          n = (features = tile.features).length;
+          while (++i < n) rescale((feature = features[i]).data.geometry, feature.element, k);
+          tile.scale = zoom;
+        }
+      }
+    } else {
+      for (key in tiles) {
+        i = -1;
+        n = (features = (tile = tiles[key]).features).length;
+        while (++i < n) rescale((feature = features[i]).data.geometry, feature.element, "");
+        delete tile.scale;
+      }
+    }
   }
 
   geoJson.url = function(x) {
     if (!arguments.length) return url;
-    url = typeof x == "string" ? po.url(x) : x;
-    return geoJson;
+    url = typeof x == "string" && /{.}/.test(x) ? po.url(x) : x;
+    if (url != null) features = null;
+    if (typeof url == "string") geoJson.tile(false);
+    return geoJson.reload();
   };
 
   geoJson.features = function(x) {
     if (!arguments.length) return features;
-    if (x) geoJson.tile(false);
-    features = x;
-    return geoJson;
+    if (features = x) {
+      url = null;
+      geoJson.tile(false);
+    }
+    return geoJson.reload();
   };
 
   geoJson.clip = function(x) {
     if (!arguments.length) return clip;
-    clip = x;
+    if (clip) container.removeChild(clipPath);
+    if (clip = x) container.insertBefore(clipPath, container.firstChild);
+    var locks = geoJson.cache.locks();
+    for (var key in locks) {
+      if (clip) locks[key].element.setAttribute("clip-path", clipHref);
+      else locks[key].element.removeAttribute("clip-path");
+    }
     return geoJson;
   };
 
-  geoJson.init = function(g) {
-    if (clip && geoJson.tile()) {
-      var size = geoJson.map().tileSize(),
-          clipPath = g.insertBefore(po.svg("clipPath"), g.firstChild),
-          rect = clipPath.appendChild(po.svg("rect"));
-      clipPath.setAttribute("id", clipId = "org.polymaps." + po.id());
-      rect.setAttribute("width", size.x);
-      rect.setAttribute("height", size.y);
+  var __tile__ = geoJson.tile;
+  geoJson.tile = function(x) {
+    if (arguments.length && !x) geoJson.clip(x);
+    return __tile__.apply(geoJson, arguments);
+  };
+
+  var __map__ = geoJson.map;
+  geoJson.map = function(x) {
+    if (x && clipRect) {
+      var size = x.tileSize();
+      clipRect.setAttribute("width", size.x);
+      clipRect.setAttribute("height", size.y);
     }
-    g.setAttribute("fill-rule", "evenodd");
+    return __map__.apply(geoJson, arguments);
+  };
+
+  geoJson.scale = function(x) {
+    if (!arguments.length) return scale;
+    if (scale = x) geoJson.on("move", move);
+    else geoJson.off("move", move);
+    if (geoJson.map()) move();
+    return geoJson;
   };
 
   geoJson.show = function(tile) {
-    geoJson.dispatch({type: "show", tile: tile, features: tiles[tile.key] || []});
+    if (clip) tile.element.setAttribute("clip-path", clipHref);
+    else tile.element.removeAttribute("clip-path");
+    geoJson.dispatch({type: "show", tile: tile, features: tile.features});
+    return geoJson;
   };
 
   geoJson.reshow = function() {
     var locks = geoJson.cache.locks();
     for (var key in locks) geoJson.show(locks[key]);
+    return geoJson;
   };
 
   return geoJson;

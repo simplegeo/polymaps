@@ -5,7 +5,7 @@
     var kml = po.geoJson(fetch);
 
     function fetch(url, update) {
-      po.queue.xml(url, function(xml) {
+      return po.queue.xml(url, function(xml) {
         update(geoJson(xml));
       });
     }
@@ -55,7 +55,7 @@
         }
         if (f.geometry) features.push(f);
       }
-      return {features: features};
+      return {type: "FeatureCollection", features: features};
     }
 
     return kml;

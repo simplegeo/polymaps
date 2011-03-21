@@ -6,9 +6,47 @@ po.layer = function(load, unload) {
       zoom,
       id,
       map,
-      container,
+      container = po.svg("g"),
       transform,
-      levels;
+      levelZoom,
+      levels = {};
+
+  container.setAttribute("class", "layer");
+  for (var i = -4; i <= -1; i++) levels[i] = container.appendChild(po.svg("g"));
+  for (var i = 2; i >= 1; i--) levels[i] = container.appendChild(po.svg("g"));
+  levels[0] = container.appendChild(po.svg("g"));
+
+  function zoomIn(z) {
+    var end = levels[0].nextSibling;
+    for (; levelZoom < z; levelZoom++) {
+      // -4, -3, -2, -1, +2, +1, =0 // current order
+      // -3, -2, -1, +2, +1, =0, -4 // insertBefore(-4, end)
+      // -3, -2, -1, +1, =0, -4, +2 // insertBefore(+2, end)
+      // -3, -2, -1, =0, -4, +2, +1 // insertBefore(+1, end)
+      // -4, -3, -2, -1, +2, +1, =0 // relabel
+      container.insertBefore(levels[-4], end);
+      container.insertBefore(levels[2], end);
+      container.insertBefore(levels[1], end);
+      var t = levels[-4];
+      for (var dz = -4; dz < 2;) levels[dz] = levels[++dz];
+      levels[dz] = t;
+    }
+  }
+
+  function zoomOut(z) {
+    var end = levels[0].nextSibling;
+    for (; levelZoom > z; levelZoom--) {
+      // -4, -3, -2, -1, +2, +1, =0 // current order
+      // -4, -3, -2, +2, +1, =0, -1 // insertBefore(-1, end)
+      // +2, -4, -3, -2, +1, =0, -1 // insertBefore(+2, -4)
+      // -4, -3, -2, -1, +2, +1, =0 // relabel
+      container.insertBefore(levels[-1], end);
+      container.insertBefore(levels[2], levels[-4]);
+      var t = levels[2];
+      for (var dz = 2; dz > -4;) levels[dz] = levels[--dz];
+      levels[dz] = t;
+    }
+  }
 
   function move() {
     var map = layer.map(), // in case the layer is removed
@@ -19,19 +57,21 @@ po.layer = function(load, unload) {
         tileSize = map.tileSize(),
         tileCenter = map.locationCoordinate(map.center());
 
-    // set the layer visibility
-    visible
-        ? container.removeAttribute("visibility")
-        : container.setAttribute("visibility", "hidden");
-
     // set the layer zoom levels
-    for (var z = -4; z <= 2; z++) {
-      levels[z].setAttribute("class", "zoom" + (z < 0 ? "" : "+") + z + " zoom" + (mapZoom + z));
+    if (levelZoom != mapZoom) {
+      if (levelZoom < mapZoom) zoomIn(mapZoom);
+      else if (levelZoom > mapZoom) zoomOut(mapZoom);
+      else levelZoom = mapZoom;
+      for (var z = -4; z <= 2; z++) {
+        var l = levels[z];
+        l.setAttribute("class", "zoom" + (z < 0 ? "" : "+") + z + " zoom" + (mapZoom + z));
+        l.setAttribute("transform", "scale(" + Math.pow(2, -z) + ")");
+      }
     }
 
     // set the layer transform
     container.setAttribute("transform",
-        "translate(" + mapSize.x / 2 + "," + mapSize.y / 2 + ")"
+        "translate(" + (mapSize.x / 2) + "," + (mapSize.y / 2) + ")"
         + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
         + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : "")
         + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
@@ -43,20 +83,9 @@ po.layer = function(load, unload) {
         c3 = map.pointCoordinate(tileCenter, {x: 0, y: mapSize.y});
 
     // round to pixel boundary to avoid anti-aliasing artifacts
-    if (!transform && !mapAngle && !mapZoomFraction) {
+    if (!mapZoomFraction && !mapAngle && !transform) {
       tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
       tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
-    }
-
-    // layer-specific zoom transform
-    var tileLevel = zoom ? zoom(mapZoom) - mapZoom : 0;
-    if (tileLevel) {
-      var k = Math.pow(2, tileLevel);
-      c0.column *= k; c0.row *= k;
-      c1.column *= k; c1.row *= k;
-      c2.column *= k; c2.row *= k;
-      c3.column *= k; c3.row *= k;
-      c0.zoom = c1.zoom = c2.zoom = c3.zoom += tileLevel;
     }
 
     // layer-specific coordinate transform
@@ -68,10 +97,21 @@ po.layer = function(load, unload) {
       tileCenter = transform.unapply(tileCenter);
     }
 
+    // layer-specific zoom transform
+    var tileLevel = zoom ? zoom(c0.zoom) - c0.zoom : 0;
+    if (tileLevel) {
+      var k = Math.pow(2, tileLevel);
+      c0.column *= k; c0.row *= k;
+      c1.column *= k; c1.row *= k;
+      c2.column *= k; c2.row *= k;
+      c3.column *= k; c3.row *= k;
+      c0.zoom = c1.zoom = c2.zoom = c3.zoom += tileLevel;
+    }
+
     // tile-specific projection
     function projection(c) {
       var zoom = c.zoom,
-          max = 1 << zoom,
+          max = zoom < 0 ? 1 : 1 << zoom,
           column = c.column % max,
           row = c.row;
       if (column < 0) column += max;
@@ -97,7 +137,7 @@ po.layer = function(load, unload) {
 
     // load the tiles!
     if (visible && tileLevel > -5 && tileLevel < 3) {
-      var ymax = 1 << c0.zoom;
+      var ymax = c0.zoom < 0 ? 1 : 1 << c0.zoom;
       if (tile) {
         scanTriangle(c0, c1, c2, 0, ymax, scanLine);
         scanTriangle(c2, c3, c0, 0, ymax, scanLine);
@@ -169,10 +209,10 @@ po.layer = function(load, unload) {
     // position tiles
     for (var key in newLocks) {
       var t = newLocks[key],
-          k = Math.pow(2, t.level = t.zoom - tileCenter.zoom),
-          x = tileSize.x * (t.column - tileCenter.column * k),
-          y = tileSize.y * (t.row - tileCenter.row * k);
-      t.element.setAttribute("transform", "translate(" + x + "," + y + ")");
+          k = Math.pow(2, t.level = t.zoom - tileCenter.zoom);
+      t.element.setAttribute("transform", "translate("
+        + (t.x = tileSize.x * (t.column - tileCenter.column * k)) + ","
+        + (t.y = tileSize.y * (t.row - tileCenter.row * k)) + ")");
     }
 
     // remove tiles that are no longer visible
@@ -192,6 +232,12 @@ po.layer = function(load, unload) {
         if (layer.show) layer.show(t);
       }
     }
+
+    // flush the cache, clearing no-longer-needed tiles
+    cache.flush();
+
+    // dispatch the move event
+    layer.dispatch({type: "move"});
   }
 
   // remove proxy tiles when tiles load
@@ -216,23 +262,10 @@ po.layer = function(load, unload) {
       }
       map.off("move", move).off("resize", move);
       container.parentNode.removeChild(container);
-      container = levels = null;
     }
     map = x;
     if (map) {
-      container = map.container().appendChild(po.svg("g"));
-      if (id) container.setAttribute("id", id);
-      container.setAttribute("class", "layer");
-      levels = {};
-      for (var i = -4; i <= -1; i++) {
-        (levels[i] = container.appendChild(po.svg("g")))
-            .setAttribute("transform", "scale(" + Math.pow(2, -i) + ")");
-      }
-      for (var i = 2; i >= 1; i--) {
-        (levels[i] = container.appendChild(po.svg("g")))
-            .setAttribute("transform", "scale(" + Math.pow(2, -i) + ")");
-      }
-      levels[0] = container.appendChild(po.svg("g"));
+      map.container().appendChild(container);
       if (layer.init) layer.init(container);
       map.on("move", move).on("resize", move);
       move();
@@ -244,15 +277,21 @@ po.layer = function(load, unload) {
     return container;
   };
 
+  layer.levels = function() {
+    return levels;
+  };
+
   layer.id = function(x) {
     if (!arguments.length) return id;
     id = x;
+    container.setAttribute("id", x);
     return layer;
   };
 
   layer.visible = function(x) {
     if (!arguments.length) return visible;
-    visible = x;
+    if (visible = x) container.removeAttribute("visibility")
+    else container.setAttribute("visibility", "hidden");
     if (map) move();
     return layer;
   };
@@ -267,12 +306,20 @@ po.layer = function(load, unload) {
   layer.zoom = function(x) {
     if (!arguments.length) return zoom;
     zoom = typeof x == "function" || x == null ? x : function() { return x; };
+    if (map) move();
     return layer;
   };
 
   layer.tile = function(x) {
     if (!arguments.length) return tile;
     tile = x;
+    if (map) move();
+    return layer;
+  };
+
+  layer.reload = function() {
+    cache.clear();
+    if (map) move();
     return layer;
   };
 
@@ -301,7 +348,11 @@ function scanSpans(e0, e1, ymin, ymax, scanLine) {
       y1 = Math.min(ymax, Math.ceil(e1.y1));
 
   // sort edges by x-coordinate
-  if (e0.x0 < e1.x0 || e0.x1 < e1.x1) { var t = e0; e0 = e1; e1 = t; }
+  if ((e0.x0 == e1.x0 && e0.y0 == e1.y0)
+      ? (e0.x0 + e1.dy / e0.dy * e0.dx < e1.x1)
+      : (e0.x1 - e1.dy / e0.dy * e0.dx < e1.x0)) {
+    var t = e0; e0 = e1; e1 = t;
+  }
 
   // scan lines!
   var m0 = e0.dx / e0.dy,
