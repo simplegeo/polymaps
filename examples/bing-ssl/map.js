@@ -30,7 +30,7 @@ function callback(data) {
     for (var j = 0; j < resources.length; j++) {
       var resource = resources[j];
       map.add(po.image()
-          .url(template(resource.imageUrl, resource.imageUrlSubdomains)))
+          .url(template(resource.imageUrl.replace(/^http:/, "https:"), resource.imageUrlSubdomains)))
           .tileSize({x: resource.imageWidth, y: resource.imageHeight});
     }
   }
