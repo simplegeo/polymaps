@@ -17,6 +17,7 @@ JS_FILES = \
 	src/Wheel.js \
 	src/Arrow.js \
 	src/Hash.js \
+	src/Touch.js \
 	src/Interact.js \
 	src/Compass.js \
 	src/Grid.js \
