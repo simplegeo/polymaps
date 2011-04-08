@@ -1844,6 +1844,8 @@ po.touch = function() {
   var touch = {},
       map,
       container,
+      rotate = false,
+      last = 0,
       locations = {}; // touch identifier -> location
 
   window.addEventListener("touchmove", touchmove, false);
@@ -1851,7 +1853,17 @@ po.touch = function() {
   function touchstart(e) {
     var i = -1,
         n = e.touches.length,
-        t;
+        t = Date.now();
+
+    // doubletap detection
+    if ((n == 1) && (t - last < 300)) {
+      var z = map.zoom();
+      map.zoomBy(1 - z + Math.floor(z), map.mouse(e.touches[0]));
+      e.preventDefault();
+    }
+    last = t;
+
+    // store original touch locations
     while (++i < n) {
       t = e.touches[i];
       locations[t.identifier] = map.pointLocation(map.mouse(t));
@@ -1860,13 +1872,13 @@ po.touch = function() {
 
   function touchmove(e) {
     switch (e.touches.length) {
-      case 1: {
+      case 1: { // single-touch pan
         var t0 = e.touches[0];
         map.zoomBy(0, map.mouse(t0), locations[t0.identifier]);
         e.preventDefault();
         break;
       }
-      case 2: { // TODO rotation!
+      case 2: { // double-touch pan + zoom + rotate
         var t0 = e.touches[0],
             t1 = e.touches[1],
             p0 = map.mouse(t0),
@@ -1884,11 +1896,18 @@ po.touch = function() {
             dc = Math.sqrt(cx * cx + cy * cy),
             z2 = Math.log(dp / dc) / Math.log(2); // zoom level
         map.zoomBy(z2 - map.zoom(), p2, l2);
+        if (rotate) map.angle(Math.atan2(cx, cy) - Math.atan2(px, py));
         e.preventDefault();
         break;
       }
     }
   }
+
+  touch.rotate = function(x) {
+    if (!arguments.length) return rotate;
+    rotate = x;
+    return touch;
+  };
 
   touch.map = function(x) {
     if (!arguments.length) return map;
