@@ -40,7 +40,7 @@ po.transform = function(a, b, c, d, e, f) {
   transform.zoomFraction = function(x) {
     if (!arguments.length) return zoomFraction;
     zoomFraction = x;
-    zoomDelta = Math.floor(zoomFraction + Math.log(Math.sqrt(a * a + b * b + c * c + d * d)) / Math.log(2));
+    zoomDelta = Math.floor(zoomFraction + Math.log(Math.sqrt(a * a + b * b + c * c + d * d)) / Math.LN2);
     k = Math.pow(2, -zoomDelta);
     return transform;
   };
@@ -625,7 +625,7 @@ po.map = function() {
         l = map.pointLocation({x: (bl.x + tr.x) / 2, y: (bl.y + tr.y) / 2});
 
     // update the zoom level
-    zoom = zoom + zoomFraction - Math.log(k) / Math.log(2);
+    zoom = zoom + zoomFraction - Math.log(k) / Math.LN2;
     rezoom();
 
     // set the new center
@@ -1846,6 +1846,8 @@ po.touch = function() {
       container,
       rotate = false,
       last = 0,
+      zoom,
+      angle,
       locations = {}; // touch identifier -> location
 
   window.addEventListener("touchmove", touchmove, false);
@@ -1863,7 +1865,9 @@ po.touch = function() {
     }
     last = t;
 
-    // store original touch locations
+    // store original zoom & touch locations
+    zoom = map.zoom();
+    angle = map.angle();
     while (++i < n) {
       t = e.touches[i];
       locations[t.identifier] = map.pointLocation(map.mouse(t));
@@ -1887,16 +1891,9 @@ po.touch = function() {
             c0 = po.map.locationCoordinate(locations[t0.identifier]),
             c1 = po.map.locationCoordinate(locations[t1.identifier]),
             c2 = {row: (c0.row + c1.row) / 2, column: (c0.column + c1.column) / 2, zoom: 0},
-            l2 = po.map.coordinateLocation(c2), // center location
-            px = p0.x - p1.x,
-            py = p0.y - p1.y,
-            dp = Math.sqrt(px * px + py * py) / 256,
-            cx = c0.column - c1.column,
-            cy = c0.row - c1.row,
-            dc = Math.sqrt(cx * cx + cy * cy),
-            z2 = Math.log(dp / dc) / Math.log(2); // zoom level
-        map.zoomBy(z2 - map.zoom(), p2, l2);
-        if (rotate) map.angle(Math.atan2(cx, cy) - Math.atan2(px, py));
+            l2 = po.map.coordinateLocation(c2); // center location
+        map.zoomBy(Math.log(e.scale) / Math.LN2 + zoom - map.zoom(), p2, l2);
+        if (rotate) map.angle(e.rotation / 180 * Math.PI + angle);
         e.preventDefault();
         break;
       }
