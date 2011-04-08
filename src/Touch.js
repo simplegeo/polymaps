@@ -5,7 +5,6 @@ po.touch = function() {
       locations = {}; // touch identifier -> location
 
   window.addEventListener("touchmove", touchmove, false);
-  window.addEventListener("touchend", touchend, false);
 
   function touchstart(e) {
     var i = -1,
@@ -15,7 +14,6 @@ po.touch = function() {
       t = e.touches[i];
       locations[t.identifier] = map.pointLocation(map.mouse(t));
     }
-    e.preventDefault();
   }
 
   function touchmove(e) {
@@ -23,6 +21,7 @@ po.touch = function() {
       case 1: {
         var t0 = e.touches[0];
         map.zoomBy(0, map.mouse(t0), locations[t0.identifier]);
+        e.preventDefault();
         break;
       }
       case 2: { // TODO rotation!
@@ -43,14 +42,10 @@ po.touch = function() {
             dc = Math.sqrt(cx * cx + cy * cy),
             z2 = Math.log(dp / dc) / Math.log(2); // zoom level
         map.zoomBy(z2 - map.zoom(), p2, l2);
+        e.preventDefault();
         break;
       }
     }
-    e.preventDefault();
-  }
-
-  function touchend(e) {
-    e.preventDefault();
   }
 
   touch.map = function(x) {
