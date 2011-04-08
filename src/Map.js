@@ -311,6 +311,7 @@ resizer.remove = function(map) {
 
 // Note: assumes single window (no frames, iframes, etc.)!
 window.addEventListener("resize", resizer, false);
+window.addEventListener("load", resizer, false);
 
 // See http://wiki.openstreetmap.org/wiki/Mercator
 
