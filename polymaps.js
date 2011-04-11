@@ -293,7 +293,7 @@ po.queue = (function() {
 
     function send() {
       req = new XMLHttpRequest();
-      if (mimeType) {
+      if (mimeType && req.overrideMimeType) {
         req.overrideMimeType(mimeType);
       }
       req.open("GET", url, true);
