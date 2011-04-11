@@ -29,8 +29,7 @@ FILES = \
 	unemployment.min.js \
 	world.min.js
 
-all: $(FILES)
-.PHONY: $(FILES:.min.js=.js)
+.PHONY all: $(FILES) $(FILES:.min.js=.js)
 .INTERMEDIATE: compiler.jar
 
 %.min.js: %.js compiler.jar
