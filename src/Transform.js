@@ -12,7 +12,7 @@ po.transform = function(a, b, c, d, e, f) {
   transform.zoomFraction = function(x) {
     if (!arguments.length) return zoomFraction;
     zoomFraction = x;
-    zoomDelta = Math.floor(zoomFraction + Math.log(Math.sqrt(a * a + b * b + c * c + d * d)) / Math.log(2));
+    zoomDelta = Math.floor(zoomFraction + Math.log(Math.sqrt(a * a + b * b + c * c + d * d)) / Math.LN2);
     k = Math.pow(2, -zoomDelta);
     return transform;
   };

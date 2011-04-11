@@ -251,7 +251,7 @@ po.map = function() {
         l = map.pointLocation({x: (bl.x + tr.x) / 2, y: (bl.y + tr.y) / 2});
 
     // update the zoom level
-    zoom = zoom + zoomFraction - Math.log(k) / Math.log(2);
+    zoom = zoom + zoomFraction - Math.log(k) / Math.LN2;
     rezoom();
 
     // set the new center
@@ -311,6 +311,7 @@ resizer.remove = function(map) {
 
 // Note: assumes single window (no frames, iframes, etc.)!
 window.addEventListener("resize", resizer, false);
+window.addEventListener("load", resizer, false);
 
 // See http://wiki.openstreetmap.org/wiki/Mercator
 
