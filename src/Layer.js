@@ -69,24 +69,29 @@ po.layer = function(load, unload) {
       }
     }
 
-    // set the layer transform
-    container.setAttribute("transform",
-        "translate(" + (mapSize.x / 2) + "," + (mapSize.y / 2) + ")"
-        + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
-        + (mapZoomFraction ? "scale(" + Math.pow(2, mapZoomFraction) + ")" : "")
-        + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
-
     // get the coordinates of the four corners
     var c0 = map.pointCoordinate(tileCenter, zero),
         c1 = map.pointCoordinate(tileCenter, {x: mapSize.x, y: 0}),
         c2 = map.pointCoordinate(tileCenter, mapSize),
         c3 = map.pointCoordinate(tileCenter, {x: 0, y: mapSize.y});
 
-    // round to pixel boundary to avoid anti-aliasing artifacts
-    if (!mapZoomFraction && !mapAngle && !transform) {
-      tileCenter.column = (Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x;
-      tileCenter.row = (Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y;
-    }
+    var col = tileCenter.column, row = tileCenter.row;
+    tileCenter.column = Math.round((Math.round(tileSize.x * tileCenter.column) + (mapSize.x & 1) / 2) / tileSize.x);
+    tileCenter.row = Math.round((Math.round(tileSize.y * tileCenter.row) + (mapSize.y & 1) / 2) / tileSize.y);
+    col -= tileCenter.column;
+    row -= tileCenter.row;
+
+    // set the layer transform
+    var roundedZoomFraction = roundZoom(Math.pow(2, mapZoomFraction));
+    container.setAttribute("transform",
+        "translate("
+          + Math.round(mapSize.x / 2 - col * tileSize.x * roundedZoomFraction)
+          + ","
+          + Math.round(mapSize.y / 2 - row * tileSize.y * roundedZoomFraction)
+        + ")"
+        + (mapAngle ? "rotate(" + mapAngle / Math.PI * 180 + ")" : "")
+        + (mapZoomFraction ? "scale(" + roundedZoomFraction + ")" : "")
+        + (transform ? transform.zoomFraction(mapZoomFraction) : ""));
 
     // layer-specific coordinate transform
     if (transform) {
@@ -206,13 +211,17 @@ po.layer = function(load, unload) {
       }
     }
 
+    function roundZoom(z) {
+      return Math.round(z * 256) / 256;
+    }
+
     // position tiles
     for (var key in newLocks) {
       var t = newLocks[key],
-          k = Math.pow(2, t.level = t.zoom - tileCenter.zoom);
+          k = roundZoom(Math.pow(2, t.level = t.zoom - tileCenter.zoom));
       t.element.setAttribute("transform", "translate("
-        + (t.x = tileSize.x * (t.column - tileCenter.column * k)) + ","
-        + (t.y = tileSize.y * (t.row - tileCenter.row * k)) + ")");
+        + Math.round(t.x = tileSize.x * (t.column - tileCenter.column * k)) + ","
+        + Math.round(t.y = tileSize.y * (t.row - tileCenter.row * k)) + ")");
     }
 
     // remove tiles that are no longer visible
