@@ -23,52 +23,71 @@ po.wheel = function() {
   outer.style.width = "0px";
   outer.style.overflowY = "scroll";
   inner.style.height = "2000px";
+  inner.style.width = "2000px";
   outer.appendChild(inner);
   document.body.appendChild(outer);
 
   function mousewheel(e) {
-    var delta = e.wheelDelta || -e.detail,
+    var deltaY = e.wheelDelta || -e.detail,
+        deltaX = 0,
         point;
 
     /* Detect the pixels that would be scrolled by this wheel event. */
-    if (delta) {
+    if (deltaY) {
       if (smooth) {
+        if (e.axis && e.axis === e.HORIZONTAL_AXIS) {
+          deltaX = deltaY;
+          deltaY = 0;
+        }
         try {
           outer.scrollTop = 1000;
+          outer.scrollLeft = 1000;
           outer.dispatchEvent(e);
-          delta = 1000 - outer.scrollTop;
+          deltaY = 1000 - outer.scrollTop;
+          deltaX = 1000 - outer.scrollLeft;
         } catch (error) {
           // Derp! Hope for the best?
         }
-        delta *= .005;
+
+        if (zoom !== 'pan') {
+          deltaY = Math.sqrt(deltaY*deltaY+deltaX*deltaX) // length of scroll
+                  * ((deltaY > deltaX && deltaY > 0) || (deltaY < deltaX && deltaX > 0) ? 1 : -1) // direction of scroll
+                  * .005 // arbitrary scale factor
+                  ;
+        }
       }
 
       /* If smooth zooming is disabled, batch events into unit steps. */
       else {
         var timeNow = Date.now();
         if (timeNow - timePrev > 200) {
-          delta = delta > 0 ? +1 : -1;
+          deltaY = deltaY > 0 ? +1 : -1;
           timePrev = timeNow;
         } else {
-          delta = 0;
+          deltaY = 0;
         }
       }
     }
 
-    if (delta) {
+
+    if (deltaY || deltaX) {
       switch (zoom) {
+        case "pan": {
+          map.panBy({x: deltaX, y: deltaY});
+          break;
+        }
         case "mouse": {
           point = map.mouse(e);
           if (!location) location = map.pointLocation(point);
-          map.off("move", move).zoomBy(delta, point, location).on("move", move);
+          map.off("move", move).zoomBy(deltaY, point, location).on("move", move);
           break;
         }
         case "location": {
-          map.zoomBy(delta, map.locationPoint(location), location);
+          map.zoomBy(deltaY, map.locationPoint(location), location);
           break;
         }
         default: { // center
-          map.zoomBy(delta);
+          map.zoomBy(deltaY);
           break;
         }
       }
