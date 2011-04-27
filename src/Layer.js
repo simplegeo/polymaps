@@ -101,11 +101,11 @@ po.layer = function(load, unload) {
         c1 = map.pointCoordinate(tileCenter, {x: mapSize.x, y: 0}),
         c2 = map.pointCoordinate(tileCenter, mapSize),
         c3 = map.pointCoordinate(tileCenter, {x: 0, y: mapSize.y});
-    
+
     function positionTiles(locks) {
       // position tiles
-      for (var key in newLocks) {
-        var t = newLocks[key],
+      for (var key in locks) {
+        var t = locks[key],
             k = Math.pow(2, t.level = t.zoom - tileCenter.zoom);
         t.element.setAttribute("transform", "translate("
           + (t.x = tileSize.x * (t.column - tileCenter.column * k)) + ","
