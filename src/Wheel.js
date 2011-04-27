@@ -34,26 +34,27 @@ po.wheel = function() {
 
     /* Detect the pixels that would be scrolled by this wheel event. */
     if (deltaY) {
+      /* smooth zooming must be enabled for 'pan' mode */
       if (smooth) {
-        if (e.axis && e.axis === e.HORIZONTAL_AXIS) {
+        /* 1 means horizontal movement, 2 means vertical */
+        if (e.axis === 1) {
           deltaX = deltaY;
           deltaY = 0;
         }
-        try {
-          outer.scrollTop = 1000;
-          outer.scrollLeft = 1000;
-          outer.dispatchEvent(e);
-          deltaY = 1000 - outer.scrollTop;
-          deltaX = 1000 - outer.scrollLeft;
-        } catch (error) {
-          // Derp! Hope for the best?
+        else {
+          try {
+            outer.scrollTop = 1000;
+            outer.scrollLeft = 1000;
+            outer.dispatchEvent(e);
+            deltaY = 1000 - outer.scrollTop;
+            deltaX = 1000 - outer.scrollLeft;
+          } catch (error) {
+            // Derp! Hope for the best?
+          }
         }
 
         if (zoom !== 'pan') {
-          deltaY = Math.sqrt(deltaY*deltaY+deltaX*deltaX) // length of scroll
-                  * ((deltaY > deltaX && deltaY > 0) || (deltaY < deltaX && deltaX > 0) ? 1 : -1) // direction of scroll
-                  * .005 // arbitrary scale factor
-                  ;
+          deltaY *= .005;
         }
       }
 
@@ -68,7 +69,6 @@ po.wheel = function() {
         }
       }
     }
-
 
     if (deltaY || deltaX) {
       switch (zoom) {
