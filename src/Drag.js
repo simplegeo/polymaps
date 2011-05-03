@@ -12,8 +12,6 @@ po.drag = function() {
         HISTORY_TIME: 200,
         // subtracted from velocity every animation interval, "acceleration"
         ACC: .1,
-        // factor to increase ACC by every animation interval, "acceleration of acceleration"
-        ACC_ACC: .09,
         // how often to animate.  we basically do it as often as possible
         ANIMATION_PERIOD: 10,
         // percentage to dampen initial acceleration by
@@ -149,15 +147,6 @@ po.drag = function() {
       /* update velocity */
       inertia.velocity.x -= inertia.acceleration.x;
       inertia.velocity.y -= inertia.acceleration.y;
-
-      /* update acceleration
-         this makes it so the map comes to a more abrupt
-         stop as opposed to taking forever and sort of petering out.
-         this: http://chart.apis.google.com/chart?chxr=0,0,2.7368715083798887&chxt=y&chs=300x225&cht=lxy&chco=3D7930&chds=0,234,0,2.7368715083798887&chd=t:12,25,38,50,65,82,98,115,131,149,166,181,198,209,224|2.6368715083798886,2.5368858689744913,2.427901522022608,2.3091085838450556,2.1796242812315234,2.038486391382773,1.8846460914476353,1.716960164518335,1.5341825041653978,1.3349548543806962,1.1177967161153715,0.8810943454061674,0.623088761333135,0.3418626746935296,0.03532624025635972&chg=14.3,-1,1,1&chls=2,4,0&chm=B,C5D4B5BB,0,0,0
-         verses: http://chart.apis.google.com/chart?chxr=0,0,2.542748091603054&chxt=y&chs=300x225&cht=lxy&chco=3D7930&chds=0,356,0,2.542748091603054&chd=t:11,24,36,49,63,75,91,104,117,131,143,155,168,179,195,210,222,237,252,267,282,293,309,328,346|2.442748091603054,2.343520303931687,2.2442925162603204,2.1450647285889537,2.045836940917587,1.9466091532462202,1.8473813655748534,1.7481535779034867,1.64892579023212,1.5496980025607532,1.4504702148893864,1.3512424272180197,1.252014639546653,1.1527868518752862,1.0535590642039194,0.9543312765325527,0.8551034888611859,0.7558757011898192,0.6566479135184524,0.5574201258470857,0.4581923381757189,0.35896455050435216,0.2597367628329854,0.16050897516161866,0.061281187490251895&chg=14.3,-1,1,1&chls=2,4,0&chm=B,C5D4B5BB,0,0,0
-         */
-      inertia.acceleration.x *= 1+inertia.ACC_ACC;
-      inertia.acceleration.y *= 1+inertia.ACC_ACC;
     }
   }
 
