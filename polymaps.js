@@ -559,6 +559,7 @@ po.map = function() {
   };
 
   map.panBy = function(x) {
+    if (x.x == 0 && x.y == 0) return;
     var k = 45 / Math.pow(2, zoom + zoomFraction - 3),
         dx = x.x * k,
         dy = x.y * k;
