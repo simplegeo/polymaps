@@ -99,5 +99,5 @@ po.queue = (function() {
     return {abort: abort};
   }
 
-  return {text: text, xml: xml, json: json, image: image};
+  return {text: text, xml: xml, json: json, image: image, count: function(){ return queued.length; }, active: function(){ return active; }};
 })();
