@@ -2378,7 +2378,7 @@ po.stylist = function() {
       }
       if (v = title) {
         if (typeof v === "function") v = v.call(null, d);
-        if (o.lastChild && o.lastChild.nodeName != 'path') {
+        if (o.lastChild && o.lastChild.nodeName != 'path' && o.lastChild.nodeName != 'circle') {
             while (o.lastChild) {
                 o.removeChild(o.lastChild);
             }
