@@ -35,8 +35,20 @@ po.stylist = function() {
       }
       if (v = title) {
         if (typeof v === "function") v = v.call(null, d);
-        while (o.lastChild) o.removeChild(o.lastChild);
-        if (v != null) o.appendChild(po.svg("title")).appendChild(document.createTextNode(v));
+        if (o.lastChild && o.lastChild.nodeName != 'path') {
+            while (o.lastChild) {
+                o.removeChild(o.lastChild);
+            }
+        }
+        if (v != null) {
+            if (o.children.length) {
+               for (var i=0; i < o.children.length; i++) {
+                o.children[i].appendChild(po.svg("title")).appendChild(document.createTextNode(v));
+               }
+            } else {
+                o.appendChild(po.svg("title")).appendChild(document.createTextNode(v));
+            }
+        }
       }
     }
   }
