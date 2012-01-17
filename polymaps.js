@@ -1151,7 +1151,7 @@ po.geoJson = function(fetch) {
       url,
       clip = true,
       clipId = "org.polymaps." + po.id(),
-      clipHref = "url(#" + clipId + ")",
+      clipHref = "url("+document.location.href.replace(/\#.+/, '')+"#" + clipId + ")",
       clipPath = container.insertBefore(po.svg("clipPath"), container.firstChild),
       clipRect = clipPath.appendChild(po.svg("rect")),
       scale = "auto",
