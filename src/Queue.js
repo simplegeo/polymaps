@@ -27,7 +27,7 @@ po.queue = (function() {
       }
       req.open("GET", url, true);
 
-      for(var key in headers) if(header.hasOwnProperty(key)) {
+      for(var key in headers) if(headers.hasOwnProperty(key)) {
         if(headers[key])
           req.setRequestHeader(key, headers[key])
       }
