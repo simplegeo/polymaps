@@ -1,5 +1,5 @@
 po.queue = (function() {
-  var queued = [], active = 0, size = 6;
+  var queued = [], active = 0, size = 6, headers = {};
 
   function process() {
     if ((active >= size) || !queued.length) return;
@@ -26,6 +26,12 @@ po.queue = (function() {
         req.overrideMimeType(mimeType);
       }
       req.open("GET", url, true);
+
+      for(var key in headers) if(headers.hasOwnProperty(key)) {
+        if(headers[key])
+          req.setRequestHeader(key, headers[key])
+      }
+
       req.onreadystatechange = function(e) {
         if (req.readyState == 4) {
           active--;
@@ -99,5 +105,9 @@ po.queue = (function() {
     return {abort: abort};
   }
 
-  return {text: text, xml: xml, json: json, image: image};
+  function header(header, value) {
+    headers[header] = value
+  }
+
+  return {text: text, xml: xml, json: json, image: image, header:header};
 })();
