@@ -1,4 +1,4 @@
-if (!org) var org = {};
+if (!window.org) window.org = {};
 if (!org.polymaps) org.polymaps = {};
 (function(po){
 
