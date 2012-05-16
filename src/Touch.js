@@ -8,7 +8,6 @@ po.touch = function() {
       angle,
       locations = {}; // touch identifier -> location
 
-  window.addEventListener("touchmove", touchmove, false);
 
   function touchstart(e) {
     var i = -1,
@@ -68,11 +67,13 @@ po.touch = function() {
     if (!arguments.length) return map;
     if (map) {
       container.removeEventListener("touchstart", touchstart, false);
+      window.removeEventListener("touchmove", touchmove, false);
       container = null;
     }
     if (map = x) {
       container = map.container();
       container.addEventListener("touchstart", touchstart, false);
+      window.addEventListener("touchmove", touchmove, false);
     }
     return touch;
   };
