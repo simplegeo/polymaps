@@ -4,6 +4,7 @@ po.layer = function(load, unload) {
       tile = true,
       visible = true,
       zoom,
+      tilesLocked,
       id,
       map,
       container = po.svg("g"),
@@ -48,6 +49,25 @@ po.layer = function(load, unload) {
     }
   }
 
+  // tile-specific projection
+  function projection(c) {
+    var zoom = c.zoom,
+        max = zoom < 0 ? 1 : 1 << zoom,
+        column = c.column % max,
+        row = c.row;
+    if (column < 0) column += max;
+    return {
+      locationPoint: function(l) {
+        var c = po.map.locationCoordinate(l),
+            k = Math.pow(2, zoom - c.zoom);
+        return {
+          x: tileSize.x * (k * c.column - column),
+          y: tileSize.y * (k * c.row - row)
+        };
+      }
+    };
+  }
+
   function move() {
     var map = layer.map(), // in case the layer is removed
         mapZoom = map.zoom(),
@@ -81,6 +101,27 @@ po.layer = function(load, unload) {
         c1 = map.pointCoordinate(tileCenter, {x: mapSize.x, y: 0}),
         c2 = map.pointCoordinate(tileCenter, mapSize),
         c3 = map.pointCoordinate(tileCenter, {x: 0, y: mapSize.y});
+    
+    function positionTiles(locks) {
+      // position tiles
+      for (var key in newLocks) {
+        var t = newLocks[key],
+            k = Math.pow(2, t.level = t.zoom - tileCenter.zoom);
+        t.element.setAttribute("transform", "translate("
+          + (t.x = tileSize.x * (t.column - tileCenter.column * k)) + ","
+          + (t.y = tileSize.y * (t.row - tileCenter.row * k)) + ")");
+      }
+
+    }
+
+    // record which tiles are visible
+    var oldLocks = cache.locks(), newLocks = {};
+
+    if (tilesLocked) {
+      positionTiles(oldLocks);
+      layer.dispatch({type: "move"});
+      return;
+    }
 
     // round to pixel boundary to avoid anti-aliasing artifacts
     if (!mapZoomFraction && !mapAngle && !transform) {
@@ -107,28 +148,6 @@ po.layer = function(load, unload) {
       c3.column *= k; c3.row *= k;
       c0.zoom = c1.zoom = c2.zoom = c3.zoom += tileLevel;
     }
-
-    // tile-specific projection
-    function projection(c) {
-      var zoom = c.zoom,
-          max = zoom < 0 ? 1 : 1 << zoom,
-          column = c.column % max,
-          row = c.row;
-      if (column < 0) column += max;
-      return {
-        locationPoint: function(l) {
-          var c = po.map.locationCoordinate(l),
-              k = Math.pow(2, zoom - c.zoom);
-          return {
-            x: tileSize.x * (k * c.column - column),
-            y: tileSize.y * (k * c.row - row)
-          };
-        }
-      };
-    }
-
-    // record which tiles are visible
-    var oldLocks = cache.locks(), newLocks = {};
 
     // reset the proxy counts
     for (var key in oldLocks) {
@@ -206,14 +225,7 @@ po.layer = function(load, unload) {
       }
     }
 
-    // position tiles
-    for (var key in newLocks) {
-      var t = newLocks[key],
-          k = Math.pow(2, t.level = t.zoom - tileCenter.zoom);
-      t.element.setAttribute("transform", "translate("
-        + (t.x = tileSize.x * (t.column - tileCenter.column * k)) + ","
-        + (t.y = tileSize.y * (t.row - tileCenter.row * k)) + ")");
-    }
+    positionTiles(newLocks);
 
     // remove tiles that are no longer visible
     for (var key in oldLocks) {
@@ -306,6 +318,13 @@ po.layer = function(load, unload) {
   layer.zoom = function(x) {
     if (!arguments.length) return zoom;
     zoom = typeof x == "function" || x == null ? x : function() { return x; };
+    if (map) move();
+    return layer;
+  };
+
+  layer.lockTiles = function(x) {
+    if (!arguments.length) return tilesLocked;
+    tilesLocked = x;
     if (map) move();
     return layer;
   };
