@@ -6,7 +6,7 @@
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <title>Polymaps - Documentation - hash</title>
     <script type="text/javascript" src="../modernizr.min.js?1.5"></script>
-    <script type="text/javascript" src="../polymaps.min.js?2.5.0"></script>
+    <script type="text/javascript" src="../polymaps.min.js?2.5.1"></script>
     <script type="text/javascript" src="../nns.min.js?1.1.0"></script>
     <style type="text/css">
 
@@ -127,17 +127,17 @@
             <i>hash</i>.<b>parser</b>([<i>x</i>])
           </dt>
           <dd>
-            <p>In combination with <a href="#formatter">formatter</a>, 
+            <p>In combination with <a href="#formatter">formatter</a>,
               parser allows you to override the behavior of the polymaps
               permalink to include extra parameters. The supplied function
-              <i>x</i> must accept two arguments: a map and a string 
+              <i>x</i> must accept two arguments: a map and a string
               representing the url fragment after the <tt>#</tt>. It should
-              return <tt>true</tt> if the hash is invalid, otherwise it 
-              should apply the hash to the supplied map directly.</p> 
+              return <tt>true</tt> if the hash is invalid, otherwise it
+              should apply the hash to the supplied map directly.</p>
 
             <p>If the argument <i>x</i> is specified, this method returns
               <tt>this</tt>. If <i>x</i> is a function it will be used to apply
-              url fragment changes to the map. If no arguments are specified, 
+              url fragment changes to the map. If no arguments are specified,
               this method returns the current parser.</p>
           </dd>
         </dl>
@@ -147,15 +147,15 @@
             <i>hash</i>.<b>formatter</b>([<i>x</i>])
           </dt>
           <dd>
-            <p>In combination with <a href="#parser">parser</a>, 
+            <p>In combination with <a href="#parser">parser</a>,
               formatter allows you to override the behavior of the polymaps
               permalink to include extra parameters. The supplied function
-              <i>x</i> must accept a map as its only argument and return a 
-              string representing the map state preceded with a <tt>#</tt>. 
+              <i>x</i> must accept a map as its only argument and return a
+              string representing the map state preceded with a <tt>#</tt>.
               The format must be understood by the current parser.</p>
 
             <p>If the argument <i>x</i> is specified, this method returns
-              <tt>this</tt>. If <i>x</i> is a function it will be used to 
+              <tt>this</tt>. If <i>x</i> is a function it will be used to
               generate url fragment changes. If no arguments are specified,
               this method returns the current formatter.</p>
           </dd>
