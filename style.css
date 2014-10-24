@@ -134,6 +134,11 @@ div#map {
   height: 500px;
 }
 
+svg.map {
+  width: 100%;
+  height: 100%;
+}
+
 #copy {
   color: #999;
   font-size: 12px;
